@@ -1,107 +1,26 @@
-# Shaders in Processing
-
-Continuing work from this Google Doc:
-
-https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0
-
-## Proposed Structure
-
-Goal: ***what do shaders unlock***?
-
-- Shader basics for true beginners (get the general idea using pixel shaders only)  
-  - Let’s do more advanced & performant graphics with PShader  
-  - Example 1: solid color  
-    - Note: can’t open a .frag or .glsl file in the IDE  
-    - Explain color values & introduce vec4 (and other data types?)  
-    - Float vs int?  
-  - Example 2: UV map colors,   
-    - Explain: coordinate system & how each pixels draws itself  
-    - (0,0) is bottom-left  
-  - Example 3: Post processing an existing image \- brightness? Chroma-style manipulation to show pixel-based operations? )  
-    - Explain: Texture is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) \- Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
-    - We’re “talking to a pixel” \- all of them at the same time. 
-    - 👉 **We Are Here*- 👉 Ideas: Post fx \- brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
-- How shaders work in Processing (PShader basics and built-in uniforms)  
-  - Example:   
-    - Time uniform to allow for movement or something else more explanatory  
-    - interactive mouseX into a uniform, with one color on each side  
-    - Texture2d for grabbing existing pixels and doing something with them  
-  - Explain: uniforms  
-    - Shader can’t change at all on its own without at least one uniform (usually for *time*)  
-    - Communication between CPU & GPU programs (aka Processing and Shader)  
-    - Allows for interactivity   
-  - Note: filter() vs shader() behavior  
-- “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
-  - 🔁 Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
-  - Example Aspect ratio correction & coordinate system?   
-    - Example: draw a circle  
-       - Link to SDF info  
-       - Compare to drawing in Processing: ellipse()  
-    - Neighbor pixels / kernel / gaussian (for blur, etc) 
-       - Pixels don’t know anything about the rest of the image, besides where it is  
-    - Check/convert notes in haxademic shaders README to explain the built-in uniforms and how to use them. Also, Alex’s default fragment/vertex shader  
-       - UV coordinate concepts within variable sized canvases  
-       - “Domain warping”  
-          - Use fract() to create zoomed/tiled output (coordinate space manipulation / “domain warping”. Compare to texture/vertex in processing  
-  - Generative drawing in a powerful/different way, a la Shadertoy  
-- Vertex shaders  
-  - What we could explain:   
-    - Colors/texturing  
-    - Displacement (vertex manipulation, color)  
-    - Different types of shaders: \#COLOR, \#TEXTURE, \#TEXLIGHT, \#LINE, \#POINT  
-  - Explain: Understand that we have been applying texture to two triangles all along  
-    - Show classic rendering stages diagram?  
-  - Make patterns and/or colors across a 3D shape  
-    - This can show how shader() changes the global context and fragment shader is contained to the shape  
-  - Color-per-vertex \- without a shader you can set colors per vertex with fill() \-\> vertex()  
-    - Interpolation between vertices of colors, attribute values, texture coords  
-  - 3d geometry & shading, which is the original use case of shaders  
-    - How does the vertex position relate to screen space UV coords?  
-  - Move in to 3D and adjust positions vertex on a plane  
-    - Normals  
-    - Uv coords  
-  - Explain: varying values \- passed from vertex shader to fragment shader  
-    - Terrain example between CPU \-\> GPU  
-  - Explain: attributes  
-- Advanced tutorial (Based on Andres’ Android tutorial)  
-  - Gradient on a circle \- run a shader on a PGraphics and apply as a texture to a circle  
-  - Point to default shaders in the Processing source code to let folks know this stuff exists?  
-  - Landscape built in example shows how to use shadertoy code?
-
-Each as an individual tutorial? One big tutorial? Seems like One Big Tutorial is the way it works on the Processing website (see [PVector](https://processing.org/tutorials/pvector/)).
-
----
----
----
----
----
----
----
----
----
----
+# PShader Tutorial
 
 ## Intro
 
-Shaders, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language), provide many opportunities for exciting, powerful, and optimized graphics techniques that can expand your creative palette. These range from post-processing effects, advanced compositing, generative drawing, and custom control over the lighting, materials, and geometry of 3d shapes. 
+Shaders, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language), provide many opportunities for exciting, powerful, and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, and custom control over the lighting, materials, and geometry of 3d shapes. 
 
-Shaders are powerful and portable graphics programs that can run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing uses a set of built-in shaders to accomplish much of this.
+Shaders are powerful and portable graphics programs that can run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of this. So, while shaders may be a new concept, they are already an integral part of how Processing works.
 
-GLSL is a “c-style language” ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is certainly different than writing Java, but there is familiar-looking syntax when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any efforts to learn them in Processing can be useful when programming in other environments\!
+GLSL is a “c-style language” ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is certainly different than writing Java, but there is familiar-looking syntax when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any efforts to learn them in Processing can be useful when programming in other environments!
+
+There are many technical details about writing shader programs that aren't covered in this tutorial, because there are so many excellent educational resources on the internet. Primarily,, this tutorial wil show introductory examples to common uses of shaders in Processing.
 
 ## Writing Your First Shader
-
-There are many technical details about writing shader programs that we’ll aren't covered in this tutorial, because there are so many excellent educational resources on the internet. Instead, this tutorial will show introductory examples to some common uses of shaders in Processing.
 
 To write a shader:
 
 * Create a new sketch in Processing and save it. This will create a new directory for your sketch
-* Inside the sketch directory, create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. We’ll start with a single shader, which is a fragment, or pixel shader  
-  * ***\[HOW DO WE CREATE & OPEN THIS FILE IN THE IDE?\]***  
+* Inside the sketch directory, create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. To keep it simple, start with a single fragment shader, also known as a pixel shader  
+  * ~~***\[HOW DO WE CREATE & OPEN THIS FILE IN THE IDE?\]***~~
     * ***SHADER MODE DOESN’T WORK IN PROCESSING 4.3.1***  
     * ***Would we need to suggest VS Code for now?***   
   * Install **Shader Mode** from the Modes manager, which will allow you to edit GLSL code in a new tab in the Processing IDE. To do this, click the dropdown button in the upper-right of the IDE, and select “Manage Modes…”. Then select “Shader Mode” and click “Install”.  
-  * ![Shader Mode Menu](images/ide-shader-mode.png)
+  * ![Shader Mode Menu](images/ide-shader-mode.png)~~
 * Use `loadshader()` to load the GLSL program   
 * Use `filter()` to apply the shader to the canvas
 
