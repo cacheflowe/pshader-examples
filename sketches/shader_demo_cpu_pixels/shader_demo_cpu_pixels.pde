@@ -13,8 +13,8 @@ void draw() {
     for (int y = 0; y < height; y++) {
       int loc = x + y * width;
       float r = red(pixels[loc]);
-      float g = green(pixels[loc]);
-      float b = blue(pixels[loc]);
+      // float g = green(pixels[loc]);
+      // float b = blue(pixels[loc]);
       pixels[loc] =  color(r,r,r);
     }
   }
