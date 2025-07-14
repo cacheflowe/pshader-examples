@@ -18,6 +18,7 @@ https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/
 
 
 Other ideas:
+- Report pixel array issue in GitHub if the latest version of Processing hasn't fixed it
 - PShapeUtil in a library - https://processing.github.io/processing-library-template/
 
 ## Conceptual Overview
@@ -52,9 +53,9 @@ Goal: ***what do shaders unlock***?
     - Explain: coordinate system & how each pixels draws itself  
     - (0,0) is bottom-left  
   - Example 3: Post processing an existing image - brightness? Chroma-style manipulation to show pixel-based operations? 
-    - Explain: Texture is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) \- Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
-    - We’re “talking to a pixel” \- all of them at the same time. 
-    - 👉 **We Are Here*- 👉 Ideas: Post fx \- brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
+    - Explain: Texture is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
+    - We’re “talking to a pixel” - all of them at the same time. 
+    - 👉 **We Are Here*- 👉 Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
 - How shaders work in Processing (PShader basics and built-in uniforms)  
   - Example:   
     - Time uniform to allow for movement or something else more explanatory  
@@ -88,18 +89,18 @@ Goal: ***what do shaders unlock***?
     - Show classic rendering stages diagram?  
   - Make patterns and/or colors across a 3D shape  
     - This can show how shader() changes the global context and fragment shader is contained to the shape  
-  - Color-per-vertex \- without a shader you can set colors per vertex with fill() \-\> vertex()  
+  - Color-per-vertex - without a shader you can set colors per vertex with fill() -\> vertex()  
     - Interpolation between vertices of colors, attribute values, texture coords  
   - 3d geometry & shading, which is the original use case of shaders  
     - How does the vertex position relate to screen space UV coords?  
   - Move in to 3D and adjust positions vertex on a plane  
     - Normals  
     - Uv coords  
-  - Explain: varying values \- passed from vertex shader to fragment shader  
-    - Terrain example between CPU \-\> GPU  
+  - Explain: varying values - passed from vertex shader to fragment shader  
+    - Terrain example between CPU -\> GPU  
   - Explain: attributes  
 - Advanced tutorial (Based on Andres’ Android tutorial)  
-  - Gradient on a circle \- run a shader on a PGraphics and apply as a texture to a circle  
+  - Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
   - Point to default shaders in the Processing source code to let folks know this stuff exists?  
   - Landscape built in example shows how to use shadertoy code?
 

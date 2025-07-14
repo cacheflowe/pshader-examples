@@ -85,14 +85,15 @@ void main() {
 In the updated shader code, notice some new things:
 
 * The output is now drawing a black-to-red gradient, as the x coordinate is fed into the red color component of the `gl_FragColor` assignment. This is an example of normalized coordinate values playing nicely with normalized color values.
-* `vertTexCoord` (shorthand for "vertex texture coordinate") is a pixel’s location in the normalized coordinate system. This value will range from 0-1 for both x and y values. It’s a `vec4`, but we only want the x and y coordinate values, which can be accessed by requesting the first two values in the `vec4`: `vertTexCoord.xy`. In this example, the x and y values are stored in a new `vec2` variable called `uv`, which stores only the two `x` & `y` values instead of four. 
-Unsurprisingly, there’s also a `vec3` data type. Single float values are simply stored in a `float` data type, just like in Processing Java code.  
-* It’s worth noting that requesting a `vec2` from a `vec4` by calling `vertTexCoord.xy` is called [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). Values can even be requested in different orders, and using different property names. Since a vec3 might be used as either an RGB color or an XYZ coordinate in a shader program, GLSL can use `.rgb` and `.xyz` interchangeably.
-* `vertTexCoord` is defined as a `varying` variable, which means that its value was passed to the fragment shader from the vertex shader. This isn’t important for now, but can become important later when working with 3d shapes. It is interesting to know, however, that there is always a vertex shader that runs before the fragment shader, even if you're not using it. Processing provides a [default vertex shader](https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders) behind the scenes if you don’t provide your own.  
-* In the world of shaders, a pixel’s location is often called its [UV coordinate](https://en.wikipedia.org/wiki/UV_mapping), which has roots in the world of 3d modeling. Since shaders were originally designed to shade a 3d surface, there’s historical overlap that surfaces in our terminology. Even in 2d shader programs, we are in fact shading a polygon mesh behind the scenes. 
-* Outside of shaders, UV coordinates are used to map textures onto polygons in Processing, which is why the `vertTexCoord` variable is named as such. The `u` and `v` refer to the x and y coordinates of a texture. In Processing, this is similar to how the `texture()` function works with a PShape or PGraphics object.
+* `vertTexCoord` (shorthand for "vertex texture coordinate") is *the current pixel*’s location in the normalized coordinate system. This value will range from 0-1 for both x and y values. This variable is provided by Processing, and it always available in any shader.
+* `vertTexCoord` is a `vec4`, but this code only uses the x and y coordinate values, which can be accessed by requesting the first two values in the `vec4`: `vertTexCoord.xy`, which returns a `vec2`. The x and y values are copied to a new `vec2` variable called `uv`.
+* In addition to `vec2` and `vec4` data types, there’s also a `vec3` data type. Single float values are simply stored in a `float` data type, just like in Processing Java code.
+* It’s worth noting that requesting a `vec2` from a `vec4` by calling `vertTexCoord.xy` is called [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). Values can even be requested in different orders, and using different property names. Since a `vec3` might be used as either an RGB color or an XYZ coordinate in a shader program, GLSL can use `.rgb` and `.xyz` interchangeably.
+* `vertTexCoord` is defined as a `varying` variable, which means that its value was passed to the fragment shader from the vertex shader. This isn’t important for now, but can become important later when working with vertex shaders. It is interesting to know, however, that there is always a vertex shader that runs before the fragment shader, even if you're not using it. Processing provides a [default vertex shader](https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders) behind the scenes if you don’t provide your own.  
+* In the world of shaders, a pixel’s location (relative to the triangle that it's drawn onto) is called its [UV coordinate](https://en.wikipedia.org/wiki/UV_mapping), which has roots in the world of 3d modeling. Even in seemingly 2-dimensional shader programs, the graphics library is shading a polygon mesh behind the scenes, even if it's just two triangles that make a rectangle.
+* UV coordinates are used to map textures onto polygons in Processing, and  which is why the `vertTexCoord` variable is named as such. The `u` and `v` are simply different names for the `x` and `y` coordinates of a texture. In Processing, this is similar to how the `texture()` function works with the `vertex()` function.
 
-If the y coordinate is applied to the green color component, the result is a classic UV map that visualizes the pixel’s coordinate system in terms of color components. In more advanced shader programming, color data is often a way to store more generalized numeric data.
+If the y coordinate is applied to the green color component, the result is a classic "UV map" that visualizes the pixel’s coordinate system in terms of color components. In more advanced shader programming, color data is often a way to store more generalized numeric data, but this is a good first look at visualizing the texture's data. 
 
 ```
 varying vec4 vertTexCoord;
@@ -105,9 +106,13 @@ void main() {
 
 ![Example 3](images/example-03.png)
 
-By visualizing the coordinate system with color, the bottom-left origin is easy to see, and the top-right corner is represented by full red and green, which appears as yellow.
+By visualizing the coordinate system with color, the bottom-left origin is easy to see (zero red and zero green), and the top-right corner is represented by full red and green, which appears as yellow.
 
-## Uniforms ??
+## Uniforms (Via Animation & Interactivity)
+
+In the previous examples, the shader program was static, and the output color was always the same. However, shaders can be dynamic and interactive, which is where they really shine. To do this, we can use **uniforms**.
+
+TODO: Either draw a circl or asplit the screen in half with a uniform coordinate, and then use the mouse position to change the color on each side of the screen. 
 
 ## Using Textures
 
