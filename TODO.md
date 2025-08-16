@@ -24,9 +24,9 @@ Other ideas:
 ## Conceptual Overview
 
 - Explain the basics of shaders 
-  - how they work (parallel) 
-  - basic datatypes & swizzling
-  - Explain the coordinate system 
+  - ✅ how they work (parallel) 
+  - ✅ basic datatypes & swizzling
+  - ✅ Explain the coordinate system 
 - Relate as much as we can back to beginner/intermediate Processing concepts
   - PVector, PImage, PShape, etc.
 - Build upon techniques for practical use cases
@@ -44,32 +44,33 @@ Other ideas:
 Goal: ***what do shaders unlock***?
 
 - Shader basics for true beginners (get the general idea using pixel shaders only)  
-  - Let’s do more advanced & performant graphics with PShader  
-  - Example 1: solid color  
-    - Note: can’t open a .frag or .glsl file in the IDE  
-    - Explain color values & introduce vec4 (and other data types?)  
-    - Float vs int?  
-  - Example 2: UV map colors,   
-    - Explain: coordinate system & how each pixels draws itself  
-    - (0,0) is bottom-left  
+  - ✅ Let’s do more advanced & performant graphics with PShader  
+  - ✅ Example 1: solid color  
+    - 🚨 Note: can’t open a .frag or .glsl file in the IDE  
+    - ✅ Explain color values & introduce vec4 (and other data types?)  
+    - 🚨 Float vs int?  
+  - ✅ Example 2: UV map colors,   
+    - ✅ Explain: coordinate system & how each pixels draws itself  
+    - ✅ (0,0) is bottom-left  
   - Example 3: Post processing an existing image - brightness? Chroma-style manipulation to show pixel-based operations? 
-    - Explain: Texture is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
+    - Explain: `texture` is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
     - We’re “talking to a pixel” - all of them at the same time. 
-    - 👉 **We Are Here*- 👉 Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
+    - 🚨 Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
 - How shaders work in Processing (PShader basics and built-in uniforms)  
   - Example:   
     - ✅ Time uniform to allow for movement or something else more explanatory  
     - ✅ interactive mouseX into a uniform, with one color on each side  
     - 🚨 Texture2d for grabbing existing pixels and doing something with them  
-  - Explain: uniforms  
+  - ✅ Explain: uniforms  
     - ✅ Shader can’t change at all on its own without at least one uniform (usually for *time*)  
-    - Communication between CPU & GPU programs (aka Processing and Shader)  
-    - Allows for interactivity   
-  - Note: filter() vs shader() behavior  
+    - ✅ Communication between CPU & GPU programs (aka Processing and Shader)  
+    - ✅ Allows for interactivity  
+    - ✅ Swizzling 
+  - 🚨 Note: filter() vs shader() behavior  
 - MATH - use circle example below
 - TEXTURES - color sampling, color adjustment, tiling
 - “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
-  - 🔁 Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
+  - ✅ Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
   - Example Aspect ratio correction & coordinate system?   
     - Example: draw a circle  
        - Link to SDF info  

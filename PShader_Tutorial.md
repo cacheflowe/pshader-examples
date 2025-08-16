@@ -71,7 +71,7 @@ In most shader environments, the bottom-most pixel has a coordinate of 0, and th
 
 By default, a fragment shader provides its pixel’s position on the canvas via `vertTexCoord`. This is one of the only pieces of information that a shader provides by default. The `shader.glsl` code can be updated to explore this interesting new coordinate system:
 
-```
+```glsl
 varying vec4 vertTexCoord;
 
 void main() {
@@ -106,16 +106,16 @@ void main() {
 
 ![Example 3](images/example-03.png)
 
-By visualizing the coordinate system with color, the bottom-left origin is easy to see (zero red and zero green), and the top-right corner is represented by full red and green, which appears as yellow.
+By visualizing the coordinate system with color, the bottom-left origin is easy to see: zero red and zero green, resulting in black, and the top-right corner is represented by full red and green, which appears as yellow.
 
-## Uniforms to add Animation and Interactivity
+## Uniforms for Animation and Interactivity
 
 In the previous examples, the shader program was static - every time `filter()` is called, the output color is always the same. However, shaders can be dynamic and interactive, which is where they can really shine. In GLSL, almost any variable can be further specified as a **uniform**, which adds the ability to **set** the value from Processing code. Uniforms are the only way to communicate to a shader program, because it has no other information about the world outside of its own code.
 
 Most GLSL data types can be set as uniforms from Processing code, with the most common being `float`, `int`, `vec2/vec3/vec4`, and `sampler2D`, which is an image, or texture representation. These values can be set in Processing code with the `set()` [method](https://processing.org/reference/PShader_set_.html) of the PShader object. Each uniform data type has its own `set()` method to properly convert Java values into GLSL values - the Processing framework has built this bridge (just like any creative coding tool needs to do) to allow communication between the CPU and GPU. Some examples of using the `set()` method are:
 
 - `uniform int myInt`: `myShader.set("myInt", 2)`
-- `uniform float myFloat`: `myShader.set("myFloat", 3)`
+- `uniform float myFloat`: `myShader.set("myFloat", 3.0)`
 - `uniform vec2 myVec2`: `myShader.set("myVec2", x, y)`
 - `uniform vec3 myVec3`: `myShader.set("myVec3", x, y, z)`
 - `uniform vec4 myVec4`: `myShader.set("myVec4", x, y, z, w)`
@@ -140,7 +140,7 @@ void draw() {
 }
 ```
 
-And in the shader code, we can access the `splitX` value as a uniform:
+And in the shader code, the `splitX` value is accessed as a uniform:
 
 ```glsl
 varying vec4 vertTexCoord;
@@ -192,7 +192,7 @@ void main() {
 - Show fract() to create a repeating pattern
 -->
 
-As one last modification of this example 
+
 
 
 ## Using Textures
@@ -238,37 +238,49 @@ In the updated shader code, there are some new concepts:
   ***\[FIND A LINK TO THIS INFO\] \- The old shader tutorial had some info about this, and github would also have a list in the [source](https://github.com/processing/processing/blob/master/core/src/processing/opengl/PShader.java#L60-L77). But how to explain them all?***  
 * There’s a new variable called `texture`, with a data type of `sampler2D`. This is the equivalent to a `PImage` in Processing \- it’s a representation of an image stored in memory. This variable is also defined as a `uniform`, which is a special kind of variable in a shader. A uniform is a piece of data that can be sent from the CPU program (Java) to the GPU program (GLSL). We’ll see more of this later, but for now, the `texture` variable is automatically handed to our GLSL program, simply by defining it in the shader. This is another place where Processing makes lots of connections behind the scenes. It’s also worth noting that in every coding environment where shaders are used, the “host” environment will generally do a lot of this behind-the-scenes work and connections to make shader programming a little easier.   
 * There’s a new built-in GLSL function called `texture2D`, which takes two arguments: a `sampler2D` and a `vec2` location. This is very similar to Processing’s [`get()`](https://processing.org/reference/get_.html) function that retrieves a pixel’s color value at a specific coordinate in an image. This code is requesting the pixel color at the current location and storing its RGBA data in a `vec4` variable called `color`. In shaders, this is often called “texture sampling” or a “texture lookup”.  
-* Finally, when setting the output color of our pixel to \``` gl_FragColor` ``, the code is using the sampled color to set the output RGB values, but only uses the red channel\! This essentially creates a grayscale version of the image that was drawn before the shader was applied. There’s so much fun to have with this technique, by swapping color channels, inverting them, or doing other kinds of color manipulation or remapping. 
+* Finally, when setting the output color of our pixel to ` gl_FragColor`, the code is using the sampled color to set the output RGB values, but only uses the red channel\! This essentially creates a grayscale version of the image that was drawn before the shader was applied. There’s so much fun to have with this technique, by swapping color channels, inverting them, or doing other kinds of color manipulation or remapping. 
 
-## Swizzling
+## Swizzling and Vector Component Shortcuts
 
-In the example above, the red channel of the sampled color is used for all three RGB components of the output color. This is done by accessing the `r` property of the `vec4` variable called `color`. There's another way to do this, by using **swizzling**, which allows multiple components of a `vec` to be accessed in different orders. Here are multiple equivalent ways to set the output color to a grayscale RGB color using the red channel for all three components:
+In the example above, the red channel of the sampled color is used for all three RGB components of the output color. This is done by accessing the `r` property of the `vec4` variable called `color`. There's another way to do this, by using **swizzling**, which allows multiple components of a `vec` to be accessed in different orders. There are multiple equivalent ways to set the output color to a grayscale RGB color using the red channel for all three components.
+
+Each color component is set individually:
 
 ```glsl
 gl_FragColor = vec4(color.r, color.r, color.r, 1.0);
 ```
 
-Each color component is set individually
+A new `vec3` is created using the red channel, and then that is passed into the `vec4` output color. If a single float value is passed into a `vec3`, it is duplicated for all three components. If a `vec3` is passed into a `vec4`, only one additional `float` value is passed in to finish populating the 4 values. This is a common technique to convert between different `vec` data types, and shows the flexibility of vector functions' via [function overloading](https://en.wikipedia.org/wiki/Function_overloading).
 
 ```glsl
 gl_FragColor = vec4(vec3(color.r), 1.0);
 ```
 
-A new `vec3` is created using the red channel, and then that is used to create the `vec4` output color. If a single float value is passed into a `vec3`, it is duplicated for all three components. If a `vec3` is passed into a `vec4`, only one additional `float` value is passed in to finish populating the 4 values. This is a common technique to convert between different `vec` data types.
+Another way to do this is with [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). The following syntax requests the red channel three times in a row, which returns a `vec3` on the fly. This is then used to create the `vec4` output color. All three examples produce the same result.
 
 ```glsl
 gl_FragColor = vec4(color.rrr, 1.0);
 ```
 
-A third way to do this is with swizzling. This syntax requests the red channel three times in a row, which returns a `vec3` on the fly. This is then used to create the `vec4` output color. All three examples produce the same result.
+`vec4` variables can also be accessed with `.xyzw` (or even `.stpq`) notation, which is equivalent to `.rgba`. This is because a `vec4` might be used as either an RGBA color or an XYZW coordinate or in a shader program. The following code produces the same result as the previous examples. It's usually best to choose the correct notation for the context of the code, so that it’s clear what the data is being used for (usually either colors or coordinates).
 
 ```glsl
 gl_FragColor = vec4(color.xxx, 1.0);
 gl_FragColor = vec4(color.sss, 1.0);
 ```
 
-`vec4` variables can also be accessed with `.xyzw` (or even `.stpq`) notation, which is equivalent to `.rgba`. This is because a `vec4` might be used as either an RGB color or an XYZW coordinate or in a shader program. This code produces the same result as the previous examples. Generally, it's best to choose the correct notation for the context of the code, so that it’s clear what the data is being used for (colors or coordinates).
+Another common use case of swizzling is that the order of the vector components can be changed when accessing them. For example, if you wanted to create a color that was green in the red channel, blue in the green channel, and red in the blue channel, you could do this with swizzling:
 
+```glsl
+gl_FragColor = vec4(color.gbr, 1.0);
+```
+
+One last interesting use case of swizzling is the ability to manipulate specific values within the vector. As an example, the red and blue channels can be set to zero while keeping the green channel intact with a single line of code:
+
+```glsl
+color.rb *= 0.0;
+gl_FragColor = vec4(color.rgb, 1.0);
+```
 
 ### Comparing CPU vs GPU pixel manipulation performance
 
