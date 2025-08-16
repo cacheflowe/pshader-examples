@@ -58,14 +58,16 @@ Goal: ***what do shaders unlock***?
     - 👉 **We Are Here*- 👉 Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
 - How shaders work in Processing (PShader basics and built-in uniforms)  
   - Example:   
-    - Time uniform to allow for movement or something else more explanatory  
-    - interactive mouseX into a uniform, with one color on each side  
-    - Texture2d for grabbing existing pixels and doing something with them  
+    - ✅ Time uniform to allow for movement or something else more explanatory  
+    - ✅ interactive mouseX into a uniform, with one color on each side  
+    - 🚨 Texture2d for grabbing existing pixels and doing something with them  
   - Explain: uniforms  
-    - Shader can’t change at all on its own without at least one uniform (usually for *time*)  
+    - ✅ Shader can’t change at all on its own without at least one uniform (usually for *time*)  
     - Communication between CPU & GPU programs (aka Processing and Shader)  
     - Allows for interactivity   
   - Note: filter() vs shader() behavior  
+- MATH - use circle example below
+- TEXTURES - color sampling, color adjustment, tiling
 - “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
   - 🔁 Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
   - Example Aspect ratio correction & coordinate system?   
