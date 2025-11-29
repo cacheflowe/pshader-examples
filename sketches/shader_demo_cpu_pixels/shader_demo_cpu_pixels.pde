@@ -2,7 +2,7 @@ PImage myImage;
 
 void setup() {
   size(640, 480);
-  myImage = loadImage("cool-cat.jpg");
+  myImage = loadImage("data/cool-cat.jpg");
 }
 
 void draw() {
