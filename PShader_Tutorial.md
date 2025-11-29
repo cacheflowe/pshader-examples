@@ -338,7 +338,7 @@ void draw() {
 * Explain: uniforms  
   * Shader can’t change at all on it’s own without at least one uniform (usually for *time*)  
   * Communication between CPU & GPU programs (aka Processing and Shader)  
-  * Allows for interactivity   
+  * Allows for interactivity and animation   
 * Note: filter() vs shader() behavior
 
 ## Comparing advanced texture mapping to shader drawing
@@ -350,6 +350,16 @@ void draw() {
 ## Drawing shapes?
 
 When `rect()` is called in Processing, there’s no simple equivalent in GLSL. This is where SDFs come into play. If a GLSL program only knows what its coordinate is, a rectangle function has to check its coordinate’s distance against the boundary of the calculation of a rectangle.  
+
+## Vertex Shaders
+
+* What we could explain:   
+  * Colors/texturing  
+  * Displacement (vertex manipulation, color)
+  * Processing built-in attributes/uniforms for vertex shaders
+  * Projection matrix / modelview matrix
+  * How to connect a vertex shader to a fragment shader in Processing
+    * varying variables to pass data between vertex and fragment shaders
 
 ## Potential advanced topics
 

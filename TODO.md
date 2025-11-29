@@ -11,7 +11,7 @@ https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/
 - Noise function doesn't exist - 
 - for loops shouldn't be used much
 - certain things are better on the CPU
-  - text
+  - Text
   - Compliments the cpu
 - Built-in uniforms
 - Enough understanding to know use cases
