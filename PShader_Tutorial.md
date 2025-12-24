@@ -183,18 +183,6 @@ void main() {
 }
 ```
 
-## GLSL Math Functions
-
-<!-- 
-- Show length/distance() to create a circle/vignette/radial gradient
-- Show sin()/cos() to animate a circle in a circle
-  - Also show an example of centered coordinate system with aspect ratio correction
-- Show fract() to create a repeating pattern
--->
-
-
-
-
 ## Using Textures
 
 With the coordinate system established, the next step involves using a texture. Drawing an image to the screen in Processing code and then manipulating the pixels demonstrates how GPU-powered parallel processing can improve upon non-GPU techniques.
@@ -217,11 +205,9 @@ void draw() {
 }
 ```
 
-In the shader, the existing pixels drawn to the screen before running the shader program can be accessed by calling `filter()`.
+In the shader program, the existing pixels drawn to the canvas by `image()` can be accessed by calling `filter()`.
 
 ```glsl
-<!-- #define PROCESSING_TEXTURE_SHADER -->
-
 varying vec4 vertTexCoord;
 uniform sampler2D texture;
 
@@ -294,6 +280,7 @@ PImage myImage;
 
 void setup() {
   size(640, 360, P2D);
+  pixelDensity(1);
   myImage = loadImage("cool-cat.png");
 }
 
@@ -342,45 +329,107 @@ void main() {
 }
 ```
 
-This comparison highlights the fundamental advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of iterating through millions of array elements on the CPU. This efficiency allows for complex, real-time visual effects like blurs, distortions, and generative patterns that would otherwise be computationally prohibitive on the CPU.
+This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex, real-time visual effects like blurs, distortions, and generative patterns that would otherwise be prohibitive on the CPU, especially at larger resolutions.
 
 ***\[NOTE\]*** In testing on a MacBook Pro M1, the shader version can take \<1ms, while the CPU version can take 30ms if the canvas size is 1920x1080. The difference is less dramatic at smaller sizes.
 
 ***\[NOTE\]*** This is broken on Mac - create a bug report
 
-
-## WHAT'S NEXT?
-
-## WIP Below ----------------------------------------
-
-
-## Adding Uniforms
-
-## ~~Post-Processing Shaders~~
-
-The previous example showed one way of altering existing pixel data. There are a number of common effects, or filters, that we could apply using a similar technique of sampling and changing the current pixel color. Processing has a set of built-in filters that also use the [`filter()`](https://processing.org/reference/filter_.html) function, but we can make our own with new shaders. Here are a couple of examples:
-
-- ***~~Vignette**~~*  
-- ***~~Brightness**~~*  
-- ***~~Tile**~~*
-
 ## Post-Processing Shaders
 
+Post-processing effects are among the most compelling reasons to use shaders. By treating the entire rendered sketch as a single texture, shaders can apply global effects like color correction and edge detection, or artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer unlimited creative control.
 
-* Example:   
-  * Time uniform to allow for movement or something else more explanatory  
-  * ~~interactive mouseX into a uniform, with one color on each side~~  
-  * ~~Texture2d for grabbing existing pixels and doing something with them~~  
-* Explain: uniforms  
-  * ~~Shader can’t change at all on it’s own without at least one uniform (usually for *time*)~~
-  * ~~Communication between CPU & GPU programs (aka Processing and Shader)~~
-  * ~~Allows for interactivity and animation~~   
-* Note: filter() vs shader() behavior
+Combining **uniforms** to control shader parameters with **textures** (the image data) and **coordinate systems** (to manipulate how and where pixels are drawn) allows for the creation of complex effects.
+
+### Example 1: Custom Brightness
+
+This example uses a `brightness` uniform to scale the RGB values of the texture.
+
+**Processing Code:**
+```java
+PShader myShader;
+PImage img;
+
+void setup() {
+  size(640, 360, P2D);
+  img = loadImage("cool-cat.png");
+  myShader = loadShader("brightness.glsl");
+}
+
+void draw() {
+  image(img, 0, 0);
+  // Map mouseX to a brightness value between 0.0 (black) and 2.0 (2x brightness)
+  float brightVal = map(mouseX, 0, width, 0.0, 2.0);
+  myShader.set("brightness", brightVal);
+  filter(myShader);
+}
+```
+
+**Shader Code (`brightness.glsl`):**
+```glsl
+varying vec4 vertTexCoord;
+uniform sampler2D texture;
+uniform float brightness;
+
+void main() {
+  vec4 color = texture2D(texture, vertTexCoord.xy);
+  // Multiply the RGB color by the brightness uniform
+  gl_FragColor = vec4(color.rgb * brightness, 1.0);
+}
+```
+
+### Example 2: Vignette
+
+A vignette effect darkens the edges of an image. This requires calculating the distance of the current pixel from the center of the screen using UV coordinates.
+
+**Shader Code (`vignette.glsl`):**
+```glsl
+uniform sampler2D texture;
+varying vec4 vertTexCoord;
+
+void main() {
+  vec2 uv = vertTexCoord.xy;
+  vec4 color = texture2D(texture, uv);
+  
+  // Calculate distance from the center (0.5, 0.5)
+  float dist = distance(uv, vec2(0.5));
+  
+  // Invert the distance so the center is white (1.0) and edges are darker
+  // The 1.0 - dist creates a linear gradient. 
+  // Using smoothstep or pow() can refine the falloff.
+  float vignette = 1.0 - (dist * 1.5); 
+  
+  gl_FragColor = vec4(color.rgb * vignette, 1.0);
+}
+```
+
+### Example 3: Tiling
+
+Shaders can also manipulate *where* a texture is sampled from. By modifying the UV coordinates before calling `texture2D()`, the image can be repeated or distorted. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which creates a sawtooth wave pattern useful for tiling.
+
+**Shader Code (`tile.glsl`):**
+```glsl
+uniform sampler2D texture;
+varying vec4 vertTexCoord;
+uniform float tiles; // Try passing 4.0 from Processing
+
+void main() {
+  vec2 uv = vertTexCoord.xy;
+  
+  // Multiply UVs by the number of tiles (e.g., 0-1 becomes 0-4)
+  // Then take the fractional part to reset the range to 0-1 four times
+  vec2 tiledUV = fract(uv * tiles);
+  
+  vec4 color = texture2D(texture, tiledUV);
+  gl_FragColor = color;
+}
+```
 
 ## Comparing advanced texture mapping to shader drawing
 
-- Zoom/tiling/paning with `texture()` and `vertex` vs doing it in a shader. There are good similarities here
+- Zoom/tiling/paning with `texture()` and `vertex` vs doing it in a shader. There are good similarities here, especially around the concept of UV coordinates
 - Displacement shader: 2 texture uniforms and reading one to apply to another
+- Compositing w/multiple textures and a mask
 - Radial gradient comparison
 
 ## Drawing shapes?
@@ -389,13 +438,17 @@ When `rect()` is called in Processing, there’s no simple equivalent in GLSL. T
 
 ## Vertex Shaders
 
-* What we could explain:   
-  * Colors/texturing  
+* What we could explain:
+  * That you need geometry to see vertex shaders in action
+  * Basic vertex manipulation (position)
+  * Colors/texturing 
   * Displacement (vertex manipulation, color)
   * Processing built-in attributes/uniforms for vertex shaders
   * Projection matrix / modelview matrix
   * How to connect a vertex shader to a fragment shader in Processing
     * varying variables to pass data between vertex and fragment shaders
+  * Lighting basics (normals, light position, etc)
+  
 
 ## Potential advanced topics
 

@@ -2,6 +2,7 @@ PImage myImage;
 
 void setup() {
   size(640, 480);
+  pixelDensity(1); // breaks w/2
   myImage = loadImage("data/cool-cat.jpg");
 }
 

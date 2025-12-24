@@ -4,6 +4,10 @@ This document continues the work from this Google Doc:
 
 https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0
 
+## Shaders in the processing4 repo
+
+- https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
+
 ## Notes from Raph:
 
 - Random number function doesn't exist
