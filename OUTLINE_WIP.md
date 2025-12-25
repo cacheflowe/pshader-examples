@@ -9,10 +9,10 @@
   - ✅ Example 2: UV map colors,   
     - ✅ Explain: coordinate system & how each pixels draws itself  
     - ✅ (0,0) is bottom-left  
-  - Example 3: Post processing an existing image - brightness? Chroma-style manipulation to show pixel-based operations? 
+  - ✅ Example 3: Post processing an existing image - brightness? Chroma-style manipulation to show pixel-based operations? 
     - Explain: `texture` is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
     - We’re “talking to a pixel” - all of them at the same time. 
-    - 👀 Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
+    - ✅  Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
 - How shaders work in Processing (PShader basics and built-in uniforms)  
   - Example:   
     - ✅ Time uniform to allow for movement or something else more explanatory  
@@ -23,15 +23,16 @@
     - ✅ Communication between CPU & GPU programs (aka Processing and Shader)  
     - ✅ Allows for interactivity  
     - ✅ Swizzling 
+    - 🚨 Processing allows us to set defaults, which is uncommon
 - Compositing with multiple images - using a matte or mask  
   - Example: use mouseX to blend between two images  
   - Explain: how to pass multiple textures into a shader as uniforms
-- Drawing generative shapes with fragment shaders
+- Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
 - MATH - use circle example below
-  - Show length/distance() to create a circle/vignette/radial gradient
+  - Show length/distance() to create a circle/radial gradient
   - Show sin()/cos() to animate a circle in a circle
     - Also show an example of centered coordinate system with aspect ratio correction
-  - Show fract() to create a repeating pattern
+  - ✅ Show fract() to create a repeating pattern
 - TEXTURES - color sampling, color adjustment, tiling
 - “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
   - ✅ Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
@@ -71,7 +72,8 @@
   - Explain: attributes  
 - Advanced tutorial (Based on Andres’ Android tutorial)  
   - Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
-  - Point to default shaders in the Processing source code to let folks know this stuff exists?  
+  - Point to default shaders in the Processing source code to let folks know this stuff exists? 
+    - https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
   - Landscape built in example shows how to use shadertoy code?
 
 

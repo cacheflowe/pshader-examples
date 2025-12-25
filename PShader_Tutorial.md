@@ -337,11 +337,13 @@ This comparison highlights a great advantage of shaders. By processing every pix
 
 ## Post-Processing Shaders
 
-Post-processing effects are among the most compelling reasons to use shaders. By treating the entire rendered sketch as a single texture, shaders can apply global effects like color correction and edge detection, or artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer unlimited creative control.
+Post-processing effects are among the most compelling reasons to use shaders. By treating the entire rendered sketch as an input texture, shaders can apply global effects like color correction and edge detection, or more artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer limitless creative control.
 
-Combining **uniforms** to control shader parameters with **textures** (the image data) and **coordinate systems** (to manipulate how and where pixels are drawn) allows for the creation of complex effects.
+<!-- Combining **uniforms** to control shader parameters with **textures** (the image data) and **coordinate systems** (to manipulate how and where pixels are drawn) allows for the creation of complex effects. -->
 
-### Example 1: Custom Brightness
+Here are a few examples of basic post-processing effects that can be achieved with shaders in Processing.
+
+### Example 1: Brightness
 
 This example uses a `brightness` uniform to scale the RGB values of the texture.
 
@@ -352,7 +354,7 @@ PImage img;
 
 void setup() {
   size(640, 360, P2D);
-  img = loadImage("cool-cat.png");
+  img = loadImage("cool-cat.jpg");
   myShader = loadShader("brightness.glsl");
 }
 
@@ -372,15 +374,18 @@ uniform sampler2D texture;
 uniform float brightness;
 
 void main() {
+  // Sample the texture at the given texture coordinates
   vec4 color = texture2D(texture, vertTexCoord.xy);
-  // Multiply the RGB color by the brightness uniform
-  gl_FragColor = vec4(color.rgb * brightness, 1.0);
+  // Multiply the RGB color by the brightness uniform, but leave alpha unchanged
+  gl_FragColor = vec4(color.rgb * brightness, color.a);
+  // Try changing just one color component for interesting effects!
+  // gl_FragColor = vec4(color.r * brightness,  color.g, color.b, color.a);
 }
 ```
 
 ### Example 2: Vignette
 
-A vignette effect darkens the edges of an image. This requires calculating the distance of the current pixel from the center of the screen using UV coordinates.
+A vignette effect darkens the edges of an image. This is achieved by calculating the distance of the current pixel from the center of the screen, and using that distance to darken the pixels color towards the edges.
 
 **Shader Code (`vignette.glsl`):**
 ```glsl
@@ -388,30 +393,32 @@ uniform sampler2D texture;
 varying vec4 vertTexCoord;
 
 void main() {
+  // Get the UV coordinates and sample the texture
   vec2 uv = vertTexCoord.xy;
   vec4 color = texture2D(texture, uv);
-  
-  // Calculate distance from the center (0.5, 0.5)
-  float dist = distance(uv, vec2(0.5));
-  
-  // Invert the distance so the center is white (1.0) and edges are darker
-  // The 1.0 - dist creates a linear gradient. 
-  // Using smoothstep or pow() can refine the falloff.
-  float vignette = 1.0 - (dist * 1.5); 
-  
+
+  // Calculate this pixel's distance from the center (0.5, 0.5)
+  vec2 center = vec2(0.5, 0.5);
+  float dist = distance(uv, center);
+
+  // Invert the distance so the center is kept to the 
+  // original color (by multiplying by 1), and edges 
+  // are darker by multiplying downward with distance.
+  float vignette = 1.0 - (dist * 1.5);
+
   gl_FragColor = vec4(color.rgb * vignette, 1.0);
 }
 ```
 
 ### Example 3: Tiling
 
-Shaders can also manipulate *where* a texture is sampled from. By modifying the UV coordinates before calling `texture2D()`, the image can be repeated or distorted. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which creates a sawtooth wave pattern useful for tiling.
+Shaders can also manipulate *where* a texture is sampled from. By modifying the original UV coordinates before sampling the texture, the image can be repeated or distorted. This is sometimes called domain warping. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which is comparable to the modulus operator `%` that's commonly used in Java and other languages.
 
 **Shader Code (`tile.glsl`):**
 ```glsl
 uniform sampler2D texture;
 varying vec4 vertTexCoord;
-uniform float tiles; // Try passing 4.0 from Processing
+uniform float tiles;
 
 void main() {
   vec2 uv = vertTexCoord.xy;
@@ -425,32 +432,37 @@ void main() {
 }
 ```
 
-## Comparing advanced texture mapping to shader drawing
+### Example 4: Displacement
 
-- Zoom/tiling/paning with `texture()` and `vertex` vs doing it in a shader. There are good similarities here, especially around the concept of UV coordinates
-- Displacement shader: 2 texture uniforms and reading one to apply to another
-- Compositing w/multiple textures and a mask
-- Radial gradient comparison
+Like the tiling example, UV coordinates can be modified *before* sampling the texture. In this case, a sine wave distortion is applied to the UV coordinates to create a wavy effect. A `phase` uniform is used to animate the pixel displacement over time.
 
-## Drawing shapes?
+**Shader code (`displace.glsl`):**
+```glsl
+uniform sampler2D texture;
+varying vec4 vertTexCoord;
+uniform float phase;
 
-When `rect()` is called in Processing, there’s no simple equivalent in GLSL. This is where SDFs come into play. If a GLSL program only knows what its coordinate is, a rectangle function has to check its coordinate’s distance against the boundary of the calculation of a rectangle.  
-
-## Vertex Shaders
-
-* What we could explain:
-  * That you need geometry to see vertex shaders in action
-  * Basic vertex manipulation (position)
-  * Colors/texturing 
-  * Displacement (vertex manipulation, color)
-  * Processing built-in attributes/uniforms for vertex shaders
-  * Projection matrix / modelview matrix
-  * How to connect a vertex shader to a fragment shader in Processing
-    * varying variables to pass data between vertex and fragment shaders
-  * Lighting basics (normals, light position, etc)
+void main() {
+  vec2 uv = vertTexCoord.xy;
   
+  // Apply a sine wave distortion to the UV coordinates
+  // When a float is multiplied by a vec2, it multiplies both components
+  float frequency = 6.0;
+  float amp = 0.1;
+  vec2 displace = vec2(
+    cos(phase + uv.y * frequency), 
+    sin(phase + uv.x * frequency)
+  ); 
+  uv += displace * amp;
 
-## Potential advanced topics
+  // sample the color from the texture with the warped UVs
+  gl_FragColor = texture2D(texture, uv);
+}
+```
 
-* Shaders can be applied to the main drawing window, or to a PGraphics instance  
-* It is recommended that you use the loadShader() function instead of calling new PShader(), but this does open the door to more advanced options like shader compiling. Here be dragons
+These are just a small sample of post-processing effects that can be created with shaders. These examples are simple and efficient enough that multiple shaders can be applied in real-time to create complex visual styles without much of a performance impact. Try loading multiple shaders and applying them in sequence.
+
+
+
+## Now show shader() instead of filter()
+## Then move on to vertex shaders, since we've explored how shader() is applied to the global context for images/rects/geometry, etc

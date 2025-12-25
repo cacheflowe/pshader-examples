@@ -4,19 +4,15 @@ This document continues the work from this Google Doc:
 
 https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0
 
-## Shaders in the processing4 repo
-
-- https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
 
 ## Notes from Raph:
 
 - Random number function doesn't exist
-- map() fucntion doesn't exist
+- map() function doesn't exist
 - Noise function doesn't exist - 
-- for loops shouldn't be used much
 - certain things are better on the CPU
   - Text
-  - Compliments the cpu
+  - Shaders complement the CPU
 - Built-in uniforms
 - Enough understanding to know use cases
 
@@ -43,6 +39,9 @@ Other ideas:
   - Noise/random functions
   - Custom data types
 - Performance considerations
+  - for loops shouldn't be used much
+  - minimize conditionals
+  - too many texture lookups are bad
 
 ## Proposed Structure
 
