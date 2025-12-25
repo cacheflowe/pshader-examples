@@ -462,7 +462,57 @@ void main() {
 
 These are just a small sample of post-processing effects that can be created with shaders. These examples are simple and efficient enough that multiple shaders can be applied in real-time to create complex visual styles without much of a performance impact. Try loading multiple shaders and applying them in sequence.
 
+### A note about `textureWrap()`
 
+By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)` function, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration can change the drawing context and affect how the GPU processes textures.
+
+```java
+PImage img;
+PShader uvRepeatShader;
+
+void setup() {
+  size(640, 360, P2D);
+  img = loadImage("cool-cat.jpg");
+  uvRepeatShader = loadShader("uv-adjust.glsl");
+}
+
+void draw() {
+  // Alternate between REPEAT and CLAMP every 60 frames
+  if(frameCount % 120 < 60) {
+    // When UV coordinates go outside 0.0 - 1.0 range, repeat the texture.
+    // This behaves like modulo in Java, or fract() in glsl
+    textureWrap(REPEAT);
+  } else {
+    // default is CLAMP
+    textureWrap(CLAMP); 
+  }
+
+  // draw a scene to be post-processed
+  image(img, 0, 0);
+  
+  // adjust UVs to show repeating vs clamping behavior
+  float mouseOffsetX = map(mouseX, 0, width, 1.0, -1.0);
+  float mouseOffsetY = map(mouseY, 0, height, -1.0, 1.0);
+  uvRepeatShader.set("uMouseOffset", mouseOffsetX, mouseOffsetY);
+  filter(uvRepeatShader);
+}
+```
+
+```glsl
+varying vec4 vertTexCoord;
+uniform sampler2D texture;
+uniform vec2 uMouseOffset;
+
+void main() {
+  // Get the UV coordinates from the vertex shader
+  // and adjust the UV coordinates based on the mouse position
+  vec2 uv = vertTexCoord.xy + uMouseOffset;
+  // Sample the texture at the adjusted texture coordinates
+  vec4 color = texture2D(texture, uv);
+  // Multiply the RGB color by the brightness uniform, but leave alpha unchanged
+  gl_FragColor = color;
+}
+```
 
 ## Now show shader() instead of filter()
 ## Then move on to vertex shaders, since we've explored how shader() is applied to the global context for images/rects/geometry, etc

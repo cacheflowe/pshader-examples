@@ -4,6 +4,9 @@ This document continues the work from this Google Doc:
 
 https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0
 
+## Editing
+
+- Adjust uniforms names to have a `u` prefix to indicate they are uniforms
 
 ## Notes from Raph:
 
