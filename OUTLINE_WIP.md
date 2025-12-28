@@ -23,7 +23,7 @@
     - ✅ Communication between CPU & GPU programs (aka Processing and Shader)  
     - ✅ Allows for interactivity  
     - ✅ Swizzling 
-    - 🚨 Processing allows us to set defaults, which is uncommon
+    - 🚨 Processing allows us to set defaults for uniforms, which is uncommon and illegal in other environments
 - Compositing with multiple images - using a matte or mask  
   - Example: use mouseX to blend between two images  
   - Explain: how to pass multiple textures into a shader as uniforms

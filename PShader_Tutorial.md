@@ -339,9 +339,7 @@ This comparison highlights a great advantage of shaders. By processing every pix
 
 Post-processing effects are among the most compelling reasons to use shaders. By treating the entire rendered sketch as an input texture, shaders can apply global effects like color correction and edge detection, or more artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer limitless creative control.
 
-<!-- Combining **uniforms** to control shader parameters with **textures** (the image data) and **coordinate systems** (to manipulate how and where pixels are drawn) allows for the creation of complex effects. -->
-
-Here are a few examples of basic post-processing effects that can be achieved with shaders in Processing.
+Here are some examples of post-processing effects that can be achieved with shaders in Processing.
 
 ### Example 1: Brightness
 
@@ -359,7 +357,9 @@ void setup() {
 }
 
 void draw() {
+  // Draw a scene to be processed
   image(img, 0, 0);
+
   // Map mouseX to a brightness value between 0.0 (black) and 2.0 (2x brightness)
   float brightVal = map(mouseX, 0, width, 0.0, 2.0);
   myShader.set("brightness", brightVal);
@@ -376,9 +376,11 @@ uniform float brightness;
 void main() {
   // Sample the texture at the given texture coordinates
   vec4 color = texture2D(texture, vertTexCoord.xy);
+
   // Multiply the RGB color by the brightness uniform, but leave alpha unchanged
   gl_FragColor = vec4(color.rgb * brightness, color.a);
-  // Try changing just one color component for interesting effects!
+
+  // Try changing just one color component for interesting effects
   // gl_FragColor = vec4(color.r * brightness,  color.g, color.b, color.a);
 }
 ```
@@ -464,7 +466,7 @@ These are just a small sample of post-processing effects that can be created wit
 
 ### A note about `textureWrap()`
 
-By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)` function, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration can change the drawing context and affect how the GPU processes textures.
+By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)` function, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration can change the drawing context and affect GLSL behavior.
 
 ```java
 PImage img;
@@ -480,7 +482,7 @@ void draw() {
   // Alternate between REPEAT and CLAMP every 60 frames
   if(frameCount % 120 < 60) {
     // When UV coordinates go outside 0.0 - 1.0 range, repeat the texture.
-    // This behaves like modulo in Java, or fract() in glsl
+    // The UV coords now behave like modulo in Java, or fract() in glsl
     textureWrap(REPEAT);
   } else {
     // default is CLAMP
@@ -514,5 +516,66 @@ void main() {
 }
 ```
 
-## Now show shader() instead of filter()
-## Then move on to vertex shaders, since we've explored how shader() is applied to the global context for images/rects/geometry, etc
+## Using `shader()` for more control
+
+The `filter()` function applies a shader to the entire canvas as a "screen space" post-processing effect. In this situation, the shader's UV coordinates are normalized from 0.0 - 1.0 across the entire canvas, and this is a great approach for generating full-canvas generative graphics or post-processing effects.
+
+Processing also provides the `shader()` function, which allows for more targeted control over where and how shaders are applied. This function can be used to apply shaders to specific geometry or areas of the canvas, rather than the entire screen. Much like functions like fill() or strokeWeight(), calling `shader()` sets the current shader for all subsequent drawing operations, until another shader is set or the custom chaser is removed by calling `resetShader()`. This is akin to using `push()` and `pop()` for styles, but specifically for shaders.
+
+The most basic use of `shader()` is to apply a shader to shapes drawn with functions like `image()`, `rect()`, or custom geometry created with `beginShape()`, `vertex()`, and `endShape()`. When a shader is applied in this way, the UV coordinates are mapped to the shape's vertices, which have their own UV coordinates. `image()`  and `rect()`, for example, have normalized coorindates like the entire canvas, but contained within the shape's bounds. In the following example, the shader is only applied to the image drawn in the center of the canvas:
+
+```java
+PImage img;
+PShader myShader;
+
+void setup() {
+  size(640, 360, P2D);
+  img = loadImage("cool-cat.jpg");
+  myShader = loadShader("shader.glsl");
+}
+
+void draw() {
+  background(255, 0, 0);
+  imageMode(CENTER);
+
+  // Set the shader on the drawing context 
+  shader(myShader);
+
+  // Draw an image - the shader will adjust the way it's drawn
+  // The `texture` uniform in the shader is automatically set to the PImage
+  image(img, width/2, height/2, img.width/2, img.height/2);
+
+  // reset the shader
+  resetShader();
+}
+```
+
+```glsl
+varying vec4 vertTexCoord;
+uniform sampler2D texture;
+
+void main() {
+  // sample color from the image being drawn
+  vec2 uv = vertTexCoord.xy;
+  vec4 color = texture2D(texture, uv);
+
+  // Set alpha based on red channel, which makes darker pixels more transparent
+  color.a = color.r; 
+  gl_FragColor = color;
+}
+```
+
+## Back to UV coordinates
+
+- note texture() and UV coords from normal processing usage
+- then show how shader() uses the same geometry data
+
+## Next section:
+-  `shader()` lets us target the shader to within specific shapes
+- This also changes the UV coordinates from "screen space" to fit within the shape's bounds (image()/rect()), or with custom UVs (beginShape()/vertex())
+- Then move on to vertex shaders, since we've explored how shader() is applied to the global context for images/rects/geometry, etc
+
+
+- But this also depends on the UV coordinates mapped to the shape's vertices
+  - Screen space UVs go from 0-1 across the entire canvas, but a shape may have different UVs depending on how it's constructed, which happens on the CPU side when drawing the shape
+- Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
