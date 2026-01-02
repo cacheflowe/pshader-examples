@@ -32,7 +32,7 @@ void draw() {
   brightnessShader.set("brightness", brightVal);
   filter(brightnessShader);
   
-  displaceShader.set("phase", frameCount * 0.05);
+  displaceShader.set("uPhase", frameCount * 0.05);
   filter(displaceShader);
 
   vignetteShader.set("tiles", brightVal);

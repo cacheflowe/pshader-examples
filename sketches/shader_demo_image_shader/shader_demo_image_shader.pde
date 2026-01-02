@@ -16,7 +16,7 @@ void draw() {
 
   // Draw an image - the shader will adjust the way it's drawn
   // The `texture` uniform in the shader is automatically set to the PImage
-  image(img, width/2, height/2, img.width/2, img.height/2);
+  image(img, mouseX, mouseY, img.width/2, img.height/2);
 
   // reset the shader
   resetShader();

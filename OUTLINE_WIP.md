@@ -1,56 +1,62 @@
 ## WIP - outline of topics to cover
 
-- Shader basics for true beginners (get the general idea using pixel shaders only)  
+- ✅ Shader basics for true beginners (get the general idea using pixel shaders only)  
   - ✅ Let’s do more advanced & performant graphics with PShader  
   - ✅ Example 1: solid color  
     - 🚨 Note: can’t open a .frag or .glsl file in the IDE  
     - ✅ Explain color values & introduce vec4 (and other data types?)  
-    - 🚨 Float vs int?  
+      - ✅ Swizzling
+    - ✅ Float vs int?  
   - ✅ Example 2: UV map colors,   
     - ✅ Explain: coordinate system & how each pixels draws itself  
     - ✅ (0,0) is bottom-left  
   - ✅ Example 3: Post processing an existing image - brightness? Chroma-style manipulation to show pixel-based operations? 
-    - Explain: `texture` is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
-    - We’re “talking to a pixel” - all of them at the same time. 
+    - ✅ Explain: `texture` is a built-in uniform, which is used along with texture2d() for sampling. (which we can cover custom uniforms later) - Processing supplies a set of default uniforms which give you information to use inside of your shader. Every environment does some version of this  
     - ✅  Ideas: Post fx - brightness, blur, vignette/radial gradient (note CustomBlend built in example)  
-- How shaders work in Processing (PShader basics and built-in uniforms)  
-  - Example:   
+- ✅ How shaders work in Processing (PShader basics and built-in uniforms)  
+  - ✅ Example:   
     - ✅ Time uniform to allow for movement or something else more explanatory  
     - ✅ interactive mouseX into a uniform, with one color on each side  
-    - 🚨 Texture2d for grabbing existing pixels and doing something with them  
+    - ✅ Texture2d for grabbing existing pixels and doing something with them  
   - ✅ Explain: uniforms  
     - ✅ Shader can’t change at all on its own without at least one uniform (usually for *time*)  
     - ✅ Communication between CPU & GPU programs (aka Processing and Shader)  
     - ✅ Allows for interactivity  
     - ✅ Swizzling 
     - 🚨 Processing allows us to set defaults for uniforms, which is uncommon and illegal in other environments
-- Compositing with multiple images - using a matte or mask  
-  - Example: use mouseX to blend between two images  
-  - Explain: how to pass multiple textures into a shader as uniforms
-- Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
-- MATH - use circle example below
-  - Show length/distance() to create a circle/radial gradient
-  - Show sin()/cos() to animate a circle in a circle
-    - Also show an example of centered coordinate system with aspect ratio correction
   - ✅ Show fract() to create a repeating pattern
-- TEXTURES - color sampling, color adjustment, tiling
-- “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
+- ✅ TEXTURES - color sampling, color adjustment, tiling
+- ✅ “Advanced” fragment shader info: A shader is a different & potentially more efficient way of drawing  
   - ✅ Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
-  - Example: Aspect ratio correction & coordinate system?   
-  - Example: draw a circle  
-     - Link to SDF info  
-     - Compare to drawing in Processing: ellipse()  
-  - Neighbor pixels / kernel / gaussian (for blur, etc) 
-     - Pixels don’t know anything about the rest of the image, besides where it is  
-     - Fragment illustration - fireflies,
+     ✅ - UV coordinate concepts within variable sized canvases  
+     ✅ - “Domain warping”  
+        ✅ - Use fract() to create zoomed/tiled output (coordinate space manipulation / “domain warping”. Compare to texture/vertex in processing  
+    - ✅ Note textureMode(REPEAT) vs CLAMP setting 
+  - ✅ Note: filter() vs shader() behavior to contain the shader operation to an image or shape, vs applying the the entire canvas. This can be useful for only affecting specific images or geometry, and necessary for vertex shader usage, where fragment shaders can be applied either way.
+  - We’re “talking to a pixel” - all of them at the same time. 
+    - Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
   - Check/convert notes in haxademic shaders README to explain the built-in uniforms and how to use them. Also, Alex’s default fragment/vertex shader  
-     - UV coordinate concepts within variable sized canvases  
-     - “Domain warping”  
-        - Use fract() to create zoomed/tiled output (coordinate space manipulation / “domain warping”. Compare to texture/vertex in processing  
-    - Note textureMode(REPEAT) vs CLAMP setting 
-  - Generative drawing in a powerful/different way, a la Shadertoy  
+  - Add to post-processing section?
+    - Compositing with multiple images - using a matte or mask  
+      - Example: use mouseX to blend between two images  
+      - Explain: how to pass multiple textures into a shader as uniforms
+  - Go back to add generative shader examples
+  - Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
+    - Generative drawing in a powerful/different way, a la Shadertoy  
+    - SDFs
+    - Show aspect-correction example to draw a proper circle, regardless of canvas size
     - Drawing tools - distance functions, patterns, noise
-  - Note: filter() vs shader() behavior to contain the shader operation to an image or shape, vs applying the the entire canvas. This can be useful for only affecting specific images or geometry, and necessary for vertex shader usage, where fragment shaders can be applied either way.
+    - Example: Aspect ratio correction & coordinate system?   
+    - Example: draw a circle  
+       - Link to SDF info  
+       - Compare to drawing in Processing: ellipse()  
+    - Neighbor pixels / kernel / gaussian (for blur, etc) 
+       - Pixels don’t know anything about the rest of the image, besides where it is  
+       - Fragment illustration - fireflies,
+    - MATH - use circle example below
+      - Show length/distance() to create a circle/radial gradient
+      - Show sin()/cos() to animate a circle in a circle
+        - Also show an example of centered coordinate system with aspect ratio correction
 - Vertex shaders  
   - What we could explain:   
     - Colors/texturing  

@@ -19,3 +19,9 @@ This is a set of instructions for creating a tutorial on using PShader in Proces
 5. Use diagrams or illustrations where helpful to explain concepts visually. These can be created separately and referenced in the tutorial.
 6. Review the tutorial for accuracy, clarity, and completeness. Ensure that all topics in the outline are adequately covered.
 7. Once a section is completed, update the OUTLINE_WIP.md to reflect progress and any changes made to the structure or content.
+
+## GLSL code examples
+
+1. When writing GLSL code examples, ensure that they are formatted correctly for inclusion in markdown files. Use triple backticks with `glsl` specified for syntax highlighting.
+2. Uniforms should be prefixed with `u` (e.g., `uTime`, `uResolution`) to distinguish them from varying variables and attributes.
+3. Provide comments within the GLSL code to explain key parts of the shader logic. This is for educational purposes for beginners, so be clear and thorough in explanations.

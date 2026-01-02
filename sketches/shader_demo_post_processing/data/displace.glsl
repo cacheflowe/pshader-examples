@@ -1,6 +1,6 @@
 uniform sampler2D texture;
 varying vec4 vertTexCoord;
-uniform float phase;
+uniform float uPhase;
 
 void main() {
   vec2 uv = vertTexCoord.xy;
@@ -10,8 +10,8 @@ void main() {
   float frequency = 6.0;
   float amp = 0.1;
   vec2 displace = vec2(
-    cos(phase + uv.y * frequency), 
-    sin(phase + uv.x * frequency)
+    cos(uPhase + uv.y * frequency), 
+    sin(uPhase + uv.x * frequency)
   ); 
   uv += displace * amp;
 
