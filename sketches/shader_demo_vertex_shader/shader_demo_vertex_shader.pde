@@ -4,28 +4,21 @@ PShader myShader;
 void setup() {
   size(640, 360, P2D);
   img = loadImage("cool-cat.jpg");
-  myShader = loadShader("shader.glsl");
+  myShader = loadShader("frag.glsl", "vert.glsl");
 }
 
 void draw() {
   background(0);
 
-  // draw a circle with custom UV coordinates
-  textureMode(NORMAL);
-  textureWrap(REPEAT);
-  
-  // update shader uniform and apply shader to the context
-  float displaceAmp = map(mouseX, 0, width, -0.25, 0.25);
+  // Update shader uniform and apply shader to the context 
+  float displaceAmp = map(mouseX, 0, width, 0, 50);
   myShader.set("uDisplaceAmp", displaceAmp);
+  myShader.set("uTime", (float) millis());
   shader(myShader);
 
-  // move geometry around a little bit, for fun effect
-  float shapeX = map(mouseX, 0, width, -200, 200);
-  float shapeY = map(mouseY, 0, height, -100, 100);
-  translate(shapeX, shapeY);
-
-  // draw custom geometry
+  // draw a circle with custom UV coordinates
   noStroke();
+  textureMode(NORMAL);
   beginShape();
   texture(img);
   int circleResolution = 36;

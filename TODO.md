@@ -34,9 +34,9 @@ Other ideas:
 - Relate as much as we can back to beginner/intermediate Processing concepts
   - PVector, PImage, PShape, etc.
 - Build upon techniques for practical use cases
-  - Post-processing effects
+  - ✅ Post-processing effects
   - Generative drawing
-  - Texture mapping
+  - ✅ Texture mapping
   - Geometry manipulation for large 3D shapes
 - Advanced techniques
   - Noise/random functions
@@ -45,7 +45,6 @@ Other ideas:
   - for loops shouldn't be used much
   - minimize conditionals
   - too many texture lookups are bad
-
-## Proposed Structure
+- Note the connection with ML tools - shaders were foundational in the current age of ML advancements, and new technologies have evolved from there
 
 

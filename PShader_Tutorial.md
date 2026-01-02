@@ -681,23 +681,142 @@ void main() {
 
 ## Adding a custom vertex shader
 
-So far, all examples have used the default vertex shader provided by Processing. However, custom vertex shaders can be created to manipulate vertex positions, pass additional data to the fragment shader, and create more complex effects. A custom vertex shader must be paired with a fragment shader in a PShader object.
+So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader in a PShader object.
 
-Using the last example as a starting point, a custom vertex shader can be created to manipulate the vertex positions of the circular shape. The following example adds a simple wave effect to the circle's vertices based on their angle around the circle.
+Using the last example as a starting point, a custom vertex shader is added to manipulate the vertex positions of the circular shape. The following example introduces a displacement effect to the circle's vertices based on their position, rather than via texture sampling as seen in the prior fragment shader example. The effect is similar in that the orginal image becomes warped, but here, it's because the *vertices* are moving, not the *sampling location* in the fragment shader. To add a custom vertex shader, create a new file named `vert.glsl` and load it alongside the fragment shader in the Processing sketch, and pass both into the `loadShader()` function, fragment shader first.
+
+The default Processing vertex shader when dealing with textures is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/TexVert.glsl), and this is what the following example modifies. There are several new uniforms, attributes, and varying variables that are used to pass data between the vertex and fragment shaders and help the vertex shader understand how to position vertices on screen. 
+
+Note that any single custom uniform that is set on the `PShader` object via `set()` in either the vertex or fragment shader is availabe to both, provided the uniform is declared in the shader code. This is a convenient way to potentially add interactivity to both shaders at once.
+
+```java
+PImage img;
+PShader myShader;
+
+void setup() {
+  size(640, 360, P2D);
+  img = loadImage("cool-cat.jpg");
+  myShader = loadShader("frag.glsl", "vert.glsl");
+}
+
+void draw() {
+  background(0);
+
+  // Update shader uniform and apply shader to the context 
+  float displaceAmp = map(mouseX, 0, width, 0, 50);
+  myShader.set("uDisplaceAmp", displaceAmp);
+  myShader.set("uTime", (float) millis());
+  shader(myShader);
+
+  // draw a circle with custom UV coordinates
+  noStroke();
+  textureMode(NORMAL);
+  beginShape();
+  texture(img);
+  int circleResolution = 36;
+  float radius = 150;
+  for (int i = 0; i <= circleResolution; i++) {
+    // calculate vertex positions around circle
+    float angle = TWO_PI * i / circleResolution;
+    float x = width/2 + cos(angle) * radius;
+    float y = height/2 + sin(angle) * radius;
+    
+    // map UVs to circle shape
+    // and correct for image aspect ratio, so the image doesn't look squished
+    float aspect = float(img.width) / float(img.height);
+    float u = 0.5 + cos(angle) * 0.5 / aspect;
+    float v = 0.5 + sin(angle) * 0.5;
+    
+    // draw each vertex position and UV coords
+    vertex(x, y, u, v);
+  }
+  endShape(CLOSE);
+  
+  resetShader();
+}
+```
 
 ```glsl
-// vertex.glsl
-attribute vec4 vertex;
+// vert.glsl
+// processing-provided variables
+uniform mat4 transformMatrix;
+uniform mat4 texMatrix;
+
+attribute vec4 position;
 attribute vec4 color;
 attribute vec2 texCoord;
-uniform mat4 transform;
-varying vec4 vertTexCoord;
+
 varying vec4 vertColor;
+varying vec4 vertTexCoord;
+
+// custom variables
+uniform float uDisplaceAmp;
+uniform float uTime;
 
 
+void main() {
+  // apply transformations to vertex position
+  vec4 newPosition = position;
+  
+  // Apply a sine wave distortion to the vertices' original positions (only the .xy components)
+  // Important note: position is in screen space, rather than normalized UV space like in the fragment shader
+  float frequency = 0.015; // use a lower frequency for position space distortion
+  float phaseX = uTime * 0.005;
+  float phaseY = uTime * 0.007;
+  vec2 displace = vec2(
+    cos(position.y * frequency + phaseX), 
+    sin(position.x * frequency + phaseY)
+  );
+  newPosition.xy += displace * uDisplaceAmp;
 
-## Next section:
-- Then move on to vertex shaders, since we've explored how shader() is applied to the global context for images/rects/geometry, etc
-- But this also depends on the UV coordinates mapped to the shape's vertices
-  - Screen space UVs go from 0-1 across the entire canvas, but a shape may have different UVs depending on how it's constructed, which happens on the CPU side when drawing the shape
-- Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
+  // set final vertex position and pass varying data to fragment shader
+  gl_Position = transformMatrix * newPosition;
+
+  // Pass vertex color and texture coordinate along to fragment shader
+  // This is default behavior in Processing, and shows the pipline between
+  // geometry creation on the CPU, vertexs shader application, and final 
+  // fragment shader rendering to the screen
+  vertColor = color;
+  vertTexCoord = texMatrix * vec4(texCoord, 1.0, 1.0);
+}
+```
+
+```glsl
+// frag.glsl
+varying vec4 vertTexCoord;
+uniform sampler2D texture;
+
+void main() {
+  // sample color from the image being drawn, 
+  // based on geometry's custom UV coords
+  vec2 uv = vertTexCoord.xy;
+
+  // draw color to screen
+  gl_FragColor = texture2D(texture, uv);
+}
+```
+
+Note the following details in the first look at vertex shaders:
+
+- Vertex positions are in their "screen space" coordinate system. For example, `vertex(200, 200)` is at 200, 200 in the vertex shader code too. This is a bit different than our normalized coordinates in the fragment shader.  
+- Displacement of vertices also happens in screen space coordinates. This means that the distortion is based on the vertex positions on screen, which are in pixel dimensions, not normalized coordinates. By specifying a max displacement of 50, each vertex can move up to 50 pixels from its original location.
+- The vertices in the example are the outer points of a circle, so displacing them creates a wavy circular shape. The inner pixels are filled in by the rasterization process, which fills in the gaps between vertices and their UV coordinates. This *interpolation* is what allows for smooth gradients and transitions between vertex positions and colors.
+- The fragment shader isn't doing anything besides passing along the final pixel color to the canvas, based on the adjusted geometry. A fragment shader is always required when using a vertex shader
+- If an `int` is passed into a [`PShader.set()`](https://processing.org/reference/PShader_set_.html) function that connects to a `float` uniform in GLSL, things can break! This is why the Java `millis()` value is cast to a `float` when setting the `uTime` uniform.
+- Finally, there are some new concepts to learn about how data is passed between Processing and GLSL, and between the vertex and fragment shaders themselves. In the vertex shader, there are several new variables that are automatically provided by Processing to help understand the geometry being drawn.
+  - `transformMatrix` and `texMatrix` are 4x4 matrixes that help position and match the UV coordinates to the vertex on screen, based on Processing's current transformations (like `translate()`, `rotate()`, and `scale()`). This matrix is multiplied by the vertex position to get the final screen position.
+  - `position` is an attribute that contains the vertex's position in screen space. An `attribute` is a variable that is set on each vertex as the geometry is drawn. When `vertex()` is called, a vertex `attribute` is created behind the scenes for each vertex's position. This is how the position is accessible in the vertex shader.
+  - `color` is another attribute that contains the vertex's color. In this example, the color isn't set explicitly, so it defaults to white. But in following examples, this attribute can be used to pass color data from the CPU to the GPU on a per-vertex basis.
+  - `texCoord` is the UV coordinate that was assigned to the vertex when `vertex(x, y, u, v)` was called. This is how custom UV coordinates are passed from the CPU to the GPU.
+  - Both `color` and UV coordinates (`texCoord`) are passed to the fragment shader via `varying` variables. A `varying` variable is used to pass data from the vertex shader to the fragment shader. The GPU automatically interpolates these values between vertices for each pixel that is drawn, which allows for smooth transitions across the surface of the shape.
+
+### The full rasterization pipeline: from CPU to Vertex Shader to Fragment Shader to screen
+
+When the vertex and fragment shader are applied to the global graphics context with the `shader` function, the following process occurs:
+- Each vertex defined by `vertex()` is processed by the vertex shader, which can modify its position and pass along (and modify) data like color and UV coordinates.
+- The GPU then performs **rasterization**, which is the process of determining which pixels on the screen are covered by the shape defined by the vertices. During rasterization, the GPU interpolates the `varying` variables (like UV coordinates and color) across the pixels that fall within the shape. This means that for each pixel, the GPU calculates the appropriate UV coordinates and color based on the values at the vertices.
+- Finally, for each pixel determined by rasterization, the fragment shader is executed. The fragment shader uses the interpolated UV coordinates to sample the texture or blend between vertex colors and determine the final color of that pixel.
+
+![](./images/rasterisation.png)
+
+## Using vertex colors instead of texture sampling
