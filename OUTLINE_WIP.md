@@ -36,31 +36,7 @@
   
 ## Remaining concepts to cover
 
-- We’re “talking to a pixel” - all of them at the same time. 
-  - Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
-- Check/convert notes in haxademic shaders README to explain the built-in uniforms and how to use them. Also, Alex’s default fragment/vertex shader  
-- Add to post-processing section?
-  - Compositing with multiple images - using a matte or mask  
-    - Example: use mouseX to blend between two images  
-    - Explain: how to pass multiple textures into a shader as uniforms
-- Go back to add generative shader examples
-- Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
-  - Generative drawing in a powerful/different way, a la Shadertoy  
-  - SDFs
-  - Show aspect-correction example to draw a proper circle, regardless of canvas size
-  - Drawing tools - distance functions, patterns, noise
-  - Example: Aspect ratio correction & coordinate system?   
-  - Example: draw a circle  
-     - Link to SDF info  
-     - Compare to drawing in Processing: ellipse()  
-  - Neighbor pixels / kernel / gaussian (for blur, etc) 
-     - Pixels don’t know anything about the rest of the image, besides where it is  
-     - Fragment illustration - fireflies,
-  - MATH - use circle example below
-    - Show length/distance() to create a circle/radial gradient
-    - Show sin()/cos() to animate a circle in a circle
-      - Also show an example of centered coordinate system with aspect ratio correction
-- Vertex shaders  
+### Vertex shaders  
   - What we could explain:   
     - ✅texturing
     - Colors 
@@ -87,6 +63,33 @@
   - Landscape built in example shows how to use shadertoy code?
   - PShape!
     - This speeds up the sketch because creating geometry is expensive. With the geometry cached, the program runs faster. 
+
+### Back to fragment shaders
+
+- We’re “talking to a pixel” - all of them at the same time. 
+  - Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
+- Check/convert notes in haxademic shaders README to explain the built-in uniforms and how to use them. Also, Alex’s default fragment/vertex shader  
+- Add to post-processing section?
+  - Compositing with multiple images - using a matte or mask  
+    - Example: use mouseX to blend between two images  
+    - Explain: how to pass multiple textures into a shader as uniforms
+- Go back to add generative shader examples
+- Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
+  - Generative drawing in a powerful/different way, a la Shadertoy  
+  - SDFs
+  - Show aspect-correction example to draw a proper circle, regardless of canvas size
+  - Drawing tools - distance functions, patterns, noise
+  - Example: Aspect ratio correction & coordinate system?   
+  - Example: draw a circle  
+     - Link to SDF info  
+     - Compare to drawing in Processing: ellipse()  
+  - Neighbor pixels / kernel / gaussian (for blur, etc) 
+     - Pixels don’t know anything about the rest of the image, besides where it is  
+     - Fragment illustration - fireflies,
+  - MATH - use circle example below
+    - Show length/distance() to create a circle/radial gradient
+    - Show sin()/cos() to animate a circle in a circle
+      - Also show an example of centered coordinate system with aspect ratio correction
 
 
 ## Final tasks
@@ -122,8 +125,9 @@
 
 * What we could explain:
   * That you need geometry to see vertex shaders in action
-  * Basic vertex manipulation (position)
-  * Colors/texturing 
+  * ✅ Basic vertex manipulation (position)
+  * ✅ texturing 
+  * Colors
   * Displacement (vertex manipulation, color)
   * Processing built-in attributes/uniforms for vertex shaders
     - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
