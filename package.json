@@ -1,0 +1,19 @@
+{
+  "name": "pshader-examples",
+  "version": "1.0.0",
+  "description": "PShader Tutorial",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "author": "Cacheflowe",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}

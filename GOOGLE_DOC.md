@@ -141,7 +141,3 @@ Spacefiller: *This is an aside, but I really like this ontology of documentation
   * You can compile glsl from [inline code](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_ReloadInlineGlsl_Rippleskin.java), especially now that the Processing IDE supports multiline strings  
   * Using float32 textures for particle simulations. I have a solution in this [GitHub issue](https://github.com/benfry/processing4/issues/724), but also have a [working](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/core/draw/context/pg32/PGraphics32.java) [implementation](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_GPUParticles.java) that I could convert into a pure Processing demo
 
-TODO:
-
-- Remove instances of “you”, as per the [style guide](https://p5js.org/contribute/documentation_style_guide/#unbiased-documentation)
-

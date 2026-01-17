@@ -23,7 +23,7 @@ Tools used:
 - The first time a Processing function is mentioned, add a link to the documentation page for it:
   - filter(): https://processing.org/reference/filter_.html
   - PShader.set(): https://processing.org/reference/PShader_set_.html
-
+- Apply the [style guide](https://p5js.org/contribute/documentation_style_guide/#unbiased-documentation)
 
 ## Notes from Raph
 
