@@ -4,9 +4,13 @@ This document continues the work from this Google Doc:
 
 https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0
 
-## Editing
+## Next steps / Editing
 
+- Add more screenshots of results
 - Adjust uniforms names to have a `u` prefix to indicate they are uniforms
+- Make sure examples exactly match the demos in the tutorial
+- Standardize capitalization in comments
+- Ask about punctuation/apostrophes/etc
 
 ## Notes from Raph:
 
@@ -33,11 +37,23 @@ Other ideas:
   - ✅ Explain the coordinate system 
 - Relate as much as we can back to beginner/intermediate Processing concepts
   - PVector, PImage, PShape, etc.
+- Functions in Processing vs GLSL
+  - https://registry.khronos.org/OpenGL/specs/
+  - Function analogies:
+    - sin() ~ sin()
+    - cos() ~ cos()
+    - ???
+    - PVector ~ vec2/vec3/vec4
+    - PImage ~ sampler2D
+    - PVector.dist() ~ distance()
+    - PVector.mag() ~ length()
+    - PVector.normalize() ~ normalize()
+    - PVector.lerp() ~ mix()
 - Build upon techniques for practical use cases
   - ✅ Post-processing effects
   - Generative drawing
   - ✅ Texture mapping
-  - Geometry manipulation for large 3D shapes
+  - Geometry manipulation for (large?) 3D shapes
 - Advanced techniques
   - Noise/random functions
   - Custom data types

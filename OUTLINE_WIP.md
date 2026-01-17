@@ -92,11 +92,6 @@
       - Also show an example of centered coordinate system with aspect ratio correction
 
 
-## Final tasks
-
-- Make sure examples exactly match the demos in the tutorial
-- Standardize capitalization in comments
-
 
 ## Tutorial/formatting questions 
 
@@ -128,7 +123,7 @@
   * ✅ Basic vertex manipulation (position)
   * ✅ texturing 
   * Colors
-  * Displacement (vertex manipulation, color)
+  * ✅ Displacement (vertex manipulation, color)
   * Processing built-in attributes/uniforms for vertex shaders
     - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
   * Projection matrix / modelview matrix
