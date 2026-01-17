@@ -12,7 +12,7 @@ This is a set of instructions for creating a tutorial on using PShader in Proces
 
 ## Instructions for Writing the Tutorial
 
-1. Use the style guide in DOCS_STYLE_GUIDE.md and the existing content in PShader_Tutorial.md as a reference for tone, style, and formatting. Maintain a consistent voice throughout the tutorial.
+1. Use the style guide in DOCS_STYLE_GUIDE.md and the existing content in PShader_Tutorial.md as a reference for technical style and formatting. Maintain a consistent voice throughout the tutorial, and reference the existing sections for writing voice and style.
 2. Follow the outline in OUTLINE_WIP.md closely, ensuring that each topic is covered in a logical order. If you feel that the order should be changed for better flow, please discuss it first.
 3. Write clear, concise explanations for each topic, avoiding jargon where possible. When technical terms are necessary, provide definitions or explanations.
 4. Include code examples for each concept discussed. Ensure that the code is well-commented and easy to understand. Test all code examples in Processing to ensure they work as intended.
@@ -25,3 +25,5 @@ This is a set of instructions for creating a tutorial on using PShader in Proces
 1. When writing GLSL code examples, ensure that they are formatted correctly for inclusion in markdown files. Use triple backticks with `glsl` specified for syntax highlighting.
 2. Uniforms should be prefixed with `u` (e.g., `uTime`, `uResolution`) to distinguish them from varying variables and attributes.
 3. Provide comments within the GLSL code to explain key parts of the shader logic. This is for educational purposes for beginners, so be clear and thorough in explanations.
+4. Try to keep GLSL examples as simple as possible while still effectively demonstrating the concept being taught. Avoid overly complex shaders that may confuse beginners.
+5. Try to relate GLSL functions and concepts back to their Processing equivalents where possible, as outlined in the TODO.md file. This will help readers make connections between the two environments.

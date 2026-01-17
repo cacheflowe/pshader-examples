@@ -90,8 +90,7 @@
     - Show length/distance() to create a circle/radial gradient
     - Show sin()/cos() to animate a circle in a circle
       - Also show an example of centered coordinate system with aspect ratio correction
-
-
+    - Show mix() to blend between two colors
 
 ## Tutorial/formatting questions 
 
@@ -122,15 +121,32 @@
   * That you need geometry to see vertex shaders in action
   * ✅ Basic vertex manipulation (position)
   * ✅ texturing 
-  * Colors
+  * ✅ Colors
   * ✅ Displacement (vertex manipulation, color)
+  * Noise generation - compare to noise() in Processing
+    * Could implement a grain post-processing effect as a demo, or displacement in a vertex shader
+  * transform matrix - esp when thinking about z-displacement
+    * Need to displace in the direction of the model normal, not just z-axis in space
+    * PShape solves for some of this
   * Processing built-in attributes/uniforms for vertex shaders
     - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
+  * Line shader, point shader types, texlight
   * Projection matrix / modelview matrix
   * How to connect a vertex shader to a fragment shader in Processing
     * varying variables to pass data between vertex and fragment shaders
   * Lighting basics (normals, light position, etc)
-  
+
+## Round-up of what shaders can do
+
+Some ideas, but this maybe is too general?
+
+* Shaders can be used for both fragment and vertex processing, allowing for a wide range of visual effects and optimizations.
+* Fragment shaders are ideal for pixel-level effects, such as color manipulation, texture sampling, and post-processing effects.
+* Vertex shaders are essential for manipulating geometry, enabling effects like vertex displacement, procedural geometry, and advanced texturing & lighting techniques.
+* Shaders leverage the parallel processing power of the GPU, making them significantly faster than CPU-based drawing methods for many tasks.
+* Shaders can be combined with traditional Processing drawing functions, allowing for a hybrid approach that utilizes the strengths of both CPU and GPU rendering.
+* Shaders open up creative possibilities that are difficult or impossible to achieve with standard Processing functions, such as complex visual effects, real-time simulations, and interactive graphics.
+
 
 ## Potential advanced topics
 

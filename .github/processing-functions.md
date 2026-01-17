@@ -67,7 +67,7 @@
 * [splitTokens()](https://processing.org/reference/splitTokens_.html)
 * [split()](https://processing.org/reference/split_.html)
 * [trim()](https://processing.org/reference/trim_.html)
-    
+
 
 ### Input
 
@@ -122,7 +122,7 @@
 * [mousePressed()](https://processing.org/reference/mousePressed_.html)
 * [pmouseY](https://processing.org/reference/pmouseY.html)
 * [pmouseX](https://processing.org/reference/pmouseX.html)
-    
+
 
 ### Constants
 
@@ -131,7 +131,7 @@
 * [QUARTER\_PI](https://processing.org/reference/QUARTER_PI.html)
 * [TAU](https://processing.org/reference/TAU.html)
 * [TWO\_PI](https://processing.org/reference/TWO_PI.html)
-    
+
 
 ### Image
 
@@ -164,7 +164,7 @@
 * [textureMode()](https://processing.org/reference/textureMode_.html)
 * [textureWrap()](https://processing.org/reference/textureWrap_.html)
 * [texture()](https://processing.org/reference/texture_.html)
-    
+
 
 ### Rendering
 
@@ -181,11 +181,34 @@
 * [createGraphics()](https://processing.org/reference/createGraphics_.html)
 * [hint()](https://processing.org/reference/hint_.html)
 * [noClip()](https://processing.org/reference/noClip_.html)
-    
+
 
 ### Shape
 
-* [PShape](https://processing.org/reference/PShape.html)
+* [PShape](https://processing.org/reference/PShape.html
+  * [isVisible()](https://processing.org/reference/PShape_isVisible_.html) - Returns a boolean value **true** if the image is set to be visible, **false** if not
+  * [setVisible()](https://processing.org/reference/PShape_setVisible_.html) - Sets the shape to be visible or invisible
+  * [disableStyle()](https://processing.org/reference/PShape_disableStyle_.html) - Disables the shape's style data and uses Processing styles
+  * [enableStyle()](https://processing.org/reference/PShape_enableStyle_.html) - Enables the shape's style data and ignores the Processing styles
+  * [beginContour()](https://processing.org/reference/PShape_beginContour_.html) - Starts a new contour
+  * [endContour()](https://processing.org/reference/PShape_endContour_.html) - Ends a contour
+  * [beginShape()](https://processing.org/reference/PShape_beginShape_.html) - Starts the creation of a new **PShape**
+  * [endShape()](https://processing.org/reference/PShape_endShape_.html) - Finishes the creation of a new **PShape**
+  * [getChildCount()](https://processing.org/reference/PShape_getChildCount_.html) - Returns the number of children
+  * [getChild()](https://processing.org/reference/PShape_getChild_.html) - Returns a child element of a shape as a **PShape** object
+  * [addChild()](https://processing.org/reference/PShape_addChild_.html) - Adds a new child
+  * [getVertexCount()](https://processing.org/reference/PShape_getVertexCount_.html) - Returns the total number of vertices as an int
+  * [getVertex()](https://processing.org/reference/PShape_getVertex_.html) - Returns the vertex at the index position
+  * [setVertex()](https://processing.org/reference/PShape_setVertex_.html) - Sets the vertex at the index position
+  * [setFill()](https://processing.org/reference/PShape_setFill_.html) - Set the fill value
+  * [setStroke()](https://processing.org/reference/PShape_setStroke_.html) - Set the stroke value
+  * [translate()](https://processing.org/reference/PShape_translate_.html) - Displaces the shape
+  * [rotateX()](https://processing.org/reference/PShape_rotateX_.html) - Rotates the shape around the x‑axis
+  * [rotateY()](https://processing.org/reference/PShape_rotateY_.html) - Rotates the shape around the y‑axis
+  * [rotateZ()](https://processing.org/reference/PShape_rotateZ_.html) - Rotates the shape around the z‑axis
+  * [rotate()](https://processing.org/reference/PShape_rotate_.html) - Rotates the shape
+  * [scale()](https://processing.org/reference/PShape_scale_.html) - Increases and decreases the size of a shape
+  * [resetMatrix()](https://processing.org/reference/PShape_resetMatrix_.html) - Replaces the current matrix of a shape with the identity matrix
 * [createShape()](https://processing.org/reference/createShape_.html)
 * [loadShape()](https://processing.org/reference/loadShape_.html)
 
@@ -242,7 +265,7 @@
 
 * [shapeMode()](https://processing.org/reference/shapeMode_.html)
 * [shape()](https://processing.org/reference/shape_.html)
-    
+
 
 ### Typography
 
@@ -267,11 +290,34 @@
 
 * [textAscent()](https://processing.org/reference/textAscent_.html)
 * [textDescent()](https://processing.org/reference/textDescent_.html)
-    
+
 
 ### Math
 
 * [PVector](https://processing.org/reference/PVector.html)
+  * [set()](https://processing.org/reference/PVector_set_.html) - Set the components of the vector
+  * [random2D()](https://processing.org/reference/PVector_random2D_.html) - Make a new 2D unit vector with a random direction
+  * [random3D()](https://processing.org/reference/PVector_random3D_.html) - Make a new 3D unit vector with a random direction
+  * [fromAngle()](https://processing.org/reference/PVector_fromAngle_.html) - Make a new 2D unit vector from an angle
+  * [copy()](https://processing.org/reference/PVector_copy_.html) - Get a copy of the vector
+  * [mag()](https://processing.org/reference/PVector_mag_.html) - Calculate the magnitude of the vector
+  * [magSq()](https://processing.org/reference/PVector_magSq_.html) - Calculate the magnitude of the vector, squared
+  * [add()](https://processing.org/reference/PVector_add_.html) - Adds x, y, and z components to a vector, one vector to another, or two independent vectors
+  * [sub()](https://processing.org/reference/PVector_sub_.html) - Subtract x, y, and z components from a vector, one vector from another, or two independent vectors
+  * [mult()](https://processing.org/reference/PVector_mult_.html) - Multiply a vector by a scalar
+  * [div()](https://processing.org/reference/PVector_div_.html) - Divide a vector by a scalar
+  * [dist()](https://processing.org/reference/PVector_dist_.html) - Calculate the distance between two points
+  * [dot()](https://processing.org/reference/PVector_dot_.html) - Calculate the dot product of two vectors
+  * [cross()](https://processing.org/reference/PVector_cross_.html) - Calculate and return the cross product
+  * [normalize()](https://processing.org/reference/PVector_normalize_.html) - Normalize the vector to a length of 1
+  * [limit()](https://processing.org/reference/PVector_limit_.html) - Limit the magnitude of the vector
+  * [setMag()](https://processing.org/reference/PVector_setMag_.html) - Set the magnitude of the vector
+  * [heading()](https://processing.org/reference/PVector_heading_.html) - Calculate the angle of rotation for this vector
+  * [setHeading()](https://processing.org/reference/PVector_setHeading_.html) - Set the direction for this vector
+  * [rotate()](https://processing.org/reference/PVector_rotate_.html) - Rotate the vector by an angle (2D only)
+  * [lerp()](https://processing.org/reference/PVector_lerp_.html) - Linear interpolate the vector to another vector
+  * [angleBetween()](https://processing.org/reference/PVector_angleBetween_.html) - Calculate and return the angle between two vectors
+  * [array()](https://processing.org/reference/PVector_array_.html) - Return a representation of the vector as a float array
 
 ## Calculation
 
@@ -334,7 +380,7 @@
 * [random()](https://processing.org/reference/random_.html)
 * [randomGaussian()](https://processing.org/reference/randomGaussian_.html)
 * [randomSeed()](https://processing.org/reference/randomSeed_.html)
-    
+
 
 ### Output
 
@@ -366,7 +412,7 @@
 
 * [saveFrame()](https://processing.org/reference/saveFrame_.html)
 * [save()](https://processing.org/reference/save_.html)
-    
+
 
 ### Color
 
@@ -391,7 +437,7 @@
 * [noFill()](https://processing.org/reference/noFill_.html)
 * [noStroke()](https://processing.org/reference/noStroke_.html)
 * [stroke()](https://processing.org/reference/stroke_.html)
-    
+
 
 ### Lights Camera
 
@@ -433,7 +479,7 @@
 * [screenX()](https://processing.org/reference/screenX_.html)
 * [screenY()](https://processing.org/reference/screenY_.html)
 * [screenZ()](https://processing.org/reference/screenZ_.html)
-    
+
 
 ### Transform
 
@@ -450,7 +496,7 @@
 * [shearX()](https://processing.org/reference/shearX_.html)
 * [shearY()](https://processing.org/reference/shearY_.html)
 * [translate()](https://processing.org/reference/translate_.html)
-    
+
 
 ### Structure
 
@@ -496,7 +542,7 @@
 * [try](https://processing.org/reference/try.html)
 * [void](https://processing.org/reference/void.html)
 *  [. (dot)](https://processing.org/reference/dot.html)
-    
+
 
 ### Control
 
@@ -530,7 +576,7 @@
 *  [&& (logical AND)](https://processing.org/reference/logicalAND.html)
 *  [! (logical NOT)](https://processing.org/reference/logicalNOT.html)
 *  [|| (logical OR)](https://processing.org/reference/logicalOR.html)
-    
+
 
 ### Environment
 

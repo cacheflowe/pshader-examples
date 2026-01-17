@@ -913,6 +913,8 @@ So far, all examples have used 2D coordinates for vertex positions. However, Pro
 
 In the next example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is drawn as seen in the previous example using `fill()` and `vertex()` - it's all generated in the vertex shader based on the vertex positions. The fragment shader simply passes along the color calculated in the vertex shader.
 
+TODO: add example code from sketch & explain output
+
 ```java
 
 ```
@@ -943,13 +945,12 @@ New concepts:
 - next example could show PShape and how they behave differently
 
 Next example:
-- Texture sampling to deform a grid of rectangles in 3D space
-
+- Texture sampling to deform a grid of rectangles in 3D space (takes the prior example one step forward)
 
 Next example:
-- texture displacement on a sphere
+- Texture sampling to deform a sphere in 3D space (blue marble example)
 - PShape w/sphere detail - this is the easiest way to texture-map a sphere
   - The geometry has UV coordinates that map perfectly to an equirectangular spherical image
-    - It also has normals that face outwards, which is helpful for lighting calculations and displacement
+  - It also has normals that face outwards, which is helpful for lighting calculations and displacement. We can note normals here!, as built-inattributes of the geometry. Rect, box, sphere all have normals that are standardized for the type of geometry
   - This is now cached geometry, which is much more efficient than calling `sphere()` or creating new vertices every frame. PShape has its own tutorial, but is very powerful when combined with shaders
-  - when setTexture() is called on a PShape, the texture is automatically bound to the `texture` uniform in the shader
+  - when setTexture() is called on a PShape, the texture is automatically bound to the `texture` uniform in the shader, just like texture is automatically passed in when calling filter()

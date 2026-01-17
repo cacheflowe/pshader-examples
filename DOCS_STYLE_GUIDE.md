@@ -1,7 +1,7 @@
 
 # **Documentation Style Guide**
 
-Hello\! Welcome to the guidelines for writing p5.js documentation. This document is a remix of the following resources:
+Hello! Welcome to the guidelines for writing p5.js documentation. This document is a remix of the following resources:
 
 * Ruby on Rails [API Documentation Guidelines](https://guides.rubyonrails.org/api_documentation_guidelines.html) (CC BY-SA 4.0)  
 * WordPress documentation guidelines for [accessibility](https://make.wordpress.org/docs/style-guide/general-guidelines/accessibility/) and [inclusivity](https://make.wordpress.org/docs/style-guide/general-guidelines/inclusivity/) (CC0)  
@@ -141,7 +141,7 @@ While writing unbiased documentation:
 | ----- | ----- |
 | person with disability | the disabled, handicapped, differently abled, challenged, abnormal |
 | person without disability | normal person, healthy person, able-bodied |
-| has \[disability\] | victim of, suffering from, affected by, stricken with |
+| has [disability] | victim of, suffering from, affected by, stricken with |
 | unable to speak, uses synthetic speech | dumb, mute |
 | deaf, low-hearing | hearing-impaired |
 | blind, low-vision | vision-impaired, visually-challenged |
@@ -480,7 +480,7 @@ While writing unbiased documentation:
   Why? Broken strings are hard to read and make code less searchable.
 
 `// Bad.`  
-`let essay = 'You see us as you want to see us: \`  
+`let essay = 'You see us as you want to see us: `  
 `in the simplest terms, in the most convenient definitions.';`
 
 `// Bad.`  
@@ -821,7 +821,7 @@ Don’t use selection operators in place of conditionals.
 
 `let images = [];`
 
-* Use [Array\#push](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push/) instead of direct assignment to add items to an array.
+* Use [Array#push](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/push/) instead of direct assignment to add items to an array.
 
 `let lyrics = [];`
 
