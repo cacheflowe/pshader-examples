@@ -5,11 +5,10 @@
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CTD Creative Coding</title>
+    <title>PShader Tutorial</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/dark.min.css" />
-
     <style>
       @import url(https://fonts.googleapis.com/css?family=Droid+Sans);
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -215,8 +214,9 @@
             prepLinksForBigPicture();
             scrollToAnchor();
             handleSpecialClicks();
-            selectHighlightElements();
-            addLeftRightArrows();
+            // selectHighlightElements();
+            // addLeftRightArrows();
+            createTOCFromHeaders();
             hljs.highlightAll();
           });
       }
@@ -231,6 +231,7 @@
               <a></a>
               <a role="button" href="https://github.com/cacheflowe/pshader-examples">GitHub</a>
             </nav>
+            <toc-container></toc-container>
           </header>
           ${title}
         `;
@@ -272,6 +273,20 @@
         a.classList.add("anchor");
         a.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M9.5 14.5a3.5 3.5 0 0 1 0-7 3.5 3.5 0 0 1 0 7z"></path><path d="M14.5 9.5a3.5 3.5 0 0 1 0 7 3.5 3.5 0 0 1 0-7z"></path><line x1="9.5" y1="14.5" x2="14.5" y2="9.5"></line></svg>`;
         return a;
+      }
+
+      function createTOCFromHeaders() {
+        let headers = document.querySelectorAll("h1, h2, h3");
+        let html = '<div class="toc"><h2>Table of Contents</h2><ul>';
+        for (let header of headers) {
+          let slug = slugify(header.innerText);
+          let level = header.tagName.toLowerCase();
+          let prefix = level === "h1" ? "" : level === "h2" ? "├─ " : "│  └─ ";
+          html += `<li class="${level}"><a href="#${slug}">${prefix}${header.innerText}</a></li>`;
+          console.log(header.innerText, slug);
+        }
+        html += "</ul></div>";
+        document.querySelector("toc-container").innerHTML = html;
       }
 
       function prepHeaderAnchors() {
@@ -428,7 +443,7 @@
         document.body.addEventListener("click", (e) => {
           if (!e.target.closest("#content")) return; // ignore clicks outside of content area
           checkHeaderClick(e);
-          checkHighlightClick(e);
+          // checkHighlightClick(e);
           checkBigPictureClick(e);
         });
       }

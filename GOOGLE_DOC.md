@@ -141,3 +141,91 @@ Spacefiller: *This is an aside, but I really like this ontology of documentation
   * You can compile glsl from [inline code](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_ReloadInlineGlsl_Rippleskin.java), especially now that the Processing IDE supports multiline strings  
   * Using float32 textures for particle simulations. I have a solution in this [GitHub issue](https://github.com/benfry/processing4/issues/724), but also have a [working](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/core/draw/context/pg32/PGraphics32.java) [implementation](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_GPUParticles.java) that I could convert into a pure Processing demo
 
+## Alex's built-in uniforms
+
+
+### **Basic shader examples**
+
+Basic vert.glsl file:
+
+```glsl
+uniform mat4 transformMatrix;
+attribute vec4 position;
+attribute vec4 color;
+varying vec4 vertColor;
+
+void main() {
+  gl_Position = transformMatrix * position;
+  vertColor = color;
+}
+```
+
+Basic frag.glsl file:
+
+```glsl
+varying vec4 vertColor;
+
+void main() {
+  gl_FragColor = vertColor;
+}
+```
+
+Loading the files above in a sketch:
+
+```java
+PShader shader;
+
+void setup() {
+  size(640, 360, P2D);
+  shader = loadShader("frag.glsl", "vert.glsl");
+}
+
+void draw() {
+  shader(shader);
+  // ... do drawing ...
+}
+```
+
+### **Vertex shader uniforms**
+
+```glsl
+uniform mat4 modelviewMatrix;
+uniform mat4 transformMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 texMatrix;
+uniform int lightCount;
+uniform vec4 lightPosition[8];
+uniform vec3 lightNormal[8];
+uniform vec3 lightAmbient[8];
+uniform vec3 lightDiffuse[8];
+uniform vec3 lightSpecular[8];  
+uniform vec3 lightFalloff[8];
+uniform vec2 lightSpot[8];
+```
+
+### **Vertex shader attributes**
+
+```glsl
+attribute vec4 position;
+attribute vec4 color;
+attribute vec3 normal;
+attribute vec2 texCoord;
+attribute vec4 ambient;
+attribute vec4 specular;
+attribute vec4 emissive;
+attribute float shininess;
+```
+
+### **Fragment shader uniforms**
+
+```glsl
+uniform sampler2D texture;
+uniform vec2 texOffset;
+```
+
+### **Fragment shader built-in variables**
+
+```glsl
+vec4 gl_FragColor
+vec4 gl_FragCoord — screen space coordinates
+```

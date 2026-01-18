@@ -2,29 +2,35 @@
 
 ## Introduction: What are Shaders?
 
-Shaders, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language), provide many opportunities for exciting, powerful, and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, and custom control over the lighting, materials, and geometry of 3d shapes. 
+Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3d shapes, and beyond. 
 
-Shaders are powerful and portable graphics programs that can run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of this. So, while shaders may be a new concept, they are already an integral part of how Processing works.
+Shader run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
 
-GLSL is a “c-style language” ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is certainly different than writing Java, but there is familiar-looking syntax when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any efforts to learn them in Processing can be useful when programming in other environments!
+GLSL is a “c-style language” ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any efforts to learn them in Processing is a highly portable skill set.
 
-There are many technical details about writing shader programs that aren't covered in this tutorial, because there are so many excellent educational resources on the internet that explain deeper concepts. Primarily, this tutorial will show introductory examples to common uses of shaders in Processing.
+This tutorial covers an entry-level introduction to using shaders in Processing, but there are many excellent educational resources on the internet that explain deeper concepts. There's a whole world of shader techniques to explore that are far beyond the scope of this introduction. Primarily, this tutorial explains basic shader concepts via examples and definitions to demonstrate common creative uses of shaders in Processing.
+
+## Processing Shader Examples
+
+In the Processing IDE, go to **File > Examples... > Topics > Shaders** to find a set of built-in shader examples that come with Processing. These examples cover a variety of shader techniques, and are a great way to start exploring how shaders work in Processing. These full source code for these examples can also be found in the [processing-examples GitHub repository](https://github.com/processing/processing-examples/tree/main/Topics/Shaders), which makes the external shader files easy to browse.
 
 ## Writing a First Shader
 
-***\[🚨🚨\]*** How do we write a shader? Which IDE?
+***\[🚨🚨\]*** How do we write a shader? Which IDE do we point users to?
+<!--
+* ~~***\[HOW DO WE CREATE & OPEN THIS FILE IN THE IDE?\]***~~
+  * ***SHADER MODE DOESN’T WORK IN PROCESSING 4.3.1***  
+  * ***Would we need to suggest VS Code for now?***   
+* Install **Shader Mode** from the Modes manager, which allows editing GLSL code in a new tab in the Processing IDE. To do this, click the dropdown button in the upper-right of the IDE, and select “Manage Modes…”. Then select “Shader Mode” and click “Install”.  
+* ![Shader Mode Menu](images/ide-shader-mode.png)~~
+-->
 
 To write a shader, follow these steps:
 
 * Create a new sketch in Processing and save it. This will create a new directory for the sketch.
-* Inside the sketch directory, create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. To keep things simple, this tutorial starts with a single fragment shader, also known as a pixel shader.
-  * ~~***\[HOW DO WE CREATE & OPEN THIS FILE IN THE IDE?\]***~~
-    * ***SHADER MODE DOESN’T WORK IN PROCESSING 4.3.1***  
-    * ***Would we need to suggest VS Code for now?***   
-  * Install **Shader Mode** from the Modes manager, which allows editing GLSL code in a new tab in the Processing IDE. To do this, click the dropdown button in the upper-right of the IDE, and select “Manage Modes…”. Then select “Shader Mode” and click “Install”.  
-  * ![Shader Mode Menu](images/ide-shader-mode.png)~~
-* Use `loadShader()` to load the GLSL program.
-* Use `filter()` to apply the shader to the canvas.
+* Inside the sketch directory, create a new directory called `data`, and inside that directory create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. To keep things simple, this tutorial starts with a single **fragment shader**, also known as a **pixel shader**.
+* Use [`loadShader()`](https://processing.org/reference/loadShader_.html) to load the GLSL program.
+* Use [`filter()`](https://processing.org/reference/filter_.html) to apply the shader to the canvas.
 
 The `loadShader()` function returns a PShader object, which is Processing’s representation of a shader program that has been loaded from GLSL source files. It can then be applied to the graphics context in the `draw()` loop. The following is an example of loading a shader file in the sketch code, with the `shader.glsl` code below. Note that shaders only work in the `P2D` or `P3D` rendering modes, because these modes use OpenGL for graphics, and GLSL is a feature of OpenGL.
 
@@ -49,7 +55,7 @@ void main() {
 
 ![Example 1](images/example-01.png)
 
-This is possibly the simplest shader that can be written in Processing. When run, the sketch should show a red background. If the background is not red, check for errors in the console. Ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all of them do.
+This is possibly the simplest shader that can be written in Processing. When run, the sketch should fill the canvas with red. If the background is not red, check for errors in the console. Ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all of them do.
 
 In the GLSL code, note the following details:
 
@@ -272,7 +278,7 @@ color.rb *= 0.0;
 gl_FragColor = vec4(color.rgb, 1.0);
 ```
 
-### Comparing CPU vs GPU Pixel Manipulation Performance
+## Comparing CPU vs GPU Pixel Manipulation Performance
 
 There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920x1080 has over 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains 4 values for the RGBA color components for all 2 million pixels, there are around 8 million pieces of data to handle. If the program is expected to run at a high framerate, this approach may not work well. In a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent. Certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the same task on the CPU.
 
@@ -570,9 +576,9 @@ void main() {
 
 ## More on UV coordinates
 
-As note previously, every shader in Processing is handed `vertTexCoord`, which allows the shader to know how to draw pixels on screen, based on where the shape's vertices are. Typlically, for rectangular shpaes, these UV coordinates are at the four corners of the shape. By using `beginShape()`, `vertex()`, and `endShape()` Processing allows for custom UV coordinates to be specified. These custom UV coordinates are passed to the shader via `vertTexCoord`, which can allow for more complexity with how an image is applied to the geometry.
+As noted previously, every shader in Processing is handed `vertTexCoord`, which allows the shader to know how to draw pixels on screen, based on where the shape's vertices are. Typlically, for rectangular shpaes, these UV coordinates are normalized to the four corners of the shape. By using `beginShape()`, `vertex()`, and `endShape()` Processing allows for custom UV coordinates to be specified as vertices are defined. These custom UV coordinates are automatically passed from the CPU to the shader via `vertTexCoord`, which can allow for more customization with how an image is applied to the geometry.
 
-Consider this example of custom UV coordinates with `beginShape()` and `vertex()` without a shader. The result mimics the `tiling.glsl` post-processing shader example, but this time the tiling is done on the CPU side by specifying custom UV coordinates for each vertex of the shape, rather than inside of the shader. This exemplifies the connection between CPU-side geometry data and how that data is used and potentially furhter maniuplated on the GPU.
+Consider this example of custom UV coordinates with `beginShape()` and `vertex()` without a shader. The result mimics the `tiling.glsl` post-processing shader example, but this time the tiling behavior is specified on the CPU by specifying custom UV coordinates for each vertex of the shape, rather than inside of the shader. This exemplifies the connection between geometry data created in Java, and how that data is used and opens the door for further manipulation on the GPU via shaders.
 
 ```java
 PImage img;
@@ -604,7 +610,7 @@ void draw() {
 }
 ```
 
-The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates mapped to the circular geometry. The drawn circle contains a cutout of the original image. The custom UV coordinates are then displaced in the shader to change where the image is being sampled from by displacing the original UV coordinates.
+The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates mapped to the circular geometry. This circle contains a cutout of the original image due to the custom UV coordinates. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates.
 
 ```java 
 PImage img;
@@ -674,7 +680,7 @@ void main() {
   vec2 displace = vec2(cos(uv.y * frequency), sin(uv.x * frequency));
   uv += displace * uDisplaceAmp;
 
-  // draw color to screen
+  // draw to screen by sampling the texture at the displaced UVs
   gl_FragColor = texture2D(texture, uv);
 }
 ```
@@ -944,8 +950,12 @@ New concepts:
 - there's a lot more to keep in mind with vertex shaders in 3D
 - next example could show PShape and how they behave differently
 
+## Texture-sampling techniques in 3d
+
 Next example:
 - Texture sampling to deform a grid of rectangles in 3D space (takes the prior example one step forward)
+
+## Spherical texturing and deformation
 
 Next example:
 - Texture sampling to deform a sphere in 3D space (blue marble example)

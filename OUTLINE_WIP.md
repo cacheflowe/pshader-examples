@@ -41,21 +41,22 @@
     - ✅texturing
     - Colors 
     - ✅ Displacement (vertex manipulation, color)  
-    - Different types of shaders: \#COLOR, \#TEXTURE, \#TEXLIGHT, \#LINE, \#POINT  
+    - Different types of shaders: #COLOR, #TEXTURE, #TEXLIGHT, #LINE, #POINT  
   - Explain: Understand that we have been applying texture to two triangles all along  
     - Show classic rendering stages diagram?  
   - Make patterns and/or colors across a 3D shape  
     - ✅ This can show how shader() changes the global context and fragment shader is contained to the shape  
-  - Color-per-vertex - without a shader you can set colors per vertex with fill() -\> vertex()  
+  - Color-per-vertex - without a shader you can set colors per vertex with fill() -> vertex()  
     - Interpolation between vertices of colors, attribute values, texture coords  
   - 3d geometry & shading, which is the original use case of shaders  
     - How does the vertex position relate to screen space UV coords?  
   - Move in to 3D and adjust positions vertex on a plane  
     - Normals  
-    - Uv coords  
+    - ✅ UV coords  
   - ✅ Explain: varying values - passed from vertex shader to fragment shader  
-    - Terrain example between CPU -\> GPU  
+    - Terrain example between CPU -> GPU  
   - ✅ Explain: attributes  
+    - Custom attributes would be cool - are these only on PShape?
   - Advanced tutorial (Based on Andres’ Android tutorial)  
   - Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
   - Point to default shaders in the Processing source code to let folks know this stuff exists? 
@@ -91,6 +92,15 @@
     - Show sin()/cos() to animate a circle in a circle
       - Also show an example of centered coordinate system with aspect ratio correction
     - Show mix() to blend between two colors
+- Simulation ideas?  
+  - Particle systems? Probably too advanced for this tutorial  
+  - Cellular automata? https://github.com/processing/processing-examples/tree/main/Topics/Shaders
+    - `ppixels`!!!!! Conway example
+    - `texOffset` & sampling kernel w/built-in texOffset uniform for neighbor pixels
+      - https://github.com/processing/processing-examples/blob/main/Topics/Shaders/BlurFilter/data/blur.glsl
+    - custom lighting:
+      - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/GlossyFishEye
+      - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/ToonShading
 
 ## Tutorial/formatting questions 
 
