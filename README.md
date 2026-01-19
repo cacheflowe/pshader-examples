@@ -971,6 +971,8 @@ TODO: add example code from sketch & explain output
 
 ```
 
+![Z-displace](images/shader_demo_vertex_shader_generative.png)
+
 New concepts:
 - `normal`
 - `transformMatrix`
