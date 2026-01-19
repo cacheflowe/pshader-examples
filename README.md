@@ -53,7 +53,7 @@ void main() {
 }
 ```
 
-![Example 1](images/example-01.png)
+![Solid color output](images/shader_demo_01.png)
 
 This is possibly the simplest shader that can be written in Processing. When run, the sketch should fill the canvas with red. If the background is not red, check for errors in the console. Ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all of them do.
 
@@ -88,7 +88,7 @@ void main() {
 }
 ```
 
-![Example 2](images/example-02.png)
+![x-coordinate to red gradient](images/shader_demo_02.png)
 
 Note the following details in the updated shader code:
 
@@ -112,7 +112,7 @@ void main() {
 }
 ```
 
-![Example 3](images/example-03.png)
+![UV map output](images/shader_demo_03.png)
 
 By visualizing the coordinate system with color, the bottom-left origin is easy to see: zero red and zero green, resulting in black, and the top-right corner is represented by full red and green, which appears as yellow.
 
@@ -859,9 +859,11 @@ When the vertex and fragment shader are applied to the global graphics context w
 
 ## Using vertex colors instead of texture sampling
 
-In the next example, texture data is put aside for another look at how vertices can contain color data. By setting the fill color before calling `vertex()`, each vertex is assigned its own color `attribute`. This color data is then passed to the fragment shader via a `varying` variable. It's notable that the `color` varying is defined exactly the same way in both shader files. The default shaders in Processing simply pass this data along, leading to smooth interpolation of gradients and texture mapping between vertices. But if the shaders are customized, the vertex color data can be manipulated in interesting (and very efficient) ways.
+In the next example, texture data is put aside for another look at how vertices can contain color data. By setting the fill color before calling `vertex()`, each vertex is assigned its own color `attribute`. This color data is then passed to the fragment shader via a `varying` variable. Note that the `color` varying is defined exactly the same way in both shader files. The default shaders in Processing simply pass this data along, leading to smooth interpolation of gradients and texture mapping between vertices. If the shaders are customized, the vertex color data can be manipulated in interesting (and very efficient) ways.
 
-If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, the texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl). This is a great starting point to create custom shaders, and builds upon common Processing techniques. 
+In the following example, the vertex shader modifies the original vertex colors based on their distance from the mouse position. Vertices closer to the mouse become brighter, while those further away remain unchanged. The fragment shader passes along the adjusted color to the screen. While previous examples have shown color calculations in the fragment shader, this example shows the possibility of manipulating colors in the vertex shader.
+
+If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, some texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl) - this is a great starting point to create custom shaders. 
 
 ```java
 PImage img;
@@ -943,40 +945,112 @@ void main() {
 }
 ```
 
-By looking into how shaders apply to vertices and their positions, colors, and texture mapping, Processing's inner workings are revealed. There's a lot of magic that happens when vertex() is called, and shaders are at work whether the developer is aware of it or not. By learning how to write custom shaders, Processing users can unlock the full power of the GPU for their own creative coding projects.
+![Mouse distance vertex colors](images/shader_demo_vertex_shader_colors.png)
+
+Processing's inner workings are revealed by looking into how shaders apply to vertices, colors, and texture mapping. There's a lot of magic that happens when vertex() is called, and shaders are at work whether the developer is aware of it or not. By creating custom shaders, the developer gains full control over this pipeline, allowing for unique visual effects and optimizations that go beyond Processing's built-in capabilities.
 
 ## Adding a third dimension with Z coordinates
 
-So far, all examples have used 2D coordinates for vertex positions. However, Processing's P3D renderer supports 3D coordinates as well. By adding a Z coordinate to the `vertex()` function (or manipulating vertex positions in the vertex shader), depth can be introduced to the geometry. This allows for more complex shapes and effects.
+So far, all examples have used 2D coordinates for vertex positions. However, Processing's P3D renderer supports 3D coordinates as well. By adding a Z coordinate to the `vertex()` function (or by manipulating vertex positions in the vertex shader), depth can be introduced to the geometry.
 
-In the next example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is drawn as seen in the previous example using `fill()` and `vertex()` - it's all generated in the vertex shader based on the vertex positions. The fragment shader simply passes along the color calculated in the vertex shader.
-
-TODO: add example code from sketch & explain output
+In the following example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is created on the CPU - it's all generated in the vertex shader based on the vertex positions.
 
 ```java
+PShader myShader;
 
+void setup() {
+  size(640, 480, P3D);
+  myShader = loadShader("frag.glsl", "vert.glsl");
+}
+
+void draw() {
+  background(0);
+  
+  // set center of screen as 3d world origin
+  translate(width/2, height/2, -100);
+  rotateX(map(mouseY, 0, height, PI, -PI));
+  rotateY(map(mouseX, 0, width, -PI, PI));
+
+  // Update shader uniform and apply shader to the context 
+  myShader.set("uTime", (float) millis());
+  myShader.set("uDisplaceAmp", 100.0);
+  shader(myShader);
+
+  // Draw a subdivided mesh grid
+  fill(255);
+  noStroke();
+  float cellSize = 10;
+  int cols = floor(width / cellSize);
+  int rows = floor(height / cellSize);
+  
+  // Create mesh using rectangles
+  for(int row = 0; row < rows; row++) {
+    for(int col = 0; col < cols; col++) {
+      float x = col * cellSize - width / 2;
+      float y = row * cellSize - height / 2;
+      rect(x, y, cellSize, cellSize);
+    }
+  }
+  
+  resetShader();
+}
+```
+
+```glsl
+// vertex.glsl
+// processing-provided variables
+uniform mat4 transformMatrix;
+
+attribute vec4 vertex;
+attribute vec3 normal;
+
+varying vec4 vertColor;
+
+// custom uniforms
+uniform float uTime;
+uniform float uDisplaceAmp;
+
+void main() {
+  // Calculate distance from center of world 
+  // in original xy coords
+  float dist = distance(vec2(0.), vertex.xy);
+  dist *= 0.05;
+
+  // sin function for circular wave, normalized & offset over time
+  float phaseOffset = uTime * -0.003;
+  float sinAmp = 0.5 + 0.5 * sin(phaseOffset + dist);
+
+  // Use the sin amplitude to also create the vertex color 
+  // and pass to fragment shader to match displacement
+  vec4 finalColor = vec4(vec3(sinAmp), 1.);
+  vertColor = finalColor;
+
+  // Apply displacement in object space along Z axis
+  // using the normal direction, which orients properly
+  vec4 displacedvertex = vertex;
+  displacedvertex.xyz += normal * (sinAmp * uDisplaceAmp); 
+  gl_Position = transformMatrix * displacedvertex;
+}
 ```
 
 ```glsl
 // frag.glsl
+varying vec4 vertColor;
 
-```
-```glsl
-// frag.glsl
-
-```
-
-```glsl
-// vert.glsl
-
+void main() {
+  gl_FragColor = vertColor;
+}
 ```
 
+![Generative vertex shader depth and colors](images/shader_demo_vertex_shader_generative.png)
+
+🚨 TODO: explain output
 New concepts:
 - `normal`
 - `transformMatrix`
 - `distance()` / `sin()` - GLSL provides lots of nice math functions!
 - camera rotation impacting vertex positions
-- this example makes it look like there's lighting, but using custom shaders basically disables all built-in lighting, unless you re-implement it yourself, which is possible if you look at the texlight shader
+- this example makes it look like there's lighting, but using custom shaders basically disables all built-in lighting, unless you re-implement it yourself. This is possible if you start with the texlight shader, or implement a custom lighting model
 - object space vs. world space vs. screen space
 - position is in screen space, rather than normalized UV space like in the fragment shader
 - there's a lot more to keep in mind with vertex shaders in 3D
@@ -989,10 +1063,15 @@ Next example:
 
 ## Spherical texturing and deformation
 
+🚨 (rewrite this) Next example matches the texture sampling locations to a sphere's UV mapping coordinates, and then displaces the sphere's vertices based on the texture color values. This creates a bumpy sphere effect, where the texture image drives the vertex displacement.
+
+
+![Sphere texture displacement vertex shader](images/shader_demo_vertex_shader_displacement.png)
+
 Next example:
 - Texture sampling to deform a sphere in 3D space (blue marble example)
 - PShape w/sphere detail - this is the easiest way to texture-map a sphere
   - The geometry has UV coordinates that map perfectly to an equirectangular spherical image
   - It also has normals that face outwards, which is helpful for lighting calculations and displacement. We can note normals here!, as built-inattributes of the geometry. Rect, box, sphere all have normals that are standardized for the type of geometry
-  - This is now cached geometry, which is much more efficient than calling `sphere()` or creating new vertices every frame. PShape has its own tutorial, but is very powerful when combined with shaders
+  - PShape is now cached geometry, which is much more efficient than calling `sphere()` or creating new vertices every frame. PShape has its own tutorial, but is very powerful when combined with shaders
   - when setTexture() is called on a PShape, the texture is automatically bound to the `texture` uniform in the shader, just like texture is automatically passed in when calling filter()

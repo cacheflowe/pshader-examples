@@ -17,5 +17,6 @@ Make suggestions to improve the section based on the following tasks:
 4. If there are ways to make the point with fewer words, this is a noble goal.
 5. Suggest additional examples or analogies if they would help clarify complex concepts.
 6. Add descriptive alt tags to markdown images for accessibility.
+7. Ensure that punctuation and formatting follow standard conventions.
 
 Provide a brief explanation of the changes made.

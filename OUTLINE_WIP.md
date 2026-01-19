@@ -143,6 +143,6 @@
     - `ppixels`!!!!! Conway example - simulation shaders
 
 
-## Summary/conclusion of what shaders can do
+## Summary/conclusion 
 
 ???

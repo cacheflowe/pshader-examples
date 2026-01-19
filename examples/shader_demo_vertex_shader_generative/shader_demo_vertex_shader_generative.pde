@@ -1,4 +1,3 @@
-PImage img;
 PShader myShader;
 
 void setup() {
@@ -22,28 +21,18 @@ void draw() {
   // Draw a subdivided mesh grid
   fill(255);
   noStroke();
-  float cellSize = 20;  // Reduced from 30 to 10 for higher resolution
-  int cols = (int)(width / cellSize);
-  int rows = (int)(height / cellSize);
+  float cellSize = 10;
+  int cols = floor(width / cellSize);
+  int rows = floor(height / cellSize);
   
-  // Create mesh using quads
-  beginShape(QUADS);
+  // Create mesh using rectangles
   for(int row = 0; row < rows; row++) {
     for(int col = 0; col < cols; col++) {
       float x = col * cellSize - width / 2;
       float y = row * cellSize - height / 2;
-      
-      // Create a quad with 4 vertices
-      vertex(x, y, 0);
-      vertex(x + cellSize, y, 0);
-      vertex(x + cellSize, y + cellSize, 0);
-      vertex(x, y + cellSize, 0);
+      rect(x, y, cellSize, cellSize);
     }
   }
-  endShape();
   
   resetShader();
-}
-void mousePressed() {
-  saveFrame("../../images/"+sketchFile("").getName()+"-####.png");
 }
