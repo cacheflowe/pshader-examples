@@ -12,11 +12,13 @@ uniform vec2 uMouse;
 void main() {
   // Calculate distance between mouse and vertex position
   float distToMouse = distance(uMouse, position.xy);
-  float maxDist = 200.;
+  float maxDist = 400.;
 
   // displace vertex position away from mouse
   vec2 displacedPosition = position.xy;
-  displacedPosition += normalize(position.xy - uMouse) * (maxDist / distToMouse);
+  vec2 displaceVec = normalize(position.xy - uMouse);
+  float displaceAmplitude = (maxDist / distToMouse);
+  displacedPosition += displaceVec * displaceAmplitude;
 
   // set vertex position
   gl_Position = transformMatrix * vec4(displacedPosition, position.z, position.w);
