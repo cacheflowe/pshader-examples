@@ -55,7 +55,7 @@ void main() {
 
 ![Solid color output](images/shader_demo_01.png)
 
-This is possibly the simplest shader that can be written in Processing. When run, the sketch should fill the canvas with red. If the background is not red, check for errors in the console. Ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all of them do.
+This is possibly the simplest complete shader program that can be written in Processing. When it runs, the sketch should fill the canvas with red. If the background is not red, check for errors in the console. Ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all of them do.
 
 In the GLSL code, note the following details:
 
@@ -120,15 +120,17 @@ By visualizing the coordinate system with color, the bottom-left origin is easy 
 
 In the previous examples, the shader program was static; every time `filter()` is called, the output color is the same. However, shaders can be dynamic and interactive. In GLSL, almost any variable can be specified as a **uniform**, which adds the ability to **set** the value from Processing code. Uniforms are the only way to communicate to a shader program, as it has no other information about the world outside of its own code.
 
-Most GLSL data types can be set as uniforms from Processing code, with the most common being `float`, `int`, `vec2/vec3/vec4`, and `sampler2D` (an image or texture representation). These values can be set in Processing code with the `set()` [method](https://processing.org/reference/PShader_set_.html) of the PShader object. Each uniform data type has its own `set()` method to properly convert Java values into GLSL values. The Processing framework provides this bridge to allow communication between the CPU and GPU. Examples of using the `set()` method include:
+Most GLSL data types can be set as uniforms from Processing code, with the most common being `float`, `int`, `vec2/vec3/vec4`, and `sampler2D` (an image or texture representation). These values can be set in Processing code with the `set()` [method](https://processing.org/reference/PShader_set_.html) of the PShader object. Each uniform data type has its own `set()` method to convert Java values into GLSL values. The Processing framework provides this bridge to allow communication from the CPU to the GPU. Examples of using the `set()` method include:
 
-- `uniform int myInt`: `myShader.set("myInt", 2)`
-- `uniform float myFloat`: `myShader.set("myFloat", 3.0)`
-- `uniform vec2 myVec2`: `myShader.set("myVec2", x, y)`
-- `uniform vec3 myVec3`: `myShader.set("myVec3", x, y, z)`
-- `uniform vec4 myVec4`: `myShader.set("myVec4", x, y, z, w)`
-- `uniform bool myBool`: `myShader.set("myBool", true)`
-- `uniform sampler2D mySampler`: `myShader.set("mySampler", myImage)`
+| Processing Code to Set Value | GLSL Uniform Declaration |
+|--------------------------|------------------------------|
+| `myShader.set("myInt", 2)` | `uniform int myInt` |
+| `myShader.set("myFloat", 3.0)` | `uniform float myFloat` |
+| `myShader.set("myVec2", x, y)` | `uniform vec2 myVec2` |
+| `myShader.set("myVec3", x, y, z)` | `uniform vec3 myVec3` |
+| `myShader.set("myVec4", x, y, z, w)` | `uniform vec4 myVec4` |
+| `myShader.set("myBool", true)` | `uniform bool myBool` |
+| `myShader.set("mySampler", myImage)` | `uniform sampler2D mySampler` |
 
 The following example uses the mouse position to change the color of the left and right sides of the screen. The `splitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
 
@@ -539,13 +541,13 @@ void main() {
 }
 ```
 
+_Result of `textureWrap(CLAMP)`_:
+
 ![textureWrap(CLAMP)](images/shader_demo_repeat-clamp.png)
 
-_Result of `textureWrap(CLAMP)`_
+_Result of `textureWrap(REPEAT)`_:
 
 ![textureWrap(REPEAT)](images/shader_demo_repeat-repeat.png)
-
-_Result of `textureWrap(REPEAT)`_
 
 
 ## Using `shader()` for more control
@@ -861,7 +863,7 @@ When the vertex and fragment shader are applied to the global graphics context w
 
 In the next example, texture data is put aside for another look at how vertices can contain color data. By setting the fill color before calling `vertex()`, each vertex is assigned its own color `attribute`. This color data is then passed to the fragment shader via a `varying` variable. Note that the `color` varying is defined exactly the same way in both shader files. The default shaders in Processing simply pass this data along, leading to smooth interpolation of gradients and texture mapping between vertices. If the shaders are customized, the vertex color data can be manipulated in interesting (and very efficient) ways.
 
-In the following example, the vertex shader modifies the original vertex colors based on their distance from the mouse position. Vertices closer to the mouse become brighter, while those further away remain unchanged. The fragment shader passes along the adjusted color to the screen. While previous examples have shown color calculations in the fragment shader, this example shows the possibility of manipulating colors in the vertex shader.
+In the following example, the vertex shader modifies the original vertex colors based on their distance from the mouse position. Vertices closer to the mouse become brighter, while those further away remain unchanged. The fragment shader passes along the adjusted color to the screen. While previous examples have shown color calculations in the fragment shader, this example shows the possibility of manipulating colors in the vertex shader. It also demonstrates more intricate interactivity by using the mouse position to influence individual vertex colors.
 
 If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, some texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl) - this is a great starting point to create custom shaders. 
 
@@ -954,6 +956,8 @@ Processing's inner workings are revealed by looking into how shaders apply to ve
 So far, all examples have used 2D coordinates for vertex positions. However, Processing's P3D renderer supports 3D coordinates as well. By adding a Z coordinate to the `vertex()` function (or by manipulating vertex positions in the vertex shader), depth can be introduced to the geometry.
 
 In the following example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is created on the CPU - it's all generated in the vertex shader based on the vertex positions.
+
+Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows camera transformations like `translate()` and `rotateX()/rotateY()` to view the 3D geometry from different angles.
 
 ```java
 PShader myShader;

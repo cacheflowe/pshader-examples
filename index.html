@@ -172,16 +172,8 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/glsl.min.js"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/glsl.min.js"></script>
     <script>
       ////////////////////////////////////////
       // marked.js .md -> html
@@ -197,10 +189,8 @@
 
       function loadMarkdownFile() {
         // get md page to include
-        let classNum = getQueryParam("class");
         let doc = getQueryParam("doc");
         let mdFile = null;
-        if (classNum) mdFile = `./classes/class-${classNum}.md`;
         if (doc) mdFile = `./docs/${doc}.md`;
         if (!mdFile) mdFile = "./README.md";
 
@@ -209,7 +199,7 @@
           .then((response) => response.text())
           .then((data) => {
             // parse & insert html from md
-            let parsedHTML = headerHTML(classNum) + marked.parse(data);
+            let parsedHTML = headerHTML() + marked.parse(data);
             document.getElementById("content").innerHTML = parsedHTML;
             // post-process generated markup
             prepHeaderAnchors();
@@ -225,8 +215,7 @@
           });
       }
 
-      function headerHTML(classNum) {
-        let title = !classNum ? "" : "<h1>PShader Tutorial</h1>";
+      function headerHTML() {
         return /* html */ `
           <header>
             <nav>
@@ -235,9 +224,8 @@
               <a></a>
               <a role="button" href="https://github.com/cacheflowe/pshader-examples">GitHub</a>
             </nav>
-            <toc-container></toc-container>
           </header>
-          ${title}
+          <toc-container></toc-container>
         `;
       }
 
@@ -280,6 +268,7 @@
       }
 
       function createTOCFromHeaders() {
+        // collect headers
         let headers = document.querySelectorAll("h1, h2, h3");
         let html = '<div class="toc"><h2>Table of Contents</h2><ul>';
         for (let header of headers) {
@@ -287,10 +276,18 @@
           let level = header.tagName.toLowerCase();
           let prefix = level === "h1" ? "" : level === "h2" ? "├─ " : "│  └─ ";
           html += `<li class="${level}"><a href="#${slug}">${prefix}${header.innerText}</a></li>`;
-          console.log(header.innerText, slug);
+          // console.log(header.innerText, slug);
         }
         html += "</ul></div>";
-        document.querySelector("toc-container").innerHTML = html;
+
+        // creat element
+        let tocOuter = document.createElement("toc-container");
+        tocOuter.innerHTML = html;
+
+        // insert after title
+        let h1 = document.querySelector("h1");
+        h1.after(tocOuter);
+        // document.querySelector("toc-container").innerHTML = html;
       }
 
       function prepHeaderAnchors() {
@@ -339,6 +336,7 @@
         // rewrite .md links
         let links = document.querySelectorAll("a");
         for (let link of links) {
+          // console.log("Processing link:", link);
           let href = link.getAttribute("href") || "";
           let isLocal = href.indexOf("http") == -1;
           if (isLocal) {
@@ -352,6 +350,7 @@
               img.setAttribute("src", href);
               img.setAttribute("data-img", href);
               link.parentNode.replaceChild(img, link);
+              console.log("Replaced link with image:", img);
             }
             if (href.indexOf(".md") != -1) {
               if (href.indexOf("/class-") != -1) {
@@ -374,6 +373,11 @@
 
       function prepLinksForBigPicture() {
         // add click listener on links to open BiggerPicture
+        let imgs = document.querySelectorAll("img");
+        for (let img of imgs) {
+          let src = img.getAttribute("src");
+          img.setAttribute("data-img", src);
+        }
         let links = document.querySelectorAll("a");
         for (let link of links) {
           let href = link.getAttribute("href");
