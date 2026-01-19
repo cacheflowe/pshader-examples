@@ -47,6 +47,14 @@ Processing source code files of interest:
 * [PShader.java](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/PShader.java)
 * [PGraphicsOpenGL.java](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/PGraphicsOpenGL.java)
 
+To render a screenshot of a sketch using PShader, use this code snippet in your Processing sketch:
+
+```java
+void mousePressed() {
+  saveFrame("../../images/"+sketchFile("").getName()+"-####.png");
+}
+```
+
 ## Current Status
 
 - We are writing the actual WIP tutorial in README.md

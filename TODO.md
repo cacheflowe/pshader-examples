@@ -18,6 +18,7 @@
 
 - 🚨 Note: can’t open a .frag or .glsl file in the IDE - how do we recommend editing a glsl file?
 - Can I use the example image I found? cool cat? what else could we use here?
+  - https://www.freepik.com/free-photo/beautiful-cat-portrait-close-up_19866347.htm
 - Ask about punctuation/apostrophes/etc
 - Can/should we link to this repo's examples in tutorial?
   - Should more examples be created in the official examples repo in a PShader tutorial section?

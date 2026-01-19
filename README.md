@@ -2,11 +2,11 @@
 
 ## Introduction: What are Shaders?
 
-Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3d shapes, and beyond. 
+Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3D shapes, and beyond. 
 
-Shader run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
+Shaders run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
 
-GLSL is a “c-style language” ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any efforts to learn them in Processing is a highly portable skill set.
+GLSL is a "c-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any effort to learn them in Processing is a highly portable skill set.
 
 This tutorial covers an entry-level introduction to using shaders in Processing, but there are many excellent educational resources on the internet that explain deeper concepts. There's a whole world of shader techniques to explore that are far beyond the scope of this introduction. Primarily, this tutorial explains basic shader concepts via examples and definitions to demonstrate common creative uses of shaders in Processing.
 
@@ -38,7 +38,7 @@ The `loadShader()` function returns a PShader object, which is Processing’s re
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myShader = loadShader("shader.glsl"); 
 }
 
@@ -136,7 +136,7 @@ The following example uses the mouse position to change the color of the left an
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myShader = loadShader("shader.glsl");
 }
 
@@ -202,7 +202,7 @@ PImage myImage;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myImage = loadImage("cool-cat.png");
   myShader = loadShader("shader.glsl"); 
 }
@@ -225,6 +225,8 @@ void main() {
   gl_FragColor = vec4(color.r, color.r, color.r, 1.0);
 }
 ```
+
+![Grayscale GPU output](images/shader_demo_gpu_pixels.png)
 
 The updated shader code introduces new concepts:
 
@@ -282,13 +284,13 @@ gl_FragColor = vec4(color.rgb, 1.0);
 
 There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920x1080 has over 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains 4 values for the RGBA color components for all 2 million pixels, there are around 8 million pieces of data to handle. If the program is expected to run at a high framerate, this approach may not work well. In a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent. Certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the same task on the CPU.
 
-To examine a comparable program that generates the same image but on the CPU, the following example loops over each pixel and sets the RGB color values to the red component:
+To examine a comparable program that generates the same image via the CPU or GPU, the following example loops over each pixel and sets the green color value to the red component, and sets the red and blue channels to zero:
 
 ```java
 PImage myImage;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   pixelDensity(1);
   myImage = loadImage("cool-cat.png");
 }
@@ -300,23 +302,21 @@ void draw() {
     for (int x = 0; x < width; x++) {
       int loc = x + y*width;
       float r = red(pixels[loc]);
-      float g = green(pixels[loc]);
-      float b = blue(pixels[loc]);
-      pixels[loc] =  color(r,r,r);
+      pixels[loc] =  color(0, r, 0); // set green channel to red value
     }
   }
   updatePixels();
 }
 ```
 
-In comparison, the shader-powered version of this program runs significantly faster:
+In comparison, the shader-powered version of this program runs significantly faster, especially at higher resolutions, when the number of pixels increases dramatically:
 
 ```java
 PImage myImage;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myImage = loadImage("cool-cat.jpg");
   myShader = loadShader("shader.glsl"); 
 }
@@ -334,15 +334,19 @@ uniform sampler2D texture;
 void main() {
   vec2 uv = vertTexCoord.xy;
   vec4 color = texture2D(texture, uv);
-  gl_FragColor = vec4(color.r, color.r, color.r, 1.0);
+  gl_FragColor = vec4(0., color.r, 0., 1.);
 }
 ```
 
-This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex, real-time visual effects like blurs, distortions, and generative patterns that would otherwise be prohibitive on the CPU, especially at larger resolutions.
+Both approaches look exactly the same, but the performance difference is substantial.
 
+![Pixel manipulation comparison](images/shader_demo_texture_filter.png)
+
+This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex, real-time visual effects like blurs, distortions, and generative patterns that could be prohibitively slow on the CPU, especially at larger resolutions.
+
+<!--
 ***\[🚨🚨\]*** In testing on a MacBook Pro M1, the shader version can take \<1ms, while the CPU version can take 30ms if the canvas size is 1920x1080. The difference is less dramatic at smaller sizes.
-
-***\[🚨🚨\]*** This is broken on Mac if using the default pixelDensity() - create a bug report
+-->
 
 ## Post-Processing Shaders
 
@@ -360,7 +364,7 @@ PShader myShader;
 PImage img;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
   myShader = loadShader("brightness.glsl");
 }
@@ -394,6 +398,8 @@ void main() {
 }
 ```
 
+![alt text](images/shader_demo_post_processing-brightness.png) 
+
 ### Example 2: Vignette
 
 A vignette effect darkens the edges of an image. This is achieved by calculating the distance of the current pixel from the center of the screen, and using that distance to darken the pixels towards the edges of the canvas.
@@ -421,6 +427,9 @@ void main() {
 }
 ```
 
+![alt text](images/shader_demo_post_processing-vignette.png)
+
+
 ### Example 3: Tiling
 
 Shaders can also manipulate *where* a texture is sampled from. By modifying the original UV coordinates before sampling the texture, the image can be repeated or distorted. This is sometimes called domain warping. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which is comparable to the modulus operator `%` that's commonly used in Java and other languages on the CPU.
@@ -442,6 +451,9 @@ void main() {
   gl_FragColor = color;
 }
 ```
+
+![alt text](images/shader_demo_post_processing-tiling.png) 
+
 
 ### Example 4: Displacement
 
@@ -471,6 +483,8 @@ void main() {
 }
 ```
 
+![alt text](images/shader_demo_post_processing-displace.png) 
+
 These are just a small sample of post-processing effects that can be created with shaders. The code here is simple and efficient enough that multiple shaders can be applied in real-time to create complex visual styles without much of a performance impact. Try loading multiple shaders and applying them in sequence with multiple calls to `filter()`.
 
 ### A note about `textureWrap()`
@@ -482,7 +496,7 @@ PImage img;
 PShader uvRepeatShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
   uvRepeatShader = loadShader("uv-adjust.glsl");
 }
@@ -525,11 +539,20 @@ void main() {
 }
 ```
 
+![textureWrap(CLAMP)](images/shader_demo_repeat-clamp.png)
+
+_Result of `textureWrap(CLAMP)`_
+
+![textureWrap(REPEAT)](images/shader_demo_repeat-repeat.png)
+
+_Result of `textureWrap(REPEAT)`_
+
+
 ## Using `shader()` for more control
 
 The `filter()` function applies a shader to the entire canvas as a "screen space" post-processing effect. In this situation, the shader's UV coordinates are normalized from 0.0 - 1.0 across the entire canvas, and this is a great approach for generating full-canvas generative graphics or post-processing effects.
 
-Processing also provides the `shader()` function, which allows for more targeted control over where and how shaders are applied. This function can be used to apply shaders to specific geometry, rather than the entire screen. Much like fill() or strokeWeight() functions, calling `shader()` sets the current shader for all subsequent drawing operations, until another shader is set or the custom chaser is removed from the global graphics state by calling `resetShader()`. This is akin to using `push()` and `pop()` for styles, but specifically for shaders.
+Processing also provides the `shader()` function, which allows for more targeted control over where and how shaders are applied. This function can be used to apply shaders to specific geometry, rather than the entire screen. Much like fill() or strokeWeight() functions, calling `shader()` sets the current shader for all subsequent drawing operations, until another shader is set or the custom shader is revoked by calling `resetShader()`. This is akin to using `push()` and `pop()` for styles, but specifically for shaders. Unexpected results may occur if `shader()` is called without resetting it, so it's good practice to always call `resetShader()` after drawing with a custom shader.
 
 The most basic use of `shader()` is to apply a shader to shapes drawn with functions like `image()`, `rect()`, or custom geometry created with `beginShape()`, `vertex()`, and `endShape()`. When a shader is applied in this way, the UV coordinates in the shader are directly mapped to the shape's vertices, which have their own UV coordinates. `image()`  and `rect()`, for example, have default coordinates (like calling `filter()` on the entire canvas), but these coordinates are contained within the shape's bounds, wherever it's drawn on-screen. In the following example, the shader is only applied within the image boundaries, wherever it is drawn on the canvas:
 
@@ -538,7 +561,7 @@ PImage img;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
   myShader = loadShader("shader.glsl");
 }
@@ -574,6 +597,9 @@ void main() {
 }
 ```
 
+![shader() alpha adjustment](images/shader_demo_image_shader.png)
+
+
 ## More on UV coordinates
 
 As noted previously, every shader in Processing is handed `vertTexCoord`, which allows the shader to know how to draw pixels on screen, based on where the shape's vertices are. Typlically, for rectangular shpaes, these UV coordinates are normalized to the four corners of the shape. By using `beginShape()`, `vertex()`, and `endShape()` Processing allows for custom UV coordinates to be specified as vertices are defined. These custom UV coordinates are automatically passed from the CPU to the shader via `vertTexCoord`, which can allow for more customization with how an image is applied to the geometry.
@@ -584,7 +610,7 @@ Consider this example of custom UV coordinates with `beginShape()` and `vertex()
 PImage img;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
 }
 
@@ -610,14 +636,16 @@ void draw() {
 }
 ```
 
-The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates mapped to the circular geometry. This circle contains a cutout of the original image due to the custom UV coordinates. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates.
+![Tiling with UV coords](images/shader_demo_image_uv_coords.png)
+
+The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
 
 ```java 
 PImage img;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
   myShader = loadShader("shader.glsl");
 }
@@ -685,9 +713,11 @@ void main() {
 }
 ```
 
+![Circle vertices & UV coordinates](images/shader_demo_custom_shape_uv_shader.png)
+
 ## Adding a custom vertex shader
 
-So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader in a PShader object.
+So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader in a PShader object. Much like a fragment shader runs once for every pixel on the screen, a vertex shader runs once for every vertex defined in the geometry being drawn. For example, running a vertex shader on a rectangle shape will execute 4 times (once for each corner vertex), while a circle shape with 36 segments will run the vertex shader 36 times (once for each vertex around the circle).
 
 Using the last example as a starting point, a custom vertex shader is added to manipulate the vertex positions of the circular shape. The following example introduces a displacement effect to the circle's vertices based on their position, rather than via texture sampling as seen in the prior fragment shader example. The effect is similar in that the orginal image becomes warped, but here, it's because the *vertices* are moving, not the *sampling location* in the fragment shader. To add a custom vertex shader, create a new file named `vert.glsl` and load it alongside the fragment shader in the Processing sketch, and pass both into the `loadShader()` function, fragment shader first.
 
@@ -700,7 +730,7 @@ PImage img;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   img = loadImage("cool-cat.jpg");
   myShader = loadShader("frag.glsl", "vert.glsl");
 }
@@ -802,6 +832,8 @@ void main() {
 }
 ```
 
+![Vertex displacement effect](images/shader_demo_vertex_shader.png)
+
 Note the following details in the first look at vertex shaders:
 
 - Vertex positions are in their "screen space" coordinate system. For example, `vertex(200, 200)` creates a vertex that lives at 200, 200 in the vertex shader code too. This is a bit different than our normalized coordinates in the fragment shader.  
@@ -816,12 +848,12 @@ Note the following details in the first look at vertex shaders:
   - `texCoord` is the UV coordinate that was assigned to the vertex when `vertex(x, y, u, v)` was called. This is how custom UV coordinates are passed from the CPU to the GPU.
   - Both `color` and UV coordinates (`texCoord`) are passed to the fragment shader via `varying` variables. A `varying` variable is used to pass data from the vertex shader to the fragment shader. The GPU automatically interpolates these values between vertices for each pixel that is drawn, which allows for smooth transitions across the surface of the shape.
 
-### The full rasterization pipeline: from CPU to Vertex Shader to Fragment Shader to screen
+### The full rasterization pipeline explained: from CPU to Vertex Shader to Fragment Shader to screen
 
 When the vertex and fragment shader are applied to the global graphics context with the `shader` function, the following process occurs:
-- Each vertex defined by `vertex()` is processed by the vertex shader, which can modify its position and pass along (and modify) data like color and UV coordinates.
-- The GPU then performs **rasterization**, which is the process of determining which pixels on the screen are covered by the shape defined by the vertices. During rasterization, the GPU interpolates the `varying` variables (like UV coordinates and color) across the pixels that fall within the shape. This means that for each pixel, the GPU calculates the appropriate UV coordinates and color based on the values at the vertices.
-- Finally, for each pixel determined by rasterization, the fragment shader is executed. The fragment shader uses the interpolated UV coordinates to sample the texture or blend between vertex colors and determine the final color of that pixel.
+- Each vertex defined by `vertex()` (or other drawing functions) is processed by the vertex shader, which can modify its position and accompanying data like color and UV coordinates. The vertex shader can also create custom numeric data to pass to the fragment shader via `varying` variables.
+- The GPU then performs **rasterization**, which determines which pixels on screen are covered by the shape defined by the vertices. During this process, the GPU interpolates the `varying` variables (like UV coordinates and color) across the pixels within the shape, calculating smooth transitions based on the values at each vertex.
+- Finally, the fragment shader executes once for each pixel. It uses the interpolated data to determine the final pixel color, whether by sampling a texture, blending between vertex colors, or performing custom color calculations.
 
 ![](./images/rasterisation.png)
 
@@ -836,7 +868,7 @@ PImage img;
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myShader = loadShader("frag.glsl", "vert.glsl");
 }
 

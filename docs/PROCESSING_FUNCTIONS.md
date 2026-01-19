@@ -126,11 +126,11 @@
 
 ### Constants
 
-* [HALF\_PI](https://processing.org/reference/HALF_PI.html)
+* [HALF_PI](https://processing.org/reference/HALF_PI.html)
 * [PI](https://processing.org/reference/PI.html)
-* [QUARTER\_PI](https://processing.org/reference/QUARTER_PI.html)
+* [QUARTER_PI](https://processing.org/reference/QUARTER_PI.html)
 * [TAU](https://processing.org/reference/TAU.html)
-* [TWO\_PI](https://processing.org/reference/TWO_PI.html)
+* [TWO_PI](https://processing.org/reference/TWO_PI.html)
 
 
 ### Image
@@ -146,7 +146,7 @@
 * [get()](https://processing.org/reference/get_.html)
 * [loadPixels()](https://processing.org/reference/loadPixels_.html)
 * [mask()](https://processing.org/reference/mask_.html)
-* [pixels\[\]](https://processing.org/reference/pixels.html)
+* [pixels[]](https://processing.org/reference/pixels.html)
 * [set()](https://processing.org/reference/set_.html)
 * [updatePixels()](https://processing.org/reference/updatePixels_.html)
 
@@ -353,24 +353,24 @@
 
 ## Operators
 
-*  [\+ (addition)](https://processing.org/reference/addition.html)
+*  [+ (addition)](https://processing.org/reference/addition.html)
 *  [+= (add assign)](https://processing.org/reference/addassign.html)
-*  [\-- (decrement)](https://processing.org/reference/decrement.html)
+*  [-- (decrement)](https://processing.org/reference/decrement.html)
 *  [/ (divide)](https://processing.org/reference/divide.html)
 *  [++ (increment)](https://processing.org/reference/increment.html)
 *  [/= (divide assign)](https://processing.org/reference/divideassign.html)
-*  [\- (minus)](https://processing.org/reference/minus.html)
+*  [- (minus)](https://processing.org/reference/minus.html)
 *  [% (modulo)](https://processing.org/reference/modulo.html)
-*  [\*= (multiply assign)](https://processing.org/reference/multiplyassign.html)
-*  [\* (multiply)](https://processing.org/reference/multiply.html)
-*  [\-= (subtract assign)](https://processing.org/reference/subtractassign.html)
+*  [*= (multiply assign)](https://processing.org/reference/multiplyassign.html)
+*  [* (multiply)](https://processing.org/reference/multiply.html)
+*  [-= (subtract assign)](https://processing.org/reference/subtractassign.html)
 
 ## Bitwise Operators
 
 *  [<< (left shift)](https://processing.org/reference/leftshift.html)
 *  [& (bitwise AND)](https://processing.org/reference/bitwiseAND.html)
 *  [| (bitwise OR)](https://processing.org/reference/bitwiseOR.html)
-*  [\>> (right shift)](https://processing.org/reference/rightshift.html)
+*  [>> (right shift)](https://processing.org/reference/rightshift.html)
 
 ## Random
 
@@ -500,14 +500,14 @@
 
 ### Structure
 
-*  [\[\] (array access)](https://processing.org/reference/arrayaccess.html)
-*  [\= (assign)](https://processing.org/reference/assign.html)
+*  [[] (array access)](https://processing.org/reference/arrayaccess.html)
+*  [= (assign)](https://processing.org/reference/assign.html)
 * [catch](https://processing.org/reference/catch.html)
 * [class](https://processing.org/reference/class.html)
 *  [, (comma)](https://processing.org/reference/comma.html)
 *  [// (comment)](https://processing.org/reference/comment.html)
 *  [{} (curly braces)](https://processing.org/reference/curlybraces.html)
-*  [/\*\* \*/ (doc comment)](https://processing.org/reference/doccomment.html)
+*  [/** */ (doc comment)](https://processing.org/reference/doccomment.html)
 * [draw()](https://processing.org/reference/draw_.html)
 * [exit()](https://processing.org/reference/exit_.html)
 * [extends](https://processing.org/reference/extends.html)
@@ -516,7 +516,7 @@
 * [implements](https://processing.org/reference/implements.html)
 * [import](https://processing.org/reference/import.html)
 * [loop()](https://processing.org/reference/loop_.html)
-*  [/\* \*/ (multiline comment)](https://processing.org/reference/multilinecomment.html)
+*  [/* */ (multiline comment)](https://processing.org/reference/multilinecomment.html)
 * [new](https://processing.org/reference/new.html)
 * [noLoop()](https://processing.org/reference/noLoop_.html)
 * [null](https://processing.org/reference/null.html)
@@ -559,9 +559,9 @@
 
 ## Relational Operators
 
-*  [\== (equality)](https://processing.org/reference/equality.html)
-*  [\> (greater than)](https://processing.org/reference/greaterthan.html)
-*  [\>= (greater than or equal to)](https://processing.org/reference/greaterthanorequalto.html)
+*  [== (equality)](https://processing.org/reference/equality.html)
+*  [> (greater than)](https://processing.org/reference/greaterthan.html)
+*  [>= (greater than or equal to)](https://processing.org/reference/greaterthanorequalto.html)
 *  [!= (inequality)](https://processing.org/reference/inequality.html)
 *  [< (less than)](https://processing.org/reference/lessthan.html)
 *  [<= (less than or equal to)](https://processing.org/reference/lessthanorequalto.html)
