@@ -6,7 +6,11 @@ This is a set of instructions for creating a tutorial on using PShader in Proces
 
 This document continues the work from this [Google Doc](https://docs.google.com/document/d/1w9dV08FGh3ZgyY85iKcwuHZk3oYmdGV_6Xg8XwvWYGo/edit?pli=1&tab=t.0), now converted to [GOOGLE_DOC.md](../docs/GOOGLE_DOC.md)
 
-Source code for the examples in this tutorial are in the [/sketches/](../sketches/) folder.
+OpenGL reference for GLES 2.0 interface is here: 
+- https://registry.khronos.org/OpenGL/specs/
+- https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf
+
+Source code for the examples in this tutorial are in the [/examples/](../examples/) folder.
 
 Running notes, braindumps, and other article ideas are in the [../docs](/docs/) folder:
 
@@ -15,11 +19,13 @@ Running notes, braindumps, and other article ideas are in the [../docs](/docs/) 
 - [SHADERS_INTRO.md](../docs/SHADERS_INTRO.md) - Cacheflowe's thoughts on getting started with shaders, and lots of links to other resources
 - [SHADES_OF_SHADERS.md](../docs/SHADES_OF_SHADERS.md) - Raph's "Fifty Shades of Shaders" tutorial
 - [PROCESSING_FUNCTIONS.md](../docs/PROCESSING_FUNCTIONS.md) - links to official documentation for Processing functions 
+- [opengl_es_full_spec_2.0.md](../docs/opengl_es_full_spec_2.0.md) - converted from the official OpenGL ES 2.0 specification PDF 
 
 Robust code examples are in the [/_assets/](../_assets/) folder:
 
 - [1405_FiftyShadesOfShaders_update](../_assets/1405_FiftyShadesOfShaders_update) - from Raph & co
 - [processing-examples-Shaders](../_assets/processing-examples-Shaders) - from the official Processing examples repo
+- [Processing default shaders](../_assets/processing-default-shaders) - from the official Processing github repo source code
 - [haxademic-shaders-@cacheflowe](../_assets/haxademic-shaders-@cacheflowe) - from the Haxademic library
 - [pshader-experiments-master-@codeanticode](../_assets/pshader-experiments-master-@codeanticode)
 - [processing-postfx-master-@cansik](../_assets/processing-postfx-master-@cansik)

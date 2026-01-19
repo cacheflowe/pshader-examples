@@ -3,13 +3,14 @@
 Tools used:
 
 - Rich text to markdown converter: https://www.rich-text-to-markdown.com/
-
-Information sources:
-
-- [https://github.com/cacheflowe/haxademic/tree/master/data/haxademic/shaders](https://github.com/cacheflowe/haxademic)   
-  - lots of notes about built-in uniforms here  
-  * Lines 233 is where some default shader strings & texCoords are defined
-
+- PDF to markdown converter: https://github.com/microsoft/markitdown
+```powershell
+source .venv/bin/activate
+\venv\Scripts\activate.bat
+cd packages
+pip install -e markitdown[all]
+markitdown "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.pdf" > "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.md"
+```
 
 ## Notes from Raph
 
@@ -39,7 +40,6 @@ Outside the scope of tutorial
   - PImage
   - PShape
 - Functions in Processing vs GLSL
-  - https://registry.khronos.org/OpenGL/specs/ (GLES 2.0 interface noted in PGL.java)
   - Function analogies (Look at comparisons in `PROCESSING_FUNCTIONS.md`):
     - sin() ~ sin()
     - cos() ~ cos()
