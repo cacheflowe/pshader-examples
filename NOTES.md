@@ -44,12 +44,13 @@ Outside the scope of tutorial
     - sin() ~ sin()
     - cos() ~ cos()
     - ???
+    - constrain() ~ clamp()
+    - lerp() ~ mix() 
     - PVector ~ vec2/vec3/vec4
     - PImage ~ sampler2D
     - PVector.dist() ~ distance()
     - PVector.mag() ~ length()
     - PVector.normalize() ~ normalize()
-    - PVector.lerp() ~ mix()
 - Performance considerations
   - for loops shouldn't be used much
   - minimize conditionals

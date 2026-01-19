@@ -10,15 +10,20 @@ varying vec4 vertColor;
 uniform vec2 uMouse;
 
 void main() {
-  gl_Position = transformMatrix * position;
-
   // Calculate distance between mouse and vertex position
-  float dist = distance(uMouse, position.xy);
+  float distToMouse = distance(uMouse, position.xy);
+  float maxDist = 200.;
+
+  // displace vertex position away from mouse
+  vec2 displacedPosition = position.xy;
+  displacedPosition += normalize(position.xy - uMouse) * (maxDist / distToMouse);
+
+  // set vertex position
+  gl_Position = transformMatrix * vec4(displacedPosition, position.z, position.w);
 
   // Use distance to modify vertex color's rgb components - closer vertices are brighter
   // Create a new `finalColor` variable to hold the adjusted color, since attributes are read-only
-  float maxDist = 200.;
-  float brightness = 1.0 - dist / maxDist;
+  float brightness = 1.0 - distToMouse / maxDist;
   brightness = clamp(brightness, 0.0, 1.0); // clamp is like Processing's constrain()
   vec4 finalColor = color; // copy original color
   finalColor.xyz += vec3(brightness);
