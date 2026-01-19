@@ -37,52 +37,48 @@
 ## Remaining concepts to cover
 
 ### Vertex shaders  
-  - What we could explain:   
-    - ✅ texturing
-    - ✅ Colors set on vertices
-      - * `varying vec4 vertColor` - Original vertex color, supplied by Processing draw calls (or PShape)
-    - ✅ Displacement (vertex manipulation, color)  
-    - Different types of shaders: #COLOR, #TEXTURE, #TEXLIGHT, #LINE, #POINT  
-  - Explain: Understand that we have been applying texture to two triangles all along  
-    - Show classic rendering stages diagram?  
-  - Make patterns and/or colors across a 3D shape  
-    - ✅ This can show how shader() changes the global context and fragment shader is contained to the shape  
-  - Color-per-vertex - without a shader you can set colors per vertex with fill() -> vertex()  
-    - Interpolation between vertices of colors, attribute values, texture coords  
-  - 3d geometry & shading, which is the original use case of shaders  
-    - How does the vertex position relate to screen space UV coords?  
-  - ✅ Move in to 3D and adjust positions vertex on a plane  
-    - Normals  
-    - ✅ UV coords  
-  - ✅ Explain: varying values - passed from vertex shader to fragment shader  
-    - Terrain example between CPU -> GPU  
-  - ✅ Explain: attributes  
-    - Custom attributes would be cool - are these only on PShape? And not in the official documentation despite being public method `attrib()`
-  - Advanced tutorial (Based on Andres’ Android tutorial)  
-  - Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
-  - ✅ Point to default shaders in the Processing source code to let folks know this stuff exists? 
-    - https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
-  - Landscape built in example shows how to use shadertoy code?
-  - PShape!
-    - This speeds up the sketch because creating geometry is expensive. With the geometry cached, the program runs faster. 
+
+- ✅ That you need geometry to see vertex shaders in action
+- ✅ texturing
+- ✅ Colors set on vertices
+  - * `varying vec4 vertColor` - Original vertex color, supplied by Processing draw calls (or PShape)
+- ✅ Displacement (vertex manipulation, color)  
+- Different types of shaders: #COLOR, #TEXTURE, #TEXLIGHT, #LINE, #POINT  
+- 🚨Explain: Understand that we have been applying texture to two triangles all along - do this in the rasterization section
+  - ✅ Show classic rendering stages diagram?  
+- 🚨 Make patterns and/or colors across a 3D shape  
+  - ✅ This can show how shader() changes the global context and fragment shader is contained to the shape  
+- ✅ Color-per-vertex - without a shader you can set colors per vertex with fill() -> vertex()  
+  - 🚨 Interpolation between vertices of colors, attribute values, texture coords - do this in the rasterization section 
+- 3d geometry & shading, which is the original use case of shaders  
+  - ✅ How does the vertex position relate to screen space UV coords?
+- ✅ Move in to 3D and adjust positions vertex on a plane  
+  - ✅ Normals  
+  - ✅ UV coords  
+- ✅ Explain: varying values - passed from vertex shader to fragment shader  
+  - 🚨 Terrain example between CPU -> GPU
+- ✅ Explain: attributes  
+  - Custom attributes would be cool - are these only on PShape? And not in the official documentation despite being public method `attrib()`
+- Advanced tutorial (Based on Andres’ Android tutorial)  
+- Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
+- ✅ Point to default shaders in the Processing source code to let folks know this stuff exists? 
+  - https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
+- Landscape built in example shows how to use shadertoy code?
+- PShape!
+  - This speeds up the sketch because creating geometry is expensive. With the geometry cached, the program runs faster. 
 
 
 * Extra Vertex shader notes - TODO: merge these into the outline above
-  * That you need geometry to see vertex shaders in action
-  * ✅ Basic vertex manipulation (position)
-  * ✅ texturing 
-  * ✅ Colors
-  * ✅ Displacement (vertex manipulation, color)
-  * transform matrix - esp when thinking about z-displacement
-    * Need to displace in the direction of the model normal, not just z-axis in space
-    * PShape solves for some of this
-  * Processing built-in attributes/uniforms for vertex shaders
-    - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
+  * 🚨 transform matrix - esp when thinking about z-displacement
+    * 🚨 Need to displace in the direction of the model normal, not just z-axis in space
+    * 🚨 PShape solves for some of this
+  * ✅ Processing built-in attributes/uniforms for vertex shaders
+    - 🚨 Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
   * Line shader, point shader types, texlight
     * Fill + stroke gets more complicated
   * Projection matrix / modelview matrix
-  * How to connect a vertex shader to a fragment shader in Processing
-    * varying variables to pass data between vertex and fragment shaders
+  * ✅ How to connect a vertex shader to a fragment shader in Processing
+    * ✅ varying variables to pass data between vertex and fragment shaders
   * Particles - check points demo in 50 shades dir
   * Lighting basics (normals, light position, etc)
   - custom lighting:
@@ -92,8 +88,8 @@
 
 ### Back to fragment shaders - math, functions, generative drawing
 
-- We’re “talking to a pixel” - all of them at the same time. 
-  - Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
+- ✅ We're "talking to a pixel" - all of them at the same time. 
+  - ✅ Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
 - Check/convert notes in haxademic shaders README to explain the built-in uniforms and how to use them. Also, Alex’s default fragment/vertex shader  
 - Add to post-processing section?
   - Compositing with multiple images - using a matte or mask  
@@ -112,7 +108,7 @@
   - Example: draw a circle  
      - Link to SDF info  
      - Compare to drawing in Processing: ellipse()  
-  - Neighbor pixels / kernel / gaussian (for blur, etc) - texOffset
+  - Neighbor pixels / kernel / gaussian (for blur, etc) - texOffset - could be added in post-processing section!
      - Pixels don’t know anything about the rest of the image, besides where it is  
      - Fragment illustration - fireflies,
     - `texOffset` & sampling kernel w/built-in texOffset uniform for neighbor pixels
@@ -136,6 +132,9 @@
   - pg.filter() doesn't need beginDraw()/endDraw()
   - pg.shader() does need beginDraw()/endDraw()
   - Shaders can be applied to the main drawing window, or to a PGraphics instance  
+
+- PShape advanced ideas
+  - `attrib()` custom attributes
 
 - Simulation ideas?  
   - Particle systems? Probably too advanced for this tutorial  

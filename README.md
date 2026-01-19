@@ -1046,8 +1046,6 @@ void main() {
 }
 ```
 
-![Z-displace](images/shader_demo_vertex_shader_generative.png)
-
 ![Generative vertex shader depth and colors](images/shader_demo_vertex_shader_generative.png)
 
 🚨 TODO: explain output
