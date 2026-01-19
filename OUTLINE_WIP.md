@@ -30,7 +30,7 @@
   - ✅ Compare CPU vs GPU version of pixel manipulation to explain why shaders are great and fast  
      ✅ - UV coordinate concepts within variable sized canvases  
      ✅ - “Domain warping”  
-        ✅ - Use fract() to create zoomed/tiled output (coordinate space manipulation / “domain warping”. Compare to texture/vertex in processing  
+        ✅ - Use fract() to create zoomed/tiled output (coordinate space manipulation / “domain warping”). Compare to texture/vertex in processing  
     - ✅ Note textureMode(REPEAT) vs CLAMP setting 
   - ✅ Note: filter() vs shader() behavior to contain the shader operation to an image or shape, vs applying the the entire canvas. This can be useful for only affecting specific images or geometry, and necessary for vertex shader usage, where fragment shaders can be applied either way.
   
@@ -38,8 +38,9 @@
 
 ### Vertex shaders  
   - What we could explain:   
-    - ✅texturing
-    - Colors 
+    - ✅ texturing
+    - ✅ Colors set on vertices
+      - * `varying vec4 vertColor` - Original vertex color, supplied by Processing draw calls (or PShape)
     - ✅ Displacement (vertex manipulation, color)  
     - Different types of shaders: #COLOR, #TEXTURE, #TEXLIGHT, #LINE, #POINT  
   - Explain: Understand that we have been applying texture to two triangles all along  
@@ -50,22 +51,46 @@
     - Interpolation between vertices of colors, attribute values, texture coords  
   - 3d geometry & shading, which is the original use case of shaders  
     - How does the vertex position relate to screen space UV coords?  
-  - Move in to 3D and adjust positions vertex on a plane  
+  - ✅ Move in to 3D and adjust positions vertex on a plane  
     - Normals  
     - ✅ UV coords  
   - ✅ Explain: varying values - passed from vertex shader to fragment shader  
     - Terrain example between CPU -> GPU  
   - ✅ Explain: attributes  
-    - Custom attributes would be cool - are these only on PShape?
+    - Custom attributes would be cool - are these only on PShape? And not in the official documentation despite being public method `attrib()`
   - Advanced tutorial (Based on Andres’ Android tutorial)  
   - Gradient on a circle - run a shader on a PGraphics and apply as a texture to a circle  
-  - Point to default shaders in the Processing source code to let folks know this stuff exists? 
+  - ✅ Point to default shaders in the Processing source code to let folks know this stuff exists? 
     - https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders
   - Landscape built in example shows how to use shadertoy code?
   - PShape!
     - This speeds up the sketch because creating geometry is expensive. With the geometry cached, the program runs faster. 
 
-### Back to fragment shaders
+
+* Extra Vertex shader notes - TODO: merge these into the outline above
+  * That you need geometry to see vertex shaders in action
+  * ✅ Basic vertex manipulation (position)
+  * ✅ texturing 
+  * ✅ Colors
+  * ✅ Displacement (vertex manipulation, color)
+  * transform matrix - esp when thinking about z-displacement
+    * Need to displace in the direction of the model normal, not just z-axis in space
+    * PShape solves for some of this
+  * Processing built-in attributes/uniforms for vertex shaders
+    - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
+  * Line shader, point shader types, texlight
+    * Fill + stroke gets more complicated
+  * Projection matrix / modelview matrix
+  * How to connect a vertex shader to a fragment shader in Processing
+    * varying variables to pass data between vertex and fragment shaders
+  * Particles - check points demo in 50 shades dir
+  * Lighting basics (normals, light position, etc)
+  - custom lighting:
+    - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/GlossyFishEye
+    - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/ToonShading
+
+
+### Back to fragment shaders - math, functions, generative drawing
 
 - We’re “talking to a pixel” - all of them at the same time. 
   - Show rasterization diagram? especially when we get to vertex shaders and non-rectangular shapes
@@ -77,88 +102,47 @@
 - Go back to add generative shader examples
 - Come back to drawing generative shapes with fragment shaders now that we've covered coordinates, uniforms, textures
   - Generative drawing in a powerful/different way, a la Shadertoy  
-  - SDFs
+  - SDFs & shape drawing
+    - Comparison: When `rect()` is called in Processing, there’s no simple equivalent in GLSL. This is where SDFs come into play. If a GLSL program only knows what its coordinate is, a rectangle function has to check its coordinate’s distance against the boundary of the calculation of a rectangle.  
   - Show aspect-correction example to draw a proper circle, regardless of canvas size
+    - look at 50shades 01/04 example
+    - Centering & aspect ratio correction or UV coords
   - Drawing tools - distance functions, patterns, noise
   - Example: Aspect ratio correction & coordinate system?   
   - Example: draw a circle  
      - Link to SDF info  
      - Compare to drawing in Processing: ellipse()  
-  - Neighbor pixels / kernel / gaussian (for blur, etc) 
+  - Neighbor pixels / kernel / gaussian (for blur, etc) - texOffset
      - Pixels don’t know anything about the rest of the image, besides where it is  
      - Fragment illustration - fireflies,
+    - `texOffset` & sampling kernel w/built-in texOffset uniform for neighbor pixels
+      - https://github.com/processing/processing-examples/blob/main/Topics/Shaders/BlurFilter/data/blur.glsl
+    -  `uniform vec2 texOffset` - The size of a pixel, mapped to normalized `vertTexCoord` coordinates. If original texture is 1000px wide, `texOffset.x` is 1/1000.
   - MATH - use circle example below
     - Show length/distance() to create a circle/radial gradient
     - Show sin()/cos() to animate a circle in a circle
-      - Also show an example of centered coordinate system with aspect ratio correction
     - Show mix() to blend between two colors
+    - Noise generation - compare to noise() in Processing
+      - Could implement a grain post-processing effect as a demo, or displacement in a vertex shader
+    - Randomness & noise (no noise() or random() functions in GLSL)
+    - map() function doesn't exist. show custom implementation  
+      ```glsl
+      float remap(float value, float low1, float high1, float low2, float high2) {
+        return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+      }
+      ```
+
+- PGraphics can use shaders for more advanced multi-canvas rendering & compositing
+  - pg.filter() doesn't need beginDraw()/endDraw()
+  - pg.shader() does need beginDraw()/endDraw()
+  - Shaders can be applied to the main drawing window, or to a PGraphics instance  
+
 - Simulation ideas?  
   - Particle systems? Probably too advanced for this tutorial  
   - Cellular automata? https://github.com/processing/processing-examples/tree/main/Topics/Shaders
-    - `ppixels`!!!!! Conway example
-    - `texOffset` & sampling kernel w/built-in texOffset uniform for neighbor pixels
-      - https://github.com/processing/processing-examples/blob/main/Topics/Shaders/BlurFilter/data/blur.glsl
-    - custom lighting:
-      - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/GlossyFishEye
-      - https://github.com/processing/processing-examples/tree/main/Topics/Shaders/ToonShading
-
-## Tutorial/formatting questions 
-
-- 🚨 Note: can’t open a .frag or .glsl file in the IDE - how do we recommend editing a glsl file?
-- Can/should we link to examples in tutorial?
-  - Should examples be created in the official examples repo?
-- Make a pass through the tutorial and add ticks around keywords and links to reference pages. What's the standard here?
-- Can I use the example image I found? cool cat? what else could we use here?
-
-## Comparing advanced texture mapping to shader drawing
-
-- Scrolling with `texture()` and `vertex` vs doing it in a shader. There are good similarities here, especially around the concept of UV coordinates
-- Displacement shader: 2 texture uniforms and reading one to apply to another
-- Compositing w/multiple textures and a mask
-- Radial gradient comparison
+    - `ppixels`!!!!! Conway example - simulation shaders
 
 
-## Drawing generative shapes?
+## Summary/conclusion of what shaders can do
 
-- Comparison: When `rect()` is called in Processing, there’s no simple equivalent in GLSL. This is where SDFs come into play. If a GLSL program only knows what its coordinate is, a rectangle function has to check its coordinate’s distance against the boundary of the calculation of a rectangle.  
-- Centering & aspect ratio correction or UV coords
-- SDFs & shape drawing
-- Randomness & noise (no noise() or random() functions in GLSL)
-
-## Vertex Shaders
-
-* What we could explain:
-  * That you need geometry to see vertex shaders in action
-  * ✅ Basic vertex manipulation (position)
-  * ✅ texturing 
-  * ✅ Colors
-  * ✅ Displacement (vertex manipulation, color)
-  * Noise generation - compare to noise() in Processing
-    * Could implement a grain post-processing effect as a demo, or displacement in a vertex shader
-  * transform matrix - esp when thinking about z-displacement
-    * Need to displace in the direction of the model normal, not just z-axis in space
-    * PShape solves for some of this
-  * Processing built-in attributes/uniforms for vertex shaders
-    - Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
-  * Line shader, point shader types, texlight
-  * Projection matrix / modelview matrix
-  * How to connect a vertex shader to a fragment shader in Processing
-    * varying variables to pass data between vertex and fragment shaders
-  * Lighting basics (normals, light position, etc)
-
-## Round-up of what shaders can do
-
-Some ideas, but this maybe is too general?
-
-* Shaders can be used for both fragment and vertex processing, allowing for a wide range of visual effects and optimizations.
-* Fragment shaders are ideal for pixel-level effects, such as color manipulation, texture sampling, and post-processing effects.
-* Vertex shaders are essential for manipulating geometry, enabling effects like vertex displacement, procedural geometry, and advanced texturing & lighting techniques.
-* Shaders leverage the parallel processing power of the GPU, making them significantly faster than CPU-based drawing methods for many tasks.
-* Shaders can be combined with traditional Processing drawing functions, allowing for a hybrid approach that utilizes the strengths of both CPU and GPU rendering.
-* Shaders open up creative possibilities that are difficult or impossible to achieve with standard Processing functions, such as complex visual effects, real-time simulations, and interactive graphics.
-
-
-## Potential advanced topics
-
-* Shaders can be applied to the main drawing window, or to a PGraphics instance  
-* It is recommended that you use the loadShader() function instead of calling new PShader(), but this does open the door to more advanced options like shader compiling. Here be dragons
+???

@@ -26,39 +26,39 @@ A shader is a small program that runs on your graphic card (or GPU) and tells yo
 
 There are several shader languages. This tutorial focuses on the OpenGL Shader Language: GLSL... 
 
-Yep, that’s all. If you feel like you need more, I recommend watching this beautiful presentation by Steven Wittens: [http://youtu.be/GNO\_CYUjMK8](http://youtu.be/GNO_CYUjMK8) 
+Yep, that’s all. If you feel like you need more, I recommend watching this beautiful presentation by Steven Wittens: [http://youtu.be/GNO_CYUjMK8](http://youtu.be/GNO_CYUjMK8) 
 
 ## **Shaders in Processing**
 
 Processing supports shaders since version 2.0 thanks to the work from Andres Colubri ([https://twitter.com/codeanticode](https://twitter.com/codeanticode)).
 
 ![][image1]  
-Let’s look at one of the default examples included in Processing. Launch the Processing IDE then go to **File \> Examples** then **Topics \> Shaders** and open the **Landscape** example.
+Let’s look at one of the default examples included in Processing. Launch the Processing IDE then go to **File > Examples** then **Topics > Shaders** and open the **Landscape** example.
 
-1\) We declare a PShader object: 
+1) We declare a PShader object: 
 
 | PShader shader; |
 | :---- |
 
-## 2\) In setup(), We load the “landscape.glsl” file:
+## 2) In setup(), We load the “landscape.glsl” file:
 
-## shader \= loadShader("landscape.glsl");
+## shader = loadShader("landscape.glsl");
 
 ## *Note: You will find shader files with extensions like .glsl, .frag or .vert or no extension at all. It doesn’t matter to Processing so you can choose whatever is most convenient.*
 
-3\) Passing variables to the shader is done using the set() function of the PShader object. For example, in draw(), we are passing the elapsed time in seconds:
+3) Passing variables to the shader is done using the set() function of the PShader object. For example, in draw(), we are passing the elapsed time in seconds:
 
 shader.set("time", (float)(millis()/1000.0));
 
 *Note: This only works if the shader code actually contains a variable called* "time"*. We will see how that works very soon.*
 
-4\) This is where we actually call the shader:
+4) This is where we actually call the shader:
 
 shader(shader); 
 
 Everything that you draw on the screen from there on will pass through the shader.
 
-5\) In this case, we just want to fill the window with the image from the shader so we merely draw a rectangle that matches the dimensions of the sketch: 
+5) In this case, we just want to fill the window with the image from the shader so we merely draw a rectangle that matches the dimensions of the sketch: 
 
 rect(0, 0, width, height);
 
@@ -68,15 +68,15 @@ A computer screen displays shapes and colors through a grid of pixels. What it m
 
 ![][image2]
 
-#### ***fragment\_01\_solid\_color***
+#### ***fragment_01_solid_color***
 
 A pixel shader is a small set of instructions that is run once for every pixel within the target geometry (here, the rectangle that fills your sketch window). The job of the pixel shader is simple: set the value of the corresponding pixel.
 
 ![][image3]
 
-gl\_FragColor \= vec4 ( 0.0, 1.0, 0.0, 1.0 );
+gl_FragColor = vec4 ( 0.0, 1.0, 0.0, 1.0 );
 
-gl\_FragColor is the OpenGL variable that tells the corresponding pixel of the window what color to display. The type of gl\_FragColor is vec4 which is basically an array of four float values in the range \[0.0, 1.0\]. These values will be interpreted as the red, green, blue and alpha values of the pixel.
+gl_FragColor is the OpenGL variable that tells the corresponding pixel of the window what color to display. The type of gl_FragColor is vec4 which is basically an array of four float values in the range [0.0, 1.0]. These values will be interpreted as the red, green, blue and alpha values of the pixel.
 
 All fragments have the same simple set of instructions and work in parallel. This is what makes shaders so much faster than pixel-by-pixel calculations.
 
@@ -86,13 +86,13 @@ Well, while it IS the same program, it IS NOT the same fragment...
 
 Confusing? Read on.
 
-#### ***fragment\_02\_linear\_gradient*** 
+#### ***fragment_02_linear_gradient*** 
 
 Fragments are in fact not all identical. The main difference between them is that each fragment is “aware” of its x and y position. It may not seem like much but it’s actually one of the most powerful feature of pixel shaders.
 
 Let’s see what happens when we make color depend on position on the x-axis.  
 ![][image4]  
-gl\_FragColor \= vec4 ( pos.x, 0.0, 0.0, 1.0 );
+gl_FragColor = vec4 ( pos.x, 0.0, 0.0, 1.0 );
 
 The gradient you see is not defined anywhere in the program. It *emerges* from this one simple rule, applied at the position of each pixel in the window.
 
@@ -102,19 +102,19 @@ As a helpful metaphor, you can imagine that carbon copies of your shader program
 
 *Topics: Center coordinates, Functions (length, step, smoothstep)*
 
-#### ***fragment\_03\_radial\_gradient*** 
+#### ***fragment_03_radial_gradient*** 
 
 ![][image5]
 
-#### ***fragment\_04\_circle***
+#### ***fragment_04_circle***
 
 ### **Interacting with shaders**
 
 *Topics: Updating uniforms, math functions (sin)*
 
-#### ***fragment\_05\_mouse\_uniform***
+#### ***fragment_05_mouse_uniform***
 
-#### ***fragment\_06\_time\_uniform***
+#### ***fragment_06_time_uniform***
 
 ## **References**
 
@@ -123,7 +123,7 @@ As a helpful metaphor, you can imagine that carbon copies of your shader program
 #### ***Beginner***
 
 Steven Wittens excellent introduction to 3D computer graphics (a good starting point)  
-[http://youtu.be/GNO\_CYUjMK8](http://youtu.be/GNO_CYUjMK8)  
+[http://youtu.be/GNO_CYUjMK8](http://youtu.be/GNO_CYUjMK8)  
 The slides for the presentation are available as well: [http://acko.net/files/fullfrontal/fullfrontal/webglmath/online.html](http://acko.net/files/fullfrontal/fullfrontal/webglmath/online.html)
 
 Shader programming in Three.js (good way to review the basics)  
@@ -132,8 +132,8 @@ Shader programming in Three.js (good way to review the basics)
 
 #### ***Intermediate***
 
-Updated reference (May 2014\) for the PShader API  
-[http://codeanticode.wordpress.com/2014/05/08/shader\_api\_in\_processing\_2/](http://codeanticode.wordpress.com/2014/05/08/shader_api_in_processing_2/)
+Updated reference (May 2014) for the PShader API  
+[http://codeanticode.wordpress.com/2014/05/08/shader_api_in_processing_2/](http://codeanticode.wordpress.com/2014/05/08/shader_api_in_processing_2/)
 
 The official Processing PShader tutorial. It assumes previous knowledge of GLSL.  
 [http://processing.org/tutorials/pshader/](http://processing.org/tutorials/pshader/)
@@ -152,7 +152,7 @@ The wikipedia page about shaders is a good reference when you already have a gra
 A comprehensive GLSL tutorial (assumes previous knowledge of OpenGL)  
 [http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/glsl-core-tutorial-index/](http://www.lighthouse3d.com/tutorials/glsl-core-tutorial/glsl-core-tutorial-index/)
 
-OpenGL ES 2.0 reference card [http://www.khronos.org/opengles/sdk/docs/reference\_cards/OpenGL-ES-2\_0-Reference-card.pdf](http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf)
+OpenGL ES 2.0 reference card [http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf](http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf)
 
 Learning Modern 3D Graphics Programming (in depth CG tutorials)  
 [http://www.arcsynthesis.org/gltut/](http://www.arcsynthesis.org/gltut/)
