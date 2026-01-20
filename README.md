@@ -6,7 +6,9 @@ Shaders are powerful and portable graphics programs, written in [GLSL](https://w
 
 Shaders run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
 
-GLSL is a "c-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any effort to learn them in Processing is a highly portable skill set.
+GLSL is a "c-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)), and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so any effort to learn them in Processing is a highly portable skill set. 
+
+> The current version of Processing (4.x) uses OpenGL ES 2.0, which is a subset of the full OpenGL specification, so some features of GLSL may not be available, and the syntax may differ from other versions. The [OpenGL ES 2.0 specification](https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf) is a useful reference when writing shaders for Processing.
 
 This tutorial covers an entry-level introduction to using shaders in Processing, but there are many excellent educational resources on the internet that explain deeper concepts. There's a whole world of shader techniques to explore that are far beyond the scope of this introduction. Primarily, this tutorial explains basic shader concepts via examples and definitions to demonstrate common creative uses of shaders in Processing.
 
@@ -719,7 +721,7 @@ void main() {
 
 ## Adding a custom vertex shader
 
-So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader in a PShader object. Much like a fragment shader runs once for every pixel on the screen, a vertex shader runs once for every vertex defined in the geometry being drawn. For example, running a vertex shader on a rectangle shape will execute 4 times (once for each corner vertex), while a circle shape with 36 segments will run the vertex shader 36 times (once for each vertex around the circle).
+So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader when creating a `PShader` object via `loadShader()`. Much like a fragment shader runs once for every pixel on the screen, a vertex shader runs once for every vertex defined in the geometry being drawn. For example, running a vertex shader on a rectangle shape will execute 4 times (once for each corner vertex), while a circle shape with 36 segments will run the vertex shader 36 times (once for each vertex around the circle). The shader program executes at the moment the geometry is drawn to the screen.
 
 Using the last example as a starting point, a custom vertex shader is added to manipulate the vertex positions of the circular shape. The following example introduces a displacement effect to the circle's vertices based on their position, rather than via texture sampling as seen in the prior fragment shader example. The effect is similar in that the orginal image becomes warped, but here, it's because the *vertices* are moving, not the *sampling location* in the fragment shader. To add a custom vertex shader, create a new file named `vert.glsl` and load it alongside the fragment shader in the Processing sketch, and pass both into the `loadShader()` function, fragment shader first.
 
@@ -847,7 +849,7 @@ Note the following details in the first look at vertex shaders:
   - `transformMatrix` and `texMatrix` are 4x4 matrixes that help position and match the UV coordinates to the vertex on screen, based on Processing's current transformations (like `translate()`, `rotate()`, and `scale()`). This matrix is multiplied by the vertex position to get the final screen position.
   - `position` is an attribute that contains the vertex's position in screen space. An `attribute` is a variable that is set on each vertex as the geometry is drawn. When `vertex()` is called in Processing, a vertex `attribute` is created behind the scenes for each vertex's position. This is how the position is accessible in the vertex shader.
   - `color` is another attribute that contains the vertex's color. In this example, the color isn't set explicitly, so it defaults to white. But in following examples, this attribute can be used to pass color data from the CPU to the GPU on a per-vertex basis.
-  - `texCoord` is the UV coordinate that was assigned to the vertex when `vertex(x, y, u, v)` was called. This is how custom UV coordinates are passed from the CPU to the GPU.
+  - `texCoord` is the UV coordinate that was assigned to the vertex when `vertex(x, y, u, v)` was called. This is how custom UV coordinates are passed from the CPU to the GPU. Primitive shapes like `rect()` and `sphere()` have default UV coordinates that are assigned automatically.
   - Both `color` and UV coordinates (`texCoord`) are passed to the fragment shader via `varying` variables. A `varying` variable is used to pass data from the vertex shader to the fragment shader. The GPU automatically interpolates these values between vertices for each pixel that is drawn, which allows for smooth transitions across the surface of the shape.
 
 ### The full rasterization pipeline explained: from CPU to Vertex Shader to Fragment Shader to screen
@@ -955,9 +957,9 @@ Processing's inner workings are revealed by looking into how shaders apply to ve
 
 So far, all examples have used 2D coordinates for vertex positions. However, Processing's P3D renderer supports 3D coordinates as well. By adding a Z coordinate to the `vertex()` function (or by manipulating vertex positions in the vertex shader), depth can be introduced to the geometry.
 
-In the following example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is created on the CPU - it's all generated in the vertex shader based on the vertex positions.
+In the following example, the vertex shader is used to generate all of the color, which also corresponds to z-position displacement on a grid of rectangles. In this case, no color or depth information is provided when the shape is created on the CPU - it's all generated in the vertex shader based on each vertices position.
 
-Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows camera transformations like `translate()` and `rotateX()/rotateY()` to view the 3D geometry from different angles.
+Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows 3d transformations like `rotateX()` and `rotateY()` to view the 3D geometry from different angles.
 
 ```java
 PShader myShader;
@@ -981,13 +983,13 @@ void draw() {
   shader(myShader);
 
   // Draw a subdivided mesh grid
+  // The shader will displace vertices in Z based on their position
   fill(255);
   noStroke();
   float cellSize = 10;
   int cols = floor(width / cellSize);
   int rows = floor(height / cellSize);
-  
-  // Create mesh using rectangles
+
   for(int row = 0; row < rows; row++) {
     for(int col = 0; col < cols; col++) {
       float x = col * cellSize - width / 2;
@@ -1048,17 +1050,53 @@ void main() {
 
 ![Generative vertex shader depth and colors](images/shader_demo_vertex_shader_generative.png)
 
+This shader code demonstrates some notable concepts:
+
+<!--
 🚨 TODO: explain output
+
 New concepts:
-- `normal`
-- `transformMatrix`
-- `distance()` / `sin()` - GLSL provides lots of nice math functions!
 - camera rotation impacting vertex positions
 - this example makes it look like there's lighting, but using custom shaders basically disables all built-in lighting, unless you re-implement it yourself. This is possible if you start with the texlight shader, or implement a custom lighting model
 - object space vs. world space vs. screen space
 - position is in screen space, rather than normalized UV space like in the fragment shader
 - there's a lot more to keep in mind with vertex shaders in 3D
 - next example could show PShape and how they behave differently
+-->
+
+* The `normal` attribute is used to determine the natural "direction" of each vertex. In this case, since the geometry is made of flat rectangles, the normals point straight out along the Z-axis, and can be used to displace the vertices in that direction. Normals are an important concept in 3D graphics, often used for lighting calculations. In the examples so far, vertices can contain lots of useful data as attributes, including position, color, texture coordinates, and normals. Depending on the geometry being drawn, there are conventions for the direction of normals. Normals typically point perpendicular to the surface for flat shapes like rectangles, and outward from the center of a sphere. See the diagrams below for reference. When primitive shapes are drawn in Processing, normals are supplied by the built-in shape functions, which can then be used in the vertex shader. When building custom geometry (with `vertex()` calls, for example), custom normals can be created with [`normal()`](https://processing.org/reference/normal_.html). 
+* `gl_Position` in a vertex shader is just like `gl_FragColor` in a fragment shader - it's the final output of the shader program. In this example, the vertex position is modified before being assigned to `gl_Position`, which changes where the vertex appears on screen. The original `vertex` attribute is read-only, so a new `displacedvertex` variable is created to store and adjust the modified position.
+
+_Typical normals of a rectangle_:
+
+![Normals of a rectangle, pointing forward from each vertex](images/diagram_normals-rect.png)
+
+_Typical normals of a sphere_:
+
+![Normals of a sphere, pointing out from the center for each vertex](images/diagram_normals-sphere.png)
+
+## GLSL math functions
+
+As seen in the previous example, `distance()` and `sin()` are built-in GLSL math functions. Because GLSL is designed for graphics programming, it includes many useful functions for vector math, trigonometry, and more. Some of these functions should be familiar from Processing's own math and `PVector` functions, while others may be unique. Find a table of just some of the overlapping math functions that are common to both Processing and GLSL below. Many of GLSL's math functions are overloaded to work with both scalar values (like `float`) and vector types (like `vec2`, `vec3`, and `vec4`), which makes them very flexible.
+
+> Common math functions in Processin and their GLSL equivalents:
+
+| Processing             | GLSL                |
+|------------------------|---------------------|
+| `sin()`                | `sin()`             |
+| `cos()`                | `cos()`             |
+| `tan()`                | `tan()`             |
+| `exp()`                | `exp()`             |
+| `sqrt()`               | `sqrt()`            |
+| `round()`              | `round()`           |
+| `floor()`              | `floor()`           |
+| `min()`                | `min()`             |
+| `max()`                | `max()`             |
+| `abs()`                | `abs()`             |
+| `lerp()`               | `mix()`             |
+| `constrain()`          | `clamp()`           |
+| `dist()`               | `distance()`        |
+
 
 ## Texture-sampling techniques in 3d
 
@@ -1073,7 +1111,8 @@ Next example:
 ![Sphere texture displacement vertex shader](images/shader_demo_vertex_shader_displacement.png)
 
 Next example:
-- Texture sampling to deform a sphere in 3D space (blue marble example)
+- Texture sampling to deform a sphere in 3D space (blue marble example) 
+  - https://svs.gsfc.nasa.gov/4720 - moon texture source
 - PShape w/sphere detail - this is the easiest way to texture-map a sphere
   - The geometry has UV coordinates that map perfectly to an equirectangular spherical image
   - It also has normals that face outwards, which is helpful for lighting calculations and displacement. We can note normals here!, as built-inattributes of the geometry. Rect, box, sphere all have normals that are standardized for the type of geometry

@@ -19,13 +19,13 @@ void draw() {
   shader(myShader);
 
   // Draw a subdivided mesh grid
+  // The shader will displace vertices in Z based on their position
   fill(255);
   noStroke();
   float cellSize = 10;
   int cols = floor(width / cellSize);
   int rows = floor(height / cellSize);
-  
-  // Create mesh using rectangles
+
   for(int row = 0; row < rows; row++) {
     for(int col = 0; col < cols; col++) {
       float x = col * cellSize - width / 2;

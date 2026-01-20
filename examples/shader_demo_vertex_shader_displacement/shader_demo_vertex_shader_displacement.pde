@@ -4,14 +4,18 @@ PShape globe;
 
 void setup() {
   size(640, 480, P3D);
-  img = loadImage("blue-marble.png");
+  img = loadImage("moon-nasa.jpg");
+
+  // load shader and set on context
+  // no need to resetShader() later since we're only drawing with the shader
   myShader = loadShader("frag.glsl", "vert.glsl");
+  shader(myShader);
   
   // build a texture-mapped sphere using PShape
-  sphereDetail(80);
+  sphereDetail(80); // increase detail for smoother sphere
   globe = createShape(SPHERE, 150);
   globe.setTexture(img);
-  globe.setStroke(color(0, 0));  
+  globe.setStroke(color(0, 0)); // invisible stroke
 }
 
 void draw() {
@@ -19,15 +23,14 @@ void draw() {
 
   // set center of screen as 3d world origin
   translate(width/2, height/2, -100);
+
+  // rotate based on mouse position
   rotateX(map(mouseY, 0, height, PI, -PI));
   rotateY(map(mouseX, 0, width, -PI, PI));
 
-  // Update shader uniform and apply shader to the context 
-  myShader.set("uDisplaceAmp", map(sin(millis() * 0.001), -1, 1, 0, 0.2));
-  shader(myShader);
+  // Update shader uniform and activate shader
+  myShader.set("uDisplaceAmp", map(sin(millis() * 0.001), -1, 1, 0, 0.75));
 
-  // draw a textured sphere
+  // draw the textured sphere with displacement
   shape(globe);
-  
-  resetShader();
 }

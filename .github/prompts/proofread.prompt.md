@@ -18,5 +18,8 @@ Make suggestions to improve the section based on the following tasks:
 5. Suggest additional examples or analogies if they would help clarify complex concepts.
 6. Add descriptive alt tags to markdown images for accessibility.
 7. Ensure that punctuation and formatting follow standard conventions.
+8. Look for opportunities to remove extraneous words or redundant phrases to make the text more concise.
+9. Look for any factual inaccuracies or outdated information and suggest corrections.
+10. Look for mote technically accurate ways to explain concepts without losing beginner-friendliness.
 
 Provide a brief explanation of the changes made.
