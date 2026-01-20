@@ -15,9 +15,9 @@ void main() {
   // sample texture color at the vertex's UV coordinate
   vec4 texColor = texture2D(texture, texCoord.xy);
 
-  // for a sphere, displace vertex position based on texture's green channel
+  // for a sphere, displace vertex position based on texture's red channel
   vec3 positionDisplaced = position.xyz;
-  positionDisplaced.xyz *= 1. + uDisplaceAmp * texColor.g;
+  positionDisplaced.xyz *= 1. + uDisplaceAmp * texColor.r;
   gl_Position = transformMatrix * vec4(positionDisplaced, position.w);
 
   // pass texture coordinates to fragment shader

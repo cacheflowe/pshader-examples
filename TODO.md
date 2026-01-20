@@ -22,6 +22,12 @@
   - https://www.freepik.com/free-photo/beautiful-cat-portrait-close-up_19866347.htm
 - Ask about punctuation/apostrophes/etc
 - Can/should we link to this repo's examples in tutorial?
+  - If so, I should rename the sketch folders 
   - Should more examples be created in the official examples repo in a PShader tutorial section?
-- Do we actually need these? `#define PROCESSING_TEXTURE_SHADER`
-- Do we need precision specifiers in fragment shaders? `#ifdef precision mediump float; #endif`  
+- Do we actually need these directives? `#define PROCESSING_TEXTURE_SHADER`
+- Do we need precision specifiers in fragment shaders?
+```c++
+#ifdef 
+precision mediump float; 
+#endif
+```

@@ -9,6 +9,7 @@ This document continues the work from this [Google Doc](https://docs.google.com/
 OpenGL reference for GLES 2.0 interface is here: 
 - https://registry.khronos.org/OpenGL/specs/
 - https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf
+- https://docs.gl/ (GLSL 3+ docs)
 
 Source code for the examples in this tutorial are in the [/examples/](../examples/) folder.
 

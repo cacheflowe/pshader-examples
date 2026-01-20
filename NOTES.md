@@ -5,8 +5,9 @@ Tools used:
 - Rich text to markdown converter: https://www.rich-text-to-markdown.com/
 - PDF to markdown converter: https://github.com/microsoft/markitdown
 ```powershell
-source .venv/bin/activate
-\venv\Scripts\activate.bat
+python -m venv .venv
+source .venv/bin/activate # macOS/Linux
+.\venv\Scripts\activate.bat # Windows
 cd packages
 pip install -e markitdown[all]
 markitdown "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.pdf" > "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.md"

@@ -69,14 +69,14 @@
 
 
 * Extra Vertex shader notes - TODO: merge these into the outline above
-  * 🚨 transform matrix - esp when thinking about z-displacement
-    * 🚨 Need to displace in the direction of the model normal, not just z-axis in space
-    * 🚨 PShape solves for some of this
+  * ✅  transform matrix - esp when thinking about z-displacement
+    * ✅ Need to displace in the direction of the model normal, not just z-axis in space
+    * ✅ PShape solves for some of this
   * ✅ Processing built-in attributes/uniforms for vertex shaders
     - 🚨 Note the **interpolation** of texture data, behaves just like the interpolation of color data if vertices are drawn with colors, and how this color data is also passed as "varying" data from the vertex shader to the fragment shader
   * Line shader, point shader types, texlight
     * Fill + stroke gets more complicated
-  * Projection matrix / modelview matrix
+  * ✅ Projection matrix / modelview matrix
   * ✅ How to connect a vertex shader to a fragment shader in Processing
     * ✅ varying variables to pass data between vertex and fragment shaders
   * Particles - check points demo in 50 shades dir

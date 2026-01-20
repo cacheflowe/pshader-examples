@@ -1097,24 +1097,124 @@ As seen in the previous example, `distance()` and `sin()` are built-in GLSL math
 | `constrain()`          | `clamp()`           |
 | `dist()`               | `distance()`        |
 
+The popuplar `map()` function in Processing does not have a direct equivalent in GLSL, but can be implemented from scratch:
 
+```glsl
+float map(float value, float inputMin, float inputMax, float outputMin, float outputMax) {
+  return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
+}
+```
+
+<!--
 ## Texture-sampling techniques in 3d
 
 Next example:
 - Texture sampling to deform a grid of rectangles in 3D space (takes the prior example one step forward)
+-->
 
-## Spherical texturing and deformation
+## Spherical texturing and deformation with PShape
 
-🚨 (rewrite this) Next example matches the texture sampling locations to a sphere's UV mapping coordinates, and then displaces the sphere's vertices based on the texture color values. This creates a bumpy sphere effect, where the texture image drives the vertex displacement.
+The next example reintroduces texture sampling in 3D space, combined with vertex displacement in a custom vertex shader. Both the vertex and fragment shaders sample the texture image, but for different purposes. The vertex shader samples the texture to determine how much to displace each vertex along its normal, while the fragment shader samples the texture to determine the final pixel color. The result is a bumpy sphere effect, where the texture image drives the vertex displacement.
 
+```java
+PImage img;
+PShader myShader;
+PShape globe;
+
+void setup() {
+  size(640, 480, P3D);
+  img = loadImage("moon-nasa.jpg");
+
+  // load shader and set on context
+  // no need to resetShader() later since we're only drawing with the shader
+  myShader = loadShader("frag.glsl", "vert.glsl");
+  shader(myShader);
+  
+  // build a texture-mapped sphere using PShape
+  sphereDetail(80); // increase detail for smoother sphere
+  globe = createShape(SPHERE, 150);
+  globe.setTexture(img);
+  globe.setStroke(color(0, 0)); // invisible stroke
+}
+
+void draw() {
+  background(0);
+
+  // set center of screen as 3d world origin
+  translate(width/2, height/2, -100);
+
+  // rotate based on mouse position
+  rotateX(map(mouseY, 0, height, PI, -PI));
+  rotateY(map(mouseX, 0, width, -PI, PI));
+
+  // Update shader uniform and activate shader
+  myShader.set("uDisplaceAmp", map(sin(millis() * 0.001), -1, 1, 0, 0.75));
+
+  // draw the textured sphere with displacement
+  shape(globe);
+}
+```
+
+```glsl
+// vertex.glsl
+// processing-provided variables
+uniform mat4 transformMatrix;
+uniform mat4 texMatrix;
+uniform sampler2D texture;
+
+attribute vec4 position;
+attribute vec2 texCoord;
+
+varying vec4 vertTexCoord;
+
+// custom uniforms
+uniform float uDisplaceAmp;
+
+void main() {
+  // sample texture color at the vertex's UV coordinate
+  vec4 texColor = texture2D(texture, texCoord.xy);
+
+  // for a sphere, displace vertex position based on texture's red channel
+  vec3 positionDisplaced = position.xyz;
+  positionDisplaced.xyz *= 1. + uDisplaceAmp * texColor.r;
+  gl_Position = transformMatrix * vec4(positionDisplaced, position.w);
+
+  // pass texture coordinates to fragment shader
+  vertTexCoord = texMatrix * vec4(texCoord, 1.0, 1.0);
+}
+```
+
+```glsl
+// frag.glsl
+varying vec4 vertTexCoord;
+uniform sampler2D texture;
+
+void main() {
+  // sample color from the image being drawn, 
+  // based on geometry's custom UV coords
+  vec2 uv = vertTexCoord.xy;
+
+  // draw color to screen
+  gl_FragColor = texture2D(texture, uv);
+}
+```
 
 ![Sphere texture displacement vertex shader](images/shader_demo_vertex_shader_displacement.png)
 
-Next example:
-- Texture sampling to deform a sphere in 3D space (blue marble example) 
-  - https://svs.gsfc.nasa.gov/4720 - moon texture source
-- PShape w/sphere detail - this is the easiest way to texture-map a sphere
-  - The geometry has UV coordinates that map perfectly to an equirectangular spherical image
-  - It also has normals that face outwards, which is helpful for lighting calculations and displacement. We can note normals here!, as built-inattributes of the geometry. Rect, box, sphere all have normals that are standardized for the type of geometry
-  - PShape is now cached geometry, which is much more efficient than calling `sphere()` or creating new vertices every frame. PShape has its own tutorial, but is very powerful when combined with shaders
-  - when setTexture() is called on a PShape, the texture is automatically bound to the `texture` uniform in the shader, just like texture is automatically passed in when calling filter()
+This example demonstrates several important concepts about working with spherical geometry and textures:
+
+* **PShape** is used to create *cached geometry*, which is significantly more efficient than calling `sphere()` (or manually creating vertices) every frame. The PShape object has its own [tutorial](https://processing.org/tutorials/pshape), and is a great pairing with custom shaders, as both tools take advantage of GPU efficiencies.
+* The `sphereDetail()` function controls the resolution of the sphere mesh. Higher detail values create more vertices, which results in a smoother sphere and more accurate displacement, but at the cost of performance.
+* When `setTexture()` is called on a PShape object, the texture is automatically bound to the `texture` uniform in the shader. This is similar to how the `texture` uniform is automatically populated when calling `filter()` with a shader.
+* **Equirectangular spherical images** are a special type of texture that appears stretched horizontally at the poles when viewed as a flat image. However, when mapped to a sphere using spherical UV coordinates, the stretching is reversed as the top and bottom edges of the image are "pinched" into single points at the sphere's poles. The [moon texture](https://svs.gsfc.nasa.gov/4720) used in this example is an equirectangular projection.
+* In the vertex shader, displacement is calculated by multiplying the vertex position by an amplitude factor derived from the texture's red channel. Since the PShape sphere geometry is centered, scaling the position vector effectively moves the vertex outward along its normal direction without needing to use normals directly. 
+
+🚨 **Next:**
+
+## Lighting and normals
+
+Do we need to talk about lighting and normals here?
+
+## POINTS example
+
+w/texture sampling in frag shader to color points
