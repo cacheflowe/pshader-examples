@@ -6,35 +6,30 @@ Shaders are powerful and portable graphics programs, written in [GLSL](https://w
 
 Shaders run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
 
-GLSL is a "C-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)) and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience—and has different goals—than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so learning them in Processing provides a highly portable skill set. 
+GLSL is a "C-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language)) and has a relatively small number of built-in data types and functions. Writing GLSL is a different experience - and has different goals - than writing Java, but the syntax should look familiar when compared to Processing or p5.js code. Many other creative coding frameworks support shaders, so learning them in Processing provides a highly portable skill set. 
 
-> The current version of Processing (4.x) uses OpenGL ES 2.0, a subset of the full OpenGL specification. Some features of GLSL may not be available, and the syntax may differ from other versions. The [OpenGL ES 2.0 specification](https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf) is a useful reference when writing shaders for Processing.
+> The current version of Processing (4.x) uses OpenGL ES 2.0, a subset of the full OpenGL specification. Some features of GLSL may not be available, and the syntax may differ from other versions. The [OpenGL ES 2.0 specification](https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf) is a useful reference for available functions and features.
 
 This tutorial provides an entry-level introduction to using shaders in Processing. Many excellent educational resources on the internet explain deeper concepts, and there is a whole world of shader techniques to explore beyond this introduction. This tutorial explains basic shader concepts through examples and definitions to demonstrate common creative uses of shaders in Processing.
 
 ## Processing Shader Examples
 
-In the Processing IDE, go to **File > Examples... > Topics > Shaders** to find a set of built-in shader examples that come with Processing. These examples cover a variety of shader techniques and are a great way to start exploring how shaders work in Processing. The full source code for these examples can also be found in the [processing-examples GitHub repository](https://github.com/processing/processing-examples/tree/main/Topics/Shaders), which makes the external shader files easy to browse.
+In the Processing IDE, go to **File > Examples... > Topics > Shaders** to find a set of built-in shader examples that come with Processing. These examples cover a variety of shader techniques and are a great way to explore how shaders work in Processing. The full source code for these examples can also be found in the [processing-examples GitHub repository](https://github.com/processing/processing-examples/tree/main/Topics/Shaders), which makes the external shader files easy to browse.
 
 ## Writing a First Shader
 
-***\[🚨🚨\]*** How do we write a shader? Which IDE do we point users to?
-<!--
-* ~~***\[HOW DO WE CREATE & OPEN THIS FILE IN THE IDE?\]***~~
-  * ***SHADER MODE DOESN’T WORK IN PROCESSING 4.3.1***  
-  * ***Would we need to suggest VS Code for now?***   
-* Install **Shader Mode** from the Modes manager, which allows editing GLSL code in a new tab in the Processing IDE. To do this, click the dropdown button in the upper-right of the IDE, and select “Manage Modes…”. Then select “Shader Mode” and click “Install”.  
-* ![Shader Mode Menu](images/ide-shader-mode.png)~~
--->
+> As of this writing, the Processing IDE does not support opening GLSL files directly. The current recommendation is to use the popular [VS Code](https://code.visualstudio.com/)) IDE with the [Processing extension](https://vscode.processing.org/) installed. This requires Processing to be installed as well, as the extension uses the Processing application to run code. Finally, add the [Shader Languages Support](https://marketplace.visualstudio.com/items?itemName=slevesque.shader) extension for GLSL syntax highlighting.
 
 To write a shader, follow these steps:
 
-* Create a new sketch in Processing and save it. This will create a new directory for the sketch.
-* Inside the sketch directory, create a new directory called `data`. Inside the `data` directory, create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. To keep things simple, this tutorial starts with a single **fragment shader**, also known as a **pixel shader**.
-* Use [`loadShader()`](https://processing.org/reference/loadShader_.html) to load the GLSL program.
+* Create a new sketch and save it. This will create a new directory for the sketch.
+* Inside the sketch directory, create a new directory called `data`, and inside the `data` directory, create a new file called `shader.glsl`. Shaders can also have the file extensions `.frag` and `.vert`. To keep things simple, this tutorial starts with a single **fragment shader**, also known as a **pixel shader**.
+* Use [`loadShader()`](https://processing.org/reference/loadShader_.html) to load the GLSL program. This function looks inside the `data` directory (as well as the root sketch directory).
 * Use [`filter()`](https://processing.org/reference/filter_.html) to apply the shader to the canvas.
 
-The `loadShader()` function returns a PShader object, which is Processing’s representation of a shader program that has been loaded from GLSL source files. It can then be applied to the graphics context in the `draw()` loop. The following is an example of loading a shader file in the sketch code, with the `shader.glsl` code below. Note that shaders only work in the `P2D` or `P3D` rendering modes, because these modes use OpenGL for graphics, and GLSL is a feature of OpenGL.
+The `loadShader()` function returns a [`PShader`](https://processing.org/reference/PShader.html) object, which is Processing’s representation of a shader program compiled from GLSL source files. It can then be applied to the graphics context in the `draw()` loop with the `filter()` or `shader()` functions. The following is an example of loading a shader file in the sketch code, with the `shader.glsl` code below. Shaders only work in the `P2D` or `P3D` rendering modes, because these modes use OpenGL for graphics, and GLSL is a feature of OpenGL.
+
+sketch.pde
 
 ```java
 PShader myShader;
@@ -49,35 +44,43 @@ void draw() {
 }
 ```
 
+shader.glsl
+
 ```glsl
 void main() {
   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ```
 
+Output:
+
 ![A solid red canvas demonstrating the simplest possible shader output](images/shader_demo_01.png)
 
-This is the simplest complete shader program that can be written in Processing. When it runs, the sketch fills the canvas with red. If the background is not red, check for errors in the console and ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all do.
+This is the simplest complete shader program that can be written in Processing. When it runs, the sketch fills the canvas with red. If the background is not red, check for errors in the console and ensure that `P2D` or `P3D` mode is set in `size()`. While most computers support shaders, not all do. And just like Processing/Java code, if there are syntax errors in the shader code, the program will fail to compile and run, and an error message should appear in the console.
 
 In the GLSL code, note the following details:
 
 * There must be a `void main()` function. This is similar to the `draw()` function in Processing, and is called automatically when `filter()` is called in a sketch. Next, the `gl_FragColor` variable is being set to a `vec4` value. This is usually the last line in a shader’s `main()` function, and it *sets the output color of the pixel that the shader program is operating on*.
-* The `vec4` data type is like a `PVector` (or an object or struct in other languages), where multiple values are contained in a single variable. A `vec4` variable stores (4) floating point numbers. Floating point numbers are simply numbers that can have a decimal point. While GLSL supports `int` values, most numeric values will likely be `float`s, and it’s important to understand that setting a float value must be done with a decimal point, which is why it looks like this: `vec4(1.0, 0.0, 0.0, 1.0)`. Passing an `int` value into a `vec4` may cause the program to crash, because the data types don’t match. For example, this would be invalid code: `vec4(1, 0, 0, 1)`, because `int` values aren't accepted in a `vec4`, which expects `float` arguments.
+* The `vec4` data type is like a `PVector` (or an object or struct in other languages), where multiple values are contained in a single variable. A `vec4` variable stores four floating point numbers. Floating point numbers are simply numbers that can have a decimal point. While GLSL supports `int` values, most numeric values will likely be `float`s, and it’s important to understand that setting a float value must be done with a decimal point, which is why it looks like this: `vec4(1.0, 0.0, 0.0, 1.0)`. Passing an `int` value into a `vec4` may cause the program to crash, because the data types don’t match. For example, this would be invalid code: `vec4(1, 0, 0, 1)`, because `int` values aren't accepted in a `vec4`, which expects `float` arguments. This is a common mistake to make when starting out with GLSL, because the difference between declaring `int`s and `float`s is more strict than many other languages.
 * Color components in Processing use a value range of 0-255, while in GLSL color values range from 0-1. In the code above, the red, green, blue, and alpha values would equate to `fill(255, 0, 0, 255)` in Processing. The four function arguments in both cases are red, green, blue, and alpha.
 
 ## Parallel Computing
 
-The shader program operates on individual pixels, which is why it’s often called a **pixel shader**. When using the **fragment shader** nomenclature, a "fragment" also refers to an individual pixel. This concept can be confusing, but it reveals the power and behavior of a GLSL program. For a sketch of 640 x 360 pixels, there are a total of 230,400 pixels, and the shader program operates on every single pixel *at the same time*. This is inherent to how the GPU functions, and is an example of [parallel computing](https://en.wikipedia.org/wiki/Parallel_computing). Machine Learning systems take advantage of this computing style, which is why GPUs are now used for much more than just graphics. 
+The shader program operates on *individual pixels*, which is why it’s often called a **pixel shader**. When using the **fragment shader** nomenclature, a "fragment" also refers to an individual pixel. This concept can be confusing, but it reveals the power and behavior of a GLSL program. For a sketch of 640 x 480 pixels, there are a total of 307,200 pixels drawn to the screen. When a shader program is executed, it operates on *every single pixel at the same time*. This is inherent to how the GPU functions, and is an example of [parallel computing](https://en.wikipedia.org/wiki/Parallel_computing), where 307,200 instances of the shader program run in parallel to draw all of the pixels in the canvas.
 
-This parallel execution differs from how shapes and colors are typically drawn in Processing, and the two styles can compliment each other with their unique strengths. While a GLSL program runs independently on each pixel, it has very limited information to use when deciding what to do with that pixel. Learning shader programming involves adapting to this style of thinking, adopting new techniques to draw shapes, picking up some new terminology, and learning how and when to make use of shaders' powerful features.
+> Machine Learning systems often take advantage of parallel computing, which is why GPUs are now used for much more than just graphics. 
+
+This parallel execution style differs from how shapes and colors are typically drawn in Processing, where a color is set with `fill()` for example, and a function like `rect()` will update many pixels on the screen. While a GLSL program runs independently on each pixel, it has very limited information to use when deciding what to do with that pixel. Learning shader programming requires adapting to this style of computational thinking, adopting new techniques to draw shapes, picking up new terminology, and learning how and when to make use of shaders' powerful features.
 
 ## A New Coordinate System
 
 In the first example, all pixels were turned red, similar to calling Processing’s `background()` function. This served as a basic introduction to a minimal shader program. The next step is to explore the coordinate system in a shader to position and manipulate pixels based on their location.
 
-In the first sketch, the coordinate system starts from the top left at `0, 0`, and extends to the bottom right at `640, 360`. This is a common way to think about coordinates on a digital screen - in pixel measurements. However, GLSL often uses a normalized coordinate system, meaning that regardless of pixel dimensions, the canvas width and height are `1`. The left-most pixel has a coordinate of `0`, and the right-most pixel has a coordinate of `1`. This shift in thinking allows calculations to be more flexible and agnostic of specific image sizes. A shader shouldn't have to know the pixel dimensions of the canvas it is drawing to; it should be able to work on any size canvas.
+In the first sketch, the Processing coordinate system starts from the top left at `0, 0`, and extends to the bottom right at `640, 480`. This is a common way to think about coordinates on a digital screen - in pixel measurements. However, GLSL commonly uses a **normalized** coordinate system, meaning that regardless of pixel dimensions, the canvas width and height are both `1`. The left-most pixel has a coordinate of `0`, and the right-most pixel has a coordinate of `1`. This shift in thinking allows calculations to be more flexible and portable by being agnostic of specific dimensions. A shader shouldn't have to know the pixel dimensions of the canvas it is drawing to; it should be able to work on any size canvas.
 
-In most shader environments, the bottom-most pixel has a coordinate of 0, and the top-most pixel has a coordinate of 1. This is known as having a flipped (or inverted) y-coordinate relative to Processing and many other coordinate systems.
+![Normalized coordinate system diagram](./images/diagram_uv_coords.png)
+
+In most shader environments, the bottom-most pixel has a coordinate of 0, and the top-most pixel has a coordinate of 1. This is known as having a flipped (or inverted) y-coordinate relative to Processing.
 
 By default, a fragment shader provides its pixel’s position on the canvas via `vertTexCoord`. This is one of the only pieces of information that a shader provides by default. Update the `shader.glsl` code to explore this coordinate system:
 
@@ -286,7 +289,7 @@ gl_FragColor = vec4(color.rgb, 1.0);
 
 ## Comparing CPU vs GPU Pixel Manipulation Performance
 
-There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920×1080 contains more than 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains four values for the RGBA color components, there are around 8 million pieces of data to handle for all 2 million pixels. If the program is expected to run at a high framerate, this approach may not work well. In a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent—certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the same task on the CPU.
+There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920×1080 contains more than 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains four values for the RGBA color components, there are around 8 million pieces of data to handle for all 2 million pixels. If the program is expected to run at a high framerate, this approach may not work well. In a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent - certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the same task on the CPU.
 
 To examine a comparable program that generates the same image via the CPU or GPU, the following example loops over each pixel and sets the green color value to the red component, and sets the red and blue channels to zero:
 
@@ -1065,7 +1068,7 @@ New concepts:
 -->
 
 * The `normal` attribute is used to determine the natural "direction" of each vertex. In this case, since the geometry is made of flat rectangles, the normals point straight out along the Z-axis and can be used to displace the vertices in that direction. Normals are an important concept in 3D graphics, often used for lighting calculations. In the examples so far, vertices can contain lots of useful data as attributes, including position, color, texture coordinates, and normals. Depending on the geometry being drawn, there are conventions for the direction of normals. Normals typically point perpendicular to the surface for flat shapes like rectangles and outward from the center of a sphere. See the diagrams below for reference. When primitive shapes are drawn in Processing, normals are supplied by the built-in shape functions, which can then be used in the vertex shader. When building custom geometry (with `vertex()` calls, for example), custom normals can be created with [`normal()`](https://processing.org/reference/normal_html).
-* `gl_Position` in a vertex shader is just like `gl_FragColor` in a fragment shader—it's the final output of the shader program. In this example, the vertex position is modified before being assigned to `gl_Position`, which changes where the vertex appears on screen. The original `vertex` attribute is read-only, so a new `displacedvertex` variable is created to store and adjust the modified position.
+* `gl_Position` in a vertex shader is just like `gl_FragColor` in a fragment shader - it's the final output of the shader program. In this example, the vertex position is modified before being assigned to `gl_Position`, which changes where the vertex appears on screen. The original `vertex` attribute is read-only, so a new `displacedvertex` variable is created to store and adjust the modified position.
 
 _Typical normals of a rectangle_:
 
