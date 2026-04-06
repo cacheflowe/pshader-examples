@@ -12,12 +12,12 @@
   - PShader.set(): https://processing.org/reference/PShader_set_.html
   - Make a pass through the tutorial and add ticks around keywords and links to reference pages. What's the standard here?
 - Apply the [style guide](https://p5js.org/contribute/documentation_style_guide/#unbiased-documentation)
+- Resave images w/old dimensions - make 640x480
+- Change cool cat to chuck doge
 
 
 ## Questions:
 
-- Can I use the example image I found? cool cat? what else could we use here?
-  - https://www.freepik.com/free-photo/beautiful-cat-portrait-close-up_19866347.htm
 - Ask about punctuation/apostrophes/etc
 - Can/should we link to this repo's examples in tutorial?
   - If so, I should rename the sketch folders 

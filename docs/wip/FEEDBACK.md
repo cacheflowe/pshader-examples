@@ -1,51 +1,3 @@
-# Shaders in Processing
-
-Tools used:
-
-- Rich text to markdown converter: https://www.rich-text-to-markdown.com/
-- PDF to markdown converter: https://github.com/microsoft/markitdown
-```powershell
-python -m venv .venv
-source .venv/bin/activate # macOS/Linux
-.\venv\Scripts\activate.bat # Windows
-cd packages
-pip install -e markitdown[all]
-markitdown "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.pdf" > "D:\workspace\pshader-examples\_assets\es_full_spec_2.0.md"
-```
-
-Cool cat image source:
-- https://www.freepik.com/free-photo/beautiful-cat-portrait-close-up_19866347.htm
-
-
-## Notes from Raph
-
-- Random number function doesn't exist
-- map() function doesn't exist. show custom implementation  
-- Noise function doesn't exist - how to handle?
-- certain things are better on the CPU
-  - Text
-  - Shaders complement the CPU
-- Enough understanding to know use cases
-- List of built-in uniforms. Where's the definitive list? Look @ Processing4 source
-
-## Topics to cover in tutorial
-
-- Overarching goal for creative coding, not just GLSL proficiency: ***what do shaders unlock***?
-- Relate as much as we can back to beginner/intermediate Processing concepts
-  - PVector / math functions
-  - PImage
-  - PShape
-- Performance considerations
-  - for loops shouldn't be used much
-  - minimize conditionals
-  - too many texture lookups are bad
-- It is recommended that you use the loadShader() function instead of calling new PShader(), but this does open the door to more advanced options like shader compiling. Here be dragons
-
-## Other ideas
-  
-Outside the scope of tutorial
-- PShapeUtil in a library - https://processing.github.io/processing-library-template/
-
 # Feedback
 
 ## Raph notes:
@@ -80,8 +32,8 @@ References:
 ## Chris notes:
 
 * In the “New Coordinate system” chapter, I think you might be packing too many ideas into the bullet points between the first x - gradient and the second xy gradient. What ideas can be shared elsewhere in other ways? This especially applies to the UV discussion, which needs a whole diagram and explainer later on perhaps, separate from the immediate discussion? I doubt many ppl know that graphics are applied to a pair of triangles to show them on your screen. I think you could actually add it on to the end of the same chapter? Also it is the reason for the different coordinate system in many ways. Eg:  
-  * Requesting a `vec2` from a `vec4` by calling `vertTexCoord.xy` is called [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). Vector components can be requested in different orders using different property names. Since a `vec3` might be used as either an RGB color or an XYZ coordinate in a shader program, GLSL can use `.rgba` and `.xyzw` interchangeably. **(somewhere later? - actually you have a swizzling chapter, wait till then to explain this?)**  
-  * `vertTexCoord` is defined as a `varying` variable, which means that its value was passed to the fragment shader from the vertex shader. This is not critical for now, but becomes important when working with vertex shaders. There is always a vertex shader that runs before the fragment shader. Processing provides a [default vertex shader](https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders) if one is not provided. **(somewhere later?)**  
+  * ~~Requesting a `vec2` from a `vec4` by calling `vertTexCoord.xy` is called [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). Vector components can be requested in different orders using different property names. Since a `vec3` might be used as either an RGB color or an XYZ coordinate in a shader program, GLSL can use `.rgba` and `.xyzw` interchangeably. **(somewhere later? - actually you have a swizzling chapter, wait till then to explain this?)**  ~~
+  * ~~`vertTexCoord` is defined as a `varying` variable, which means that its value was passed to the fragment shader from the vertex shader. This is not critical for now, but becomes important when working with vertex shaders. There is always a vertex shader that runs before the fragment shader. Processing provides a [default vertex shader](https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders) if one is not provided. **(somewhere later?)** ~~
   * In shader programming, a pixel’s location (relative to the triangle that it's drawn onto) is called its UV coordinate, which has roots in 3D modeling. Even in seemingly 2-dimensional shader programs, the graphics library shades a polygon mesh behind the scenes, even if it is just two triangles that make a rectangle.   
   * UV coordinates map textures onto polygons in Processing, which explains the name vertTexCoord. The u and v are simply different names for the x and y coordinates of a texture. In Processing, this is similar to how the texture() function works with the vertex() function.  
 * In the animation chapter, I can see the next step being adding a sin() to move back and forth, and I would immediately wonder if I should do such calculations in Processing vs in the shader - is it worth speaking about that here - what is better done in a shader and what is better done outside?  
