@@ -9,7 +9,7 @@ This serves as the source-of-truth for the code import system and helps track wh
 ## Section → Example Mapping (Updated)
 
 _All examples now use numbered directories with import directives in `README_SRC.md`._
-_Original `shader_demo_*` directories still exist for reference._
+_Original `shader_demo_*` directories archived to `_assets/article-examples-converted/`._
 
 | Section in README.md | New Example Directory | Files Imported | Old Directory |
 |---------------------|----------------------|----------------|---------------|
@@ -36,11 +36,13 @@ _Original `shader_demo_*` directories still exist for reference._
 
 ## Diagram → Section Mapping
 
-| Diagram | Example Directory | Used In Section |
-|---------|-------------------|-----------------|
-| UV coordinate grid | `diagram_uv_coords/` | A New Coordinate System |
-| Normal directions | `diagram_normals/` | Adding Z coordinates |
-| Interpolation | `diagram_interpolation/` | (not yet used - for rasterization section) |
+Diagrams live in `/diagrams/` (moved from `/examples/`).
+
+| Diagram | Directory | Used In Section |
+|---------|-----------|----------------|
+| UV coordinate grid | `diagrams/diagram_uv_coords/` | A New Coordinate System |
+| Normal directions | `diagrams/diagram_normals/` | Adding Z coordinates |
+| Interpolation | `diagrams/diagram_interpolation/` | (not yet used - for rasterization section) |
 
 ## Screenshots → Section Mapping
 

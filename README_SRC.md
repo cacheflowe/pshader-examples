@@ -127,21 +127,21 @@ In the shader code, the `splitX` value is accessed as a uniform:
 
 ![An animated black and white split screen following the mouse cursor horizontally](images/example-04.gif)
 
-Modify the code to use the Processing `millis()` function to animate the `time` uniform. Shaders often use a `time` uniform to animate different aspects of the output. Without a changing uniform value, the shader program cannot animate anything.
+Modify the code to use the Processing `millis()` function to animate the `uTime` uniform. Shaders often use a `uTime` uniform to animate different aspects of the output. Without a changing uniform value, the shader program cannot animate anything.
 
 ```java
 void draw() {
   // count up from 0-1, looping every second
-  myShader.set("time", (millis() / 1000.0) % 1.0);
+  myShader.set("uTime", (millis() / 1000.0) % 1.0);
 }
 ```
 
 ```glsl
 varying vec4 vertTexCoord;
-uniform float time;
+uniform float uTime;
 
 void main() {
-  if (vertTexCoord.x < time) {
+  if (vertTexCoord.x < uTime) {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   } else {
     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);

@@ -34,18 +34,23 @@ Each example is a standalone Processing sketch in `/examples/`. Numbered example
 | 18 | `18_vertex_generative/` | 3D with Z coordinates | .pde + vert.glsl + frag.glsl |
 | 19 | `19_vertex_displacement/` | PShape sphere | .pde + vert.glsl + frag.glsl |
 
-### Original Examples (still present, not imported)
+### Original Examples (archived to `_assets/article-examples-converted/`)
 
 | Directory | Type | Notes |
 |-----------|------|-------|
-| `diagram_interpolation/` | Diagram | Could illustrate rasterization section |
-| `diagram_normals/` | Diagram | Images used in article |
-| `diagram_uv_coords/` | Diagram | Images used in article |
 | `fragment_01_solid_color/` | Standalone | From 50 Shades, uses green |
 | `shader_demo_cpu_pixels_bug/` | Standalone | Bug demo |
 | `shader_demo_custom_shape_uv/` | Standalone | Custom shape UVs (no texture) |
-| `shader_demo_post_processing/` | Original | Combined 4-filter demo, kept as "stacking" bonus |
+| `shader_demo_post_processing/` | Original | Combined 4-filter demo |
 | `shader_demo_01/` through `shader_demo_vertex_shader_displacement/` | Original | Superseded by numbered versions |
+
+### Diagrams (moved to `/diagrams/`)
+
+| Directory | Notes |
+|-----------|-------|
+| `diagram_interpolation/` | Could illustrate rasterization section |
+| `diagram_normals/` | Images used in article |
+| `diagram_uv_coords/` | Images used in article |
 
 ### Examples NOT yet in the article
 - `fragment_01_solid_color/` - From 50 Shades, uses green instead of red
