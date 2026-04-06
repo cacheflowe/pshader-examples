@@ -199,6 +199,8 @@ void main() {
 }
 ```
 
+> A useful rule of thumb when working with uniforms: if a value is the same for every pixel, calculate it on the CPU and send it as a uniform. In this example, the modulus calculation `(millis() / 1000.0) % 1.0` produces a single number that doesn't change per pixel, so it makes sense to compute it in Processing and pass the result. On the other hand, in the shader code, the comparison `vertTexCoord.x < uTime` *does* depend on each pixel's position, so it belongs in the shader. This split - CPU for global values, GPU for per-pixel work - is a practical pattern that applies throughout shader development.
+
 ## Using Textures
 
 With the coordinate system established, the next step is to use a texture. Drawing an image to the screen in Processing code and then manipulating the pixels demonstrates how GPU-powered parallel processing can improve upon non-GPU techniques.
@@ -223,7 +225,7 @@ The updated shader code introduces new concepts:
 * A new built-in GLSL function called `texture2D` takes two arguments: a `sampler2D` and a `vec2` location. This is similar to Processing’s [`get()`](https://processing.org/reference/get_.html) function, which retrieves a pixel’s color value at a specific coordinate in an image. This code requests the pixel color at the current location and stores its RGBA data in a `vec4` variable called `color`. In shaders, this is often called “texture sampling” or a “texture lookup”.
 * Finally, when setting the output color of the pixel to `gl_FragColor`, the code uses the sampled color to set the output RGB values, but only uses the red channel. This creates a grayscale version of the image drawn before the shader was applied. This technique allows for swapping color channels, inverting them, or performing other kinds of color manipulation or remapping. 
 
-> This example uses `filter()` to apply the shader as a full-canvas post-processing effect - after the image has already been drawn to the canvas, the shader processes every pixel. Later in the tutorial, the `shader()` function is introduced, which applies shaders to specific shapes and geometry rather than the entire canvas. Both approaches are useful at different times, but `filter()` is the simplest way to get started.
+> This example uses `filter()` to apply the shader as a full-canvas post-processing effect. Behind the scenes, `filter()` takes a snapshot of the entire canvas *as it currently exists* - including everything drawn up to that point with `background()`, `image()`, `rect()`, or any other drawing function - and passes that snapshot to the shader as the `texture` uniform. The shader processes every pixel and writes the result back to the canvas. If multiple shapes or images are drawn before `filter()` is called, they are all composited into one flat texture first. Calling `filter()` multiple times applies each shader in sequence, with each one processing the output of the previous one. Later in the tutorial, the `shader()` function is introduced, which applies shaders to specific shapes and geometry rather than the entire canvas.
 
 ## Swizzling and Vector Component Shortcuts
 

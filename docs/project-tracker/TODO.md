@@ -55,18 +55,13 @@ Targeted additions to existing content. Small-to-medium edits, not full new sect
 
 - [x] **2.3** Fill in generative 3D grid TODO block
   - Explained: transformMatrix/object space vs screen space, fake lighting caveat, TexLight reference, vertex-to-fragment varying pattern, pixel-space coordinates
-  - 🚨 TODO: Manually test example 19 and verify these notes are helpful and accurate in context
+  - [ ] 🚨 TODO: Manually test example 19 and verify these notes are helpful and accurate in context
 
-- [ ] **2.4** Add sin() CPU vs shader note in animation section ← _Chris feedback_
-  - When to calculate on CPU vs in shader
-  - Practical guidance: "If the value is the same for every pixel, calculate it on the CPU and send as a uniform"
-  - Place in or right after the `uTime` animation example
+- [x] **2.4** Add sin() CPU vs shader note in animation section ← _Chris feedback_
+  - Added blockquote after uTime code snippets: "if a value is the same for every pixel, calculate it on the CPU and send it as a uniform"
 
-- [ ] **2.5** Clarify filter() order of operations ← _Chris feedback_
-  - What does filter() actually send to the shader?
-  - If multiple things are drawn before filter(), do they all pass through?
-  - How is filter() different from shader() + geometry?
-  - Add in the "Using Textures" section or as a note after first filter() use
+- [x] **2.5** Clarify filter() order of operations ← _Chris feedback_
+  - Expanded blockquote after first texture example: filter() snapshots the entire canvas as-is, multiple draw calls composite into one texture, calling filter() multiple times chains sequentially
 
 - [ ] **2.6** Improve framing before swizzling code examples ← _Chris feedback_
   - Add transition text like "The following line does the same thing, but in a more concise way..."

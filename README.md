@@ -259,6 +259,8 @@ void main() {
 }
 ```
 
+> A useful rule of thumb when working with uniforms: if a value is the same for every pixel, calculate it on the CPU and send it as a uniform. In this example, the modulus calculation `(millis() / 1000.0) % 1.0` produces a single number that doesn't change per pixel, so it makes sense to compute it in Processing and pass the result. On the other hand, in the shader code, the comparison `vertTexCoord.x < uTime` *does* depend on each pixel's position, so it belongs in the shader. This split - CPU for global values, GPU for per-pixel work - is a practical pattern that applies throughout shader development.
+
 ## Using Textures
 
 With the coordinate system established, the next step is to use a texture. Drawing an image to the screen in Processing code and then manipulating the pixels demonstrates how GPU-powered parallel processing can improve upon non-GPU techniques.
@@ -307,6 +309,8 @@ The updated shader code introduces new concepts:
 * Finally, when setting the output color of the pixel to `gl_FragColor`, the code uses the sampled color to set the output RGB values, but only uses the red channel. This creates a grayscale version of the image drawn before the shader was applied. This technique allows for swapping color channels, inverting them, or performing other kinds of color manipulation or remapping. 
 
 > This example uses `filter()` to apply the shader as a full-canvas post-processing effect - after the image has already been drawn to the canvas, the shader processes every pixel. Later in the tutorial, the `shader()` function is introduced, which applies shaders to specific shapes and geometry rather than the entire canvas. Both approaches are useful at different times, but `filter()` is the simplest way to get started.
+>
+> It's worth understanding what `filter()` actually does behind the scenes: it takes a snapshot of the entire canvas *as it currently exists* - including everything drawn up to that point with `background()`, `image()`, `rect()`, or any other drawing function - and passes that snapshot to the shader as the `texture` uniform. The shader then processes every pixel and writes the result back to the canvas. This means that if multiple shapes or images are drawn before `filter()` is called, they are all composited into a single image first, and the shader sees them as one flat texture. Calling `filter()` multiple times applies each shader in sequence, with each one processing the output of the previous one.
 
 ## Swizzling and Vector Component Shortcuts
 
@@ -1271,11 +1275,22 @@ void main() {
 
 This shader code demonstrates some notable concepts:
 
+<!--
+🚨 TODO: explain output
+
+New concepts:
+- camera rotation impacting vertex positions
+- this example makes it look like there's lighting, but using custom shaders basically disables all built-in lighting, unless you re-implement it yourself. This is possible if you start with the texlight shader, or implement a custom lighting model
+- object space vs. world space vs. screen space
+- position is in screen space, rather than normalized UV space like in the fragment shader
+- there's a lot more to keep in mind with vertex shaders in 3D
+- next example could show PShape and how they behave differently
+-->
+
 * The Processing sketch uses `translate()` and `rotateX()`/`rotateY()` to position and orient the grid in 3D space. These transformations are captured by the `transformMatrix` uniform, which the vertex shader uses to convert vertex positions into their final screen locations. This means the vertex shader doesn't need to know about camera angles - it operates in **object space** (the grid's own coordinate system), and the matrix handles the transformation to **screen space** (where things actually appear on screen).
 * The brightness of each rectangle varies based on the sine wave displacement, which looks like lighting - but it is not. Using a custom vertex shader disables Processing's built-in lighting system entirely. Any brightness, color, or shading must be calculated manually in the shader code. To use Processing's built-in lighting with custom shaders, the shader would need to be based on the [TexLight shader](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/TexLightVert.glsl), which includes the necessary lighting uniforms and calculations.
 * The vertex shader generates both the displacement and the color from the same `sinAmp` value. This is a practical pattern: computing a value once in the vertex shader and passing it to the fragment shader via a `varying` variable is more efficient than recalculating it per-pixel. The fragment shader in this example is minimal - it simply passes the interpolated vertex color to the screen.
 * Vertex positions in the vertex shader are in screen space (pixel coordinates), not the normalized 0-1 UV space used in fragment shaders. The `distance()` calculation uses the original `vertex.xy` coordinates, which are the pixel positions set by `rect()` in the Processing sketch. This is why the displacement amplitude (`uDisplaceAmp`) is set to `100.0` - it represents 100 pixels of movement along the Z axis.
-
 * The `normal` attribute is used to determine the natural "direction" of each vertex. In this case, since the geometry is made of flat rectangles, the normals point straight out along the Z-axis and can be used to displace the vertices in that direction. Normals are an important concept in 3D graphics, often used for lighting calculations. In the examples so far, vertices can contain lots of useful data as attributes, including position, color, texture coordinates, and normals. Depending on the geometry being drawn, there are conventions for the direction of normals. Normals typically point perpendicular to the surface for flat shapes like rectangles and outward from the center of a sphere. See the diagrams below for reference. When primitive shapes are drawn in Processing, normals are supplied by the built-in shape functions, which can then be used in the vertex shader. When building custom geometry (with `vertex()` calls, for example), custom normals can be created with [`normal()`](https://processing.org/reference/normal_html).
 * `gl_Position` in a vertex shader is just like `gl_FragColor` in a fragment shader - it's the final output of the shader program. In this example, the vertex position is modified before being assigned to `gl_Position`, which changes where the vertex appears on screen. The original `vertex` attribute is read-only, so a new `displacedvertex` variable is created to store and adjust the modified position.
 
