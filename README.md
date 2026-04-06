@@ -29,7 +29,7 @@ To write a shader, follow these steps:
 
 The `loadShader()` function returns a [`PShader`](https://processing.org/reference/PShader.html) object, which is Processing’s representation of a shader program compiled from GLSL source files. It can then be applied to the graphics context in the `draw()` loop with the `filter()` or `shader()` functions. The following is an example of loading a shader file in the sketch code, with the `shader.glsl` code below. Shaders only work in the `P2D` or `P3D` rendering modes, because these modes use OpenGL for graphics, and GLSL is a feature of OpenGL.
 
-sketch.pde
+**sketch.pde**
 
 ```java
 PShader myShader;
@@ -44,7 +44,7 @@ void draw() {
 }
 ```
 
-shader.glsl
+**shader.glsl**
 
 ```glsl
 void main() {
@@ -85,6 +85,8 @@ In most shader environments, the bottom-most pixel has a coordinate of 0, and th
 
 By default, a fragment shader provides its pixel’s position on the canvas via `vertTexCoord`. This is one of the only pieces of information that a shader provides by default. Update the `shader.glsl` code to explore this coordinate system:
 
+**shader.glsl**
+
 ```glsl
 varying vec4 vertTexCoord;
 
@@ -106,6 +108,8 @@ Note the following details in the updated shader code:
 * UV coordinates exist to map textures onto polygon vertices, which explains the name `vertTexCoord`, as in "vertex texture coordinate". The `u` and `v` are simply different names for the `x` and `y` coordinates of a texture. In Processing, this is similar to how the `texture()` function works with the `vertex()` function.
 
 In the next example, the y coordinate is used to set the green color component, resulting in a classic "UV map" that visualizes the pixel’s coordinate system in terms of color components. Red displays the x coordinate, and green displays the y coordinate. In more advanced shader programming, color data is often a way to store more generalized numeric data. This example provides a first look at visualizing the texture's data, turning position into color. 
+
+**shader.glsl**
 
 ```glsl
 varying vec4 vertTexCoord;
