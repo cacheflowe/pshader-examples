@@ -15,27 +15,22 @@ Reorganize existing content for better pedagogical flow. No new writing — just
   - Helps readers navigate the long article and understand scope
   - Update after each new section is added
 
-- [ ] **1.2** Add part dividers to group related sections
-  - **Part 1: Fragment Shader Fundamentals** — Intro through textures (examples 1-7)
-  - **Part 2: Post-Processing & Texture Techniques** — Post-FX, UV manipulation (examples 8-15)
-  - **Part 3: Vertex Shaders & 3D** — Custom vertex shaders through PShape (examples 16-19)
-  - **Part 4: Going Further** — Shader types, lighting, SDFs, advanced topics
-  - Even just `---` with part labels helps show progress
+- [x] **1.2** Add part dividers to group related sections
+  - **Part 1: Fragment Shader Fundamentals** — Intro through SDF (examples 1-8)
+  - **Part 2: Post-Processing & Texture Techniques** — Post-FX, UV manipulation (examples 9-16)
+  - **Part 3: Vertex Shaders & 3D** — Custom vertex shaders through PShape (examples 17-20)
+  - **Part 4: Going Further** — Advanced topics, resources
 
-- [ ] **1.3** Move GLSL math functions section earlier
-  - Currently after example 18 — reader has already used `sin()`, `distance()`, `fract()`, `mix()` without reference
-  - Move to after swizzling or after post-processing examples
-  - The math table becomes a toolkit the reader carries forward
+- [x] **1.3** Move GLSL math functions section earlier
+  - Moved to after CPU vs GPU comparison, before SDF section
+  - Math table now serves as a toolkit the reader carries forward
 
-- [ ] **1.4** Fold `textureWrap()` into the tiling post-processing example
-  - Currently breaks the flow between post-processing and `shader()`
-  - Natural fit as a sidebar: "By the way, Processing has a built-in way to control this..."
-  - Or move to a reference/appendix section at the end
+- [x] **1.4** Fold `textureWrap()` into the tiling post-processing example
+  - Folded into the tiling section with textureWrap(REPEAT) vs CLAMP comparison
 
-- [ ] **1.5** Tighten the UV / shader() mid-section (sections 13-15)
-  - Consider combining "More on UV coordinates" and "Custom shape UV + shader" into one section
-  - Add a brief `filter()` vs `shader()` comparison earlier (after first `filter()` use) so the reader has a mental model before the dedicated section
-  - Goal: reduce the gap between post-processing and vertex shaders
+- [x] **1.5** Tighten the UV / shader() mid-section
+  - Combined UV sections into streamlined flow
+  - filter() vs shader() distinction clarified
 
 - [ ] **1.6** Foreshadow PShape before the final example
   - Add a one-paragraph mention when vertex shaders are introduced: "Processing's PShape caches geometry on the GPU, which pairs naturally with custom shaders — we'll see this later"
@@ -47,10 +42,11 @@ Reorganize existing content for better pedagogical flow. No new writing — just
 
 Targeted additions to existing content. Small-to-medium edits, not full new sections.
 
-- [ ] **2.1** Add "What can shaders do?" motivation gallery to the intro ← _Raph feedback_
-  - 3-5 images or GIFs showing compelling shader outputs (generative art, post-fx, 3D materials)
-  - Answer the reader's #1 question: "Why should I care?"
-  - Could use examples from haxademic, Shadertoy, or community work
+- [x] **2.1** Add "What can shaders do?" motivation gallery to the intro ← _Raph feedback_
+  - ✅ Section written with 7 categories: generative patterns, raymarching, stylized rendering, physics sims, live coding, creative tools, generative art
+  - ✅ Video game graphics origin note added to intro paragraph
+  - 🚨 Images are still TODO placeholders — continue curating artists and capturing screenshots
+  - Artists referenced: Inigo Quilez, Kali, Flockaroo, Amanda Ghassaei, Olivia Jack, Patricio Gonzalez Vivo, ilithya, marioecg, lejeunerenard, Char Stiles
 
 - [ ] **2.2** Add a "Debugging shaders" section or sidebar ← _NEW (analysis)_
   - The most critical missing practical topic for beginners

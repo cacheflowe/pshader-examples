@@ -2,7 +2,7 @@
 
 ## Introduction: What are Shaders?
 
-Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3D shapes, and beyond. 
+Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3D shapes, and beyond. Shader technology originates in video game graphics — every lighting model, particle effect, and post-processing technique in modern games relies on the same GPU pipeline — and creative coders have adopted these tools to make art.
 
 Shaders run in Processing via the [PShader](https://processing.org/reference/PShader.html) object. These programs run on a computer’s GPU (Graphics Processing Unit), rather than the CPU (Central Processing Unit), which is where Java code is executed. Processing already takes advantage of the GPU in many ways, from loading a program's images (via PImage) into video RAM (VRAM), caching geometry (via the [PShape](https://processing.org/reference/PShape.html) object), and rendering geometric shapes and images to the screen, with functions like `rect()` and `image()`. Behind the scenes, Processing even uses a set of built-in shaders to accomplish much of its default behavior. So, while shaders may be a new concept to some, they are already an integral part of how Processing works "under the hood".
 
@@ -11,6 +11,42 @@ GLSL is a "C-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Sha
 > The current version of Processing (4.x) uses OpenGL ES 2.0, a subset of the full OpenGL specification. Some features of GLSL may not be available, and the syntax may differ from other versions. The [OpenGL ES 2.0 specification](https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf) is a useful reference for available functions and features.
 
 This tutorial provides an entry-level introduction to using shaders in Processing. Many excellent educational resources on the internet explain deeper concepts, and there is a whole world of shader techniques to explore beyond this introduction. This tutorial explains basic shader concepts through examples and definitions to demonstrate common creative uses of shaders in Processing.
+
+## What Can Shaders Do?
+
+Shaders power an enormous range of visual techniques. Before diving into the code, here are a few examples of what artists and developers are building with shader programming across different platforms. While this tutorial focuses on the fundamentals, these examples show the breadth of what becomes possible.
+
+<!-- 🚨 TODO: Find/capture images for each category. Keep this section short and visual — 1-2 sentences per category max. This is a motivation gallery, not an artist directory. Continue looking for artists and examples to feature here. -->
+
+**Generative patterns and fractals** — Shaders can produce infinitely detailed mathematical structures, from Mandelbrot zooms to kaleidoscopic fractal worlds, rendered entirely from equations.
+
+<!-- 🚨 TODO: placeholder image — fractal or generative pattern (Kali, Shadertoy) -->
+
+**Raymarching and 3D scenes from pure math** — Without any 3D models or meshes, shaders can construct entire scenes using signed distance functions and ray marching, producing photorealistic lighting, reflections, and shadows from nothing but math.
+
+<!-- 🚨 TODO: placeholder image — raymarched scene (Inigo Quilez, Shadertoy) -->
+
+**Stylized rendering and post-processing** — Shaders excel at transforming existing images and video into painterly, hand-drawn, or otherwise stylized output in real time.
+
+<!-- 🚨 TODO: placeholder image — stylized/painterly rendering (Flockaroo) -->
+
+**Physics simulations** — Fluid dynamics, particle systems, and agent-based simulations like physarum can run entirely on the GPU, processing millions of elements simultaneously.
+
+<!-- 🚨 TODO: placeholder image — fluid sim or physarum (Amanda Ghassaei, Sage Jenson) -->
+
+**Live coding and performance** — Tools like [Hydra](https://hydra.ojack.xyz/) by Olivia Jack allow shaders to be written and modified live during audiovisual performances, turning code into a real-time instrument.
+
+<!-- 🚨 TODO: placeholder image — live coded visuals (Olivia Jack / Hydra, Char Stiles) -->
+
+**Creative tools and frameworks** — Projects like [Lygia](https://lygia.xyz/) by Patricio Gonzalez Vivo provide reusable shader libraries that make advanced techniques like lighting models, noise functions, and color spaces accessible across platforms.
+
+<!-- 🚨 TODO: placeholder image — lygia/tool output (Patricio Gonzalez Vivo) -->
+
+**Generative art and creative coding** — Many artists working in WebGL and other shader environments use GLSL to create unique visual works, from abstract compositions to interactive installations.
+
+<!-- 🚨 TODO: placeholder image — generative art (ilithya, Mario Carrillo / marioecg, lejeunerenard) -->
+
+The artists and projects shown here represent a small cross-section of the shader community. [Shadertoy](https://www.shadertoy.com/) is an excellent place to explore thousands of shader programs shared by artists and developers around the world.
 
 ## Processing Shader Examples
 
