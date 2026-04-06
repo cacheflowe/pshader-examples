@@ -263,44 +263,10 @@ Here are some examples of post-processing effects that can be achieved with shad
 This simple example uses a custom `brightness` uniform to adjust the RGB values of the texture. 
 
 **Processing Code:**
-```java
-PShader myShader;
-PImage img;
-
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-  myShader = loadShader("brightness.glsl");
-}
-
-void draw() {
-  // Draw a scene to be processed
-  image(img, 0, 0);
-
-  // Map mouseX to a brightness value between 0.0 (black) and 2.0 (2x brightness)
-  float brightVal = map(mouseX, 0, width, 0.0, 2.0);
-  myShader.set("uBrightness", brightVal);
-  filter(myShader);
-}
-```
+<!-- @import examples/08_post_brightness/08_post_brightness.pde lang:java -->
 
 **Shader Code (`brightness.glsl`):**
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-uniform float uBrightness;
-
-void main() {
-  // Sample the texture at the given texture coordinates
-  vec4 color = texture2D(texture, vertTexCoord.xy);
-
-  // Multiply the RGB color by the brightness uniform, but leave alpha unchanged
-  gl_FragColor = vec4(color.rgb * uBrightness, color.a);
-
-  // Try changing just one color component for interesting effects
-  // gl_FragColor = vec4(color.r * uBrightness,  color.g, color.b, color.a);
-}
-```
+<!-- @import examples/08_post_brightness/data/brightness.glsl lang:glsl -->
 
 ![A cat photo with adjustable brightness controlled by mouse position](images/shader_demo_post_processing-brightness.png)
 
@@ -309,27 +275,7 @@ void main() {
 A vignette effect darkens the edges of an image. This is achieved by calculating the distance of the current pixel from the center of the screen, and using that distance to darken the pixels towards the edges of the canvas.
 
 **Shader Code (`vignette.glsl`):**
-```glsl
-uniform sampler2D texture;
-varying vec4 vertTexCoord;
-
-void main() {
-  // Get the UV coordinates and sample the texture
-  vec2 uv = vertTexCoord.xy;
-  vec4 color = texture2D(texture, uv);
-
-  // Calculate this pixel's distance from the center (0.5, 0.5)
-  vec2 center = vec2(0.5, 0.5);
-  float dist = distance(uv, center);
-
-  // Invert the distance so the center is kept to the 
-  // original color (by multiplying by 1), and edges 
-  // are darker by multiplying downward with distance.
-  float vignette = 1.0 - (dist * 1.5);
-
-  gl_FragColor = vec4(color.rgb * vignette, 1.0);
-}
-```
+<!-- @import examples/09_post_vignette/data/vignette.glsl lang:glsl -->
 
 ![A cat photo with darkened edges creating a vignette effect](images/shader_demo_post_processing-vignette.png)
 
@@ -339,22 +285,7 @@ void main() {
 Shaders can also manipulate *where* a texture is sampled from. By modifying the original UV coordinates before sampling the texture, the image can be repeated or distorted. This is sometimes called domain warping. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which is comparable to the modulus operator `%` that's commonly used in Java and other languages on the CPU.
 
 **Shader Code (`tile.glsl`):**
-```glsl
-uniform sampler2D texture;
-varying vec4 vertTexCoord;
-uniform float uTiles;
-
-void main() {
-  vec2 uv = vertTexCoord.xy;
-  
-  // Multiply UVs by the number of tiles (e.g., 0-1 becomes 0-4)
-  // Then take the fractional part to reset the range to 0-1 four times
-  vec2 tiledUV = fract(uv * uTiles);
-  
-  vec4 color = texture2D(texture, tiledUV);
-  gl_FragColor = color;
-}
-```
+<!-- @import examples/10_post_tiling/data/tile.glsl lang:glsl -->
 
 ![A cat photo tiled in a grid pattern showing texture repetition](images/shader_demo_post_processing-tiling.png)
 
@@ -364,28 +295,7 @@ void main() {
 Like the tiling example, UV coordinates can be modified *before* sampling the texture. In this case, a sine wave distortion is applied to the UV coordinates to create a wavy effect. A `phase` uniform is used to animate the pixel displacement over time.
 
 **Shader code (`displace.glsl`):**
-```glsl
-uniform sampler2D texture;
-varying vec4 vertTexCoord;
-uniform float uPhase;
-
-void main() {
-  vec2 uv = vertTexCoord.xy;
-  
-  // Apply a sine wave distortion to the UV coordinates
-  // When a float is multiplied by a vec2, it multiplies both components
-  float frequency = 6.0;
-  float amp = 0.1;
-  vec2 displace = vec2(
-    cos(uPhase + uv.y * frequency), 
-    sin(uPhase + uv.x * frequency)
-  ); 
-  uv += displace * amp;
-
-  // sample the color from the texture with the warped UVs
-  gl_FragColor = texture2D(texture, uv);
-}
-```
+<!-- @import examples/11_post_displace/data/displace.glsl lang:glsl -->
 
 ![A cat photo with wavy distortion applied via sine wave displacement](images/shader_demo_post_processing-displace.png)
 
