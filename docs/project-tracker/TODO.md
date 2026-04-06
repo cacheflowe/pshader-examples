@@ -45,21 +45,17 @@ Targeted additions to existing content. Small-to-medium edits, not full new sect
 - [x] **2.1** Add "What can shaders do?" motivation gallery to the intro ← _Raph feedback_
   - ✅ Section written with 7 categories: generative patterns, raymarching, stylized rendering, physics sims, live coding, creative tools, generative art
   - ✅ Video game graphics origin note added to intro paragraph
-  - 🚨 Images are still TODO placeholders — continue curating artists and capturing screenshots
+  - [ ] 🚨 Images are still TODO placeholders — continue curating artists and capturing screenshots
   - Artists referenced: Inigo Quilez, Kali, Flockaroo, Amanda Ghassaei, Olivia Jack, Patricio Gonzalez Vivo, ilithya, marioecg, lejeunerenard, Char Stiles
 
-- [ ] **2.2** Add a "Debugging shaders" section or sidebar ← _NEW (analysis)_
-  - The most critical missing practical topic for beginners
-  - Cover: checking console for compilation errors, common mistakes (int vs float, missing semicolons, misspelled uniforms)
-  - Tip: "If your screen is black, try outputting a solid color first"
-  - Tip: visualize uniforms as colors to verify they're being received
-  - Place after the first shader example or as a standalone sidebar early on
+- [x] **2.2** Add a "Debugging shaders" section or sidebar ← _NEW (analysis)_
+  - Placed after first shader example, before Parallel Computing
+  - Covers: console errors, black screen diagnosis, silent uniform mismatches, visualizing values as colors
+  - [ ] 🚨 TODO: Test a broken shader in Processing and paste a real compiler error message into the tutorial as an example
 
-- [ ] **2.3** Fill in generative 3D grid TODO block (🚨 #6 at line ~442)
-  - Explain camera rotation impacting vertex positions
-  - Object space vs world space vs screen space
-  - Note that custom shaders disable built-in lighting (the sine brightness isn't real lighting)
-  - This is a natural lead-in to the lighting section
+- [x] **2.3** Fill in generative 3D grid TODO block
+  - Explained: transformMatrix/object space vs screen space, fake lighting caveat, TexLight reference, vertex-to-fragment varying pattern, pixel-space coordinates
+  - 🚨 TODO: Manually test example 19 and verify these notes are helpful and accurate in context
 
 - [ ] **2.4** Add sin() CPU vs shader note in animation section ← _Chris feedback_
   - When to calculate on CPU vs in shader
