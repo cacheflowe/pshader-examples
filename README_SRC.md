@@ -155,34 +155,15 @@ With the coordinate system established, the next step is to use a texture. Drawi
 
 Load an image in the Processing sketch and draw it to the screen to provide a texture to work with. Place an image file into the `/data` directory. In this example, the image is named `cool-cat.png`.
 
-```java
-PImage myImage;
-PShader myShader;
+**sketch.pde**
 
-void setup() {
-  size(640, 480, P2D);
-  myImage = loadImage("cool-cat.png");
-  myShader = loadShader("shader.glsl"); 
-}
-
-void draw() {
-  image(myImage, 0, 0);
-  filter(myShader);  
-}
-```
+<!-- @import examples/05_texture_grayscale/05_texture_grayscale.pde lang:java -->
 
 In the shader program, the existing pixels drawn to the canvas by `image()` can be accessed by calling `filter()`.
 
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
+**shader.glsl**
 
-void main() {
-  vec2 uv = vertTexCoord.xy;
-  vec4 color = texture2D(texture, uv);
-  gl_FragColor = vec4(color.r, color.r, color.r, 1.0);
-}
-```
+<!-- @import examples/05_texture_grayscale/data/shader.glsl lang:glsl -->
 
 ![A grayscale version of an image showing only the red channel](images/shader_demo_gpu_pixels.png)
 
@@ -250,57 +231,16 @@ There are many [examples](https://processing.org/tutorials/pixels/#our-second-im
 
 To examine a comparable program that generates the same image via the CPU or GPU, the following example loops over each pixel and sets the green color value to the red component, and sets the red and blue channels to zero:
 
-```java
-PImage myImage;
-
-void setup() {
-  size(640, 480, P2D);
-  pixelDensity(1);
-  myImage = loadImage("cool-cat.png");
-}
-
-void draw() {
-  image(myImage, 0, 0);
-  loadPixels();
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      int loc = x + y*width;
-      float r = red(pixels[loc]);
-      pixels[loc] =  color(0, r, 0); // set green channel to red value
-    }
-  }
-  updatePixels();
-}
-```
+**sketch.pde**
+<!-- @import examples/06_cpu_pixels/06_cpu_pixels.pde lang:java -->
 
 In comparison, the shader-powered version of this program runs significantly faster, especially at higher resolutions, when the number of pixels increases dramatically:
 
-```java
-PImage myImage;
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/07_texture_filter/07_texture_filter.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  myImage = loadImage("cool-cat.jpg");
-  myShader = loadShader("shader.glsl"); 
-}
-
-void draw() {
-  image(myImage, 0, 0);
-  filter(myShader);  
-}
-```
-
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-
-void main() {
-  vec2 uv = vertTexCoord.xy;
-  vec4 color = texture2D(texture, uv);
-  gl_FragColor = vec4(0., color.r, 0., 1.);
-}
-```
+**shader.glsl**
+<!-- @import examples/07_texture_filter/data/shader.glsl lang:glsl -->
 
 Both approaches look exactly the same, but the performance difference is substantial.
 

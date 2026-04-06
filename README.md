@@ -215,6 +215,8 @@ With the coordinate system established, the next step is to use a texture. Drawi
 
 Load an image in the Processing sketch and draw it to the screen to provide a texture to work with. Place an image file into the `/data` directory. In this example, the image is named `cool-cat.png`.
 
+**sketch.pde**
+
 ```java
 PImage myImage;
 PShader myShader;
@@ -227,11 +229,13 @@ void setup() {
 
 void draw() {
   image(myImage, 0, 0);
-  filter(myShader);  
+  filter(myShader);
 }
 ```
 
 In the shader program, the existing pixels drawn to the canvas by `image()` can be accessed by calling `filter()`.
+
+**shader.glsl**
 
 ```glsl
 varying vec4 vertTexCoord;
@@ -310,6 +314,7 @@ There are many [examples](https://processing.org/tutorials/pixels/#our-second-im
 
 To examine a comparable program that generates the same image via the CPU or GPU, the following example loops over each pixel and sets the green color value to the red component, and sets the red and blue channels to zero:
 
+**sketch.pde**
 ```java
 PImage myImage;
 
@@ -335,6 +340,7 @@ void draw() {
 
 In comparison, the shader-powered version of this program runs significantly faster, especially at higher resolutions, when the number of pixels increases dramatically:
 
+**sketch.pde**
 ```java
 PImage myImage;
 PShader myShader;
@@ -351,6 +357,7 @@ void draw() {
 }
 ```
 
+**shader.glsl**
 ```glsl
 varying vec4 vertTexCoord;
 uniform sampler2D texture;
