@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:readme": "node scripts/build.js",
+    "renumber": "node scripts/renumber.js",
     "preview": "vite preview"
   },
   "author": "Cacheflowe",
