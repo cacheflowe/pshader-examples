@@ -171,6 +171,8 @@ The updated shader code introduces new concepts:
 * A new built-in GLSL function called `texture2D` takes two arguments: a `sampler2D` and a `vec2` location. This is similar to Processing’s [`get()`](https://processing.org/reference/get_.html) function, which retrieves a pixel’s color value at a specific coordinate in an image. This code requests the pixel color at the current location and stores its RGBA data in a `vec4` variable called `color`. In shaders, this is often called “texture sampling” or a “texture lookup”.
 * Finally, when setting the output color of the pixel to `gl_FragColor`, the code uses the sampled color to set the output RGB values, but only uses the red channel. This creates a grayscale version of the image drawn before the shader was applied. This technique allows for swapping color channels, inverting them, or performing other kinds of color manipulation or remapping. 
 
+> This example uses `filter()` to apply the shader as a full-canvas post-processing effect - after the image has already been drawn to the canvas, the shader processes every pixel. Later in the tutorial, the `shader()` function is introduced, which applies shaders to specific shapes and geometry rather than the entire canvas. Both approaches are useful at different times, but `filter()` is the simplest way to get started.
+
 ## Swizzling and Vector Component Shortcuts
 
 In the previous example, the red channel of the sampled color is used for all three RGB components of the output color. This is done by accessing the `r` property of the `vec4` variable called `color`.
@@ -242,6 +244,36 @@ Both approaches look exactly the same, but the performance difference is substan
 
 This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex real-time visual effects like blurs, distortions, and generative patterns that could be prohibitively slow on the CPU, especially at larger resolutions. For reference, on a MacBook Pro M1 at 1920×1080, the shader version runs in under 1ms per frame while the CPU version takes roughly 30ms - a 30× speedup. The difference is less dramatic at smaller canvas sizes, but it scales dramatically as resolution increases.
 
+## GLSL Math Functions
+
+Before exploring more advanced shader techniques, it's useful to know that GLSL includes many built-in math functions for vector math, trigonometry, and more. Some of these functions should be familiar from Processing's own math and `PVector` functions, while others may be unique. The table below shows some of the overlapping math functions that are common to both Processing and GLSL. Many of GLSL's math functions are overloaded to work with both scalar values (like `float`) and vector types (like `vec2`, `vec3`, and `vec4`), which makes them very flexible. Several of these functions appear in the examples that follow.
+
+> Common math functions in Processing and their GLSL equivalents:
+
+| Processing             | GLSL                |
+|------------------------|---------------------|
+| `sin()`                | `sin()`             |
+| `cos()`                | `cos()`             |
+| `tan()`                | `tan()`             |
+| `exp()`                | `exp()`             |
+| `sqrt()`               | `sqrt()`            |
+| `round()`              | `round()`           |
+| `floor()`              | `floor()`           |
+| `min()`                | `min()`             |
+| `max()`                | `max()`             |
+| `abs()`                | `abs()`             |
+| `lerp()`               | `mix()`             |
+| `constrain()`          | `clamp()`           |
+| `dist()`               | `distance()`        |
+
+The popular `map()` function in Processing does not have a direct equivalent in GLSL but can be implemented from scratch:
+
+```glsl
+float map(float value, float inputMin, float inputMax, float outputMin, float outputMax) {
+  return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
+}
+```
+
 ## Post-Processing Shaders
 
 Post-processing effects are among the most compelling reasons to use shaders, and the above examples have introduced the concept. By treating the entire rendered sketch as an input texture, shaders can apply global effects like color correction and edge detection or more artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer limitless creative control.
@@ -279,21 +311,7 @@ Shaders can also manipulate *where* a texture is sampled from. By modifying the 
 
 ![A cat photo tiled in a grid pattern showing texture repetition](images/shader_demo_post_processing-tiling.png)
 
-
-### Example 4: Displacement
-
-Like the tiling example, UV coordinates can be modified *before* sampling the texture. In this case, a sine wave distortion is applied to the UV coordinates to create a wavy effect. A `phase` uniform is used to animate the pixel displacement over time.
-
-**Shader code (`displace.glsl`):**
-<!-- @import examples/11_post_displace/data/displace.glsl lang:glsl -->
-
-![A cat photo with wavy distortion applied via sine wave displacement](images/shader_demo_post_processing-displace.png)
-
-These are just a small sample of post-processing effects that can be created with shaders. The code here is simple and efficient enough that multiple shaders can be applied in real-time to create complex visual styles without much of a performance impact. Try loading multiple shaders and applying them in sequence with multiple calls to `filter()`.
-
-### A note about `textureWrap()`
-
-By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)`, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration in Processing can change the global drawing context and affect GLSL behavior.
+The tiling example raises a question: what happens when UV coordinates extend beyond the normalized 0-1 range? By default, the `texture2D()` function uses the color of the nearest edge pixel - a behavior called "clamping". However, Processing provides [`textureWrap()`](https://processing.org/reference/textureWrap_.html) to control this behavior. Calling `textureWrap(REPEAT)` switches from clamping to repeating the texture, which is often the desired behavior when UV coordinates are scaled or offset. This is an example of how CPU-side configuration in Processing can change the global drawing context and affect GLSL behavior.
 
 **sketch.pde**
 <!-- @import examples/12_texture_wrap/12_texture_wrap.pde lang:java -->
@@ -308,6 +326,18 @@ _Result of `textureWrap(CLAMP)`_:
 _Result of `textureWrap(REPEAT)`_:
 
 ![A cat photo tiling seamlessly when UV coordinates go beyond 0-1 range](images/shader_demo_repeat-repeat.png)
+
+
+### Example 4: Displacement
+
+Like the tiling example, UV coordinates can be modified *before* sampling the texture. In this case, a sine wave distortion is applied to the UV coordinates to create a wavy effect. A `phase` uniform is used to animate the pixel displacement over time.
+
+**Shader code (`displace.glsl`):**
+<!-- @import examples/11_post_displace/data/displace.glsl lang:glsl -->
+
+![A cat photo with wavy distortion applied via sine wave displacement](images/shader_demo_post_processing-displace.png)
+
+These are just a small sample of post-processing effects that can be created with shaders. The code here is simple and efficient enough that multiple shaders can be applied in real-time to create complex visual styles without much of a performance impact. Try loading multiple shaders and applying them in sequence with multiple calls to `filter()`.
 
 
 ## Using `shader()` for more control
@@ -327,7 +357,7 @@ The most basic use of `shader()` is to apply a shader to shapes drawn with funct
 ![A cat photo with alpha transparency based on pixel brightness](images/shader_demo_image_shader.png)
 
 
-## More on UV coordinates
+## Custom UV Coordinates and Geometry
 
 As noted previously, every shader in Processing is handed `vertTexCoord`, which allows the shader to know how to draw pixels on screen based on where the shape's vertices are. Typically, for rectangular shapes, these UV coordinates are normalized to the four corners of the shape. By using `beginShape()`, `vertex()`, and `endShape()`, Processing allows for custom UV coordinates to be specified as vertices are defined. These custom UV coordinates are automatically passed from the CPU to the shader via `vertTexCoord`, which allows for more customization with how an image is applied to the geometry.
 
@@ -338,7 +368,7 @@ Consider this example of custom UV coordinates with `beginShape()` and `vertex()
 
 ![A cat photo tiled multiple times across the canvas using custom UV coordinates](images/shader_demo_image_uv_coords.png)
 
-The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
+Custom UV coordinates also allow for non-rectangular geometry. The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
 
 **sketch.pde**
 <!-- @import examples/15_custom_uv_shader/15_custom_uv_shader.pde lang:java -->
@@ -460,36 +490,6 @@ _Typical normals of a rectangle_:
 _Typical normals of a sphere_:
 
 ![Diagram showing normals radiating outward from the center at each vertex of a sphere](images/diagram_normals-sphere.png)
-
-## GLSL math functions
-
-As seen in the previous example, `distance()` and `sin()` are built-in GLSL math functions. Because GLSL is designed for graphics programming, it includes many useful functions for vector math, trigonometry, and more. Some of these functions should be familiar from Processing's own math and `PVector` functions, while others may be unique. The table below shows some of the overlapping math functions that are common to both Processing and GLSL. Many of GLSL's math functions are overloaded to work with both scalar values (like `float`) and vector types (like `vec2`, `vec3`, and `vec4`), which makes them very flexible.
-
-> Common math functions in Processing and their GLSL equivalents:
-
-| Processing             | GLSL                |
-|------------------------|---------------------|
-| `sin()`                | `sin()`             |
-| `cos()`                | `cos()`             |
-| `tan()`                | `tan()`             |
-| `exp()`                | `exp()`             |
-| `sqrt()`               | `sqrt()`            |
-| `round()`              | `round()`           |
-| `floor()`              | `floor()`           |
-| `min()`                | `min()`             |
-| `max()`                | `max()`             |
-| `abs()`                | `abs()`             |
-| `lerp()`               | `mix()`             |
-| `constrain()`          | `clamp()`           |
-| `dist()`               | `distance()`        |
-
-The popular `map()` function in Processing does not have a direct equivalent in GLSL but can be implemented from scratch:
-
-```glsl
-float map(float value, float inputMin, float inputMax, float outputMin, float outputMax) {
-  return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
-}
-```
 
 <!--
 ## Texture-sampling techniques in 3d
