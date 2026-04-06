@@ -1,150 +1,266 @@
 # Actionable TODO List
 
-Priority-ordered tasks to finish the tutorial. Check off as completed.
+Unified plan to finish the tutorial. Organized by implementation order.
+Cross-referenced with: analysis review, Raph's feedback, Chris's feedback, OUTLINE_WIP.md, NOTES.md.
+
+Check off as completed.
 
 ---
 
-## Phase 1: Finish Writing Remaining Sections
+## Phase 1: Article Structure & Flow Fixes
 
-These are the unwritten sections from the outline that need to be authored in README.md.
+Reorganize existing content for better pedagogical flow. No new writing — just moving, combining, and adding brief connective tissue.
 
-- [ ] **1.1** Write "Different types of shaders" section
+- [ ] **1.1** Add a Table of Contents at the top of the article
+  - Helps readers navigate the long article and understand scope
+  - Update after each new section is added
+
+- [ ] **1.2** Add part dividers to group related sections
+  - **Part 1: Fragment Shader Fundamentals** — Intro through textures (examples 1-7)
+  - **Part 2: Post-Processing & Texture Techniques** — Post-FX, UV manipulation (examples 8-15)
+  - **Part 3: Vertex Shaders & 3D** — Custom vertex shaders through PShape (examples 16-19)
+  - **Part 4: Going Further** — Shader types, lighting, SDFs, advanced topics
+  - Even just `---` with part labels helps show progress
+
+- [ ] **1.3** Move GLSL math functions section earlier
+  - Currently after example 18 — reader has already used `sin()`, `distance()`, `fract()`, `mix()` without reference
+  - Move to after swizzling or after post-processing examples
+  - The math table becomes a toolkit the reader carries forward
+
+- [ ] **1.4** Fold `textureWrap()` into the tiling post-processing example
+  - Currently breaks the flow between post-processing and `shader()`
+  - Natural fit as a sidebar: "By the way, Processing has a built-in way to control this..."
+  - Or move to a reference/appendix section at the end
+
+- [ ] **1.5** Tighten the UV / shader() mid-section (sections 13-15)
+  - Consider combining "More on UV coordinates" and "Custom shape UV + shader" into one section
+  - Add a brief `filter()` vs `shader()` comparison earlier (after first `filter()` use) so the reader has a mental model before the dedicated section
+  - Goal: reduce the gap between post-processing and vertex shaders
+
+- [ ] **1.6** Foreshadow PShape before the final example
+  - Add a one-paragraph mention when vertex shaders are introduced: "Processing's PShape caches geometry on the GPU, which pairs naturally with custom shaders — we'll see this later"
+  - Prevents PShape, `sphereDetail()`, `setTexture()`, and equirectangular projection from all arriving at once
+
+---
+
+## Phase 2: Fill Gaps in Existing Written Sections
+
+Targeted additions to existing content. Small-to-medium edits, not full new sections.
+
+- [ ] **2.1** Add "What can shaders do?" motivation gallery to the intro ← _Raph feedback_
+  - 3-5 images or GIFs showing compelling shader outputs (generative art, post-fx, 3D materials)
+  - Answer the reader's #1 question: "Why should I care?"
+  - Could use examples from haxademic, Shadertoy, or community work
+
+- [ ] **2.2** Add a "Debugging shaders" section or sidebar ← _NEW (analysis)_
+  - The most critical missing practical topic for beginners
+  - Cover: checking console for compilation errors, common mistakes (int vs float, missing semicolons, misspelled uniforms)
+  - Tip: "If your screen is black, try outputting a solid color first"
+  - Tip: visualize uniforms as colors to verify they're being received
+  - Place after the first shader example or as a standalone sidebar early on
+
+- [ ] **2.3** Fill in generative 3D grid TODO block (🚨 #6 at line ~442)
+  - Explain camera rotation impacting vertex positions
+  - Object space vs world space vs screen space
+  - Note that custom shaders disable built-in lighting (the sine brightness isn't real lighting)
+  - This is a natural lead-in to the lighting section
+
+- [ ] **2.4** Add sin() CPU vs shader note in animation section ← _Chris feedback_
+  - When to calculate on CPU vs in shader
+  - Practical guidance: "If the value is the same for every pixel, calculate it on the CPU and send as a uniform"
+  - Place in or right after the `uTime` animation example
+
+- [ ] **2.5** Clarify filter() order of operations ← _Chris feedback_
+  - What does filter() actually send to the shader?
+  - If multiple things are drawn before filter(), do they all pass through?
+  - How is filter() different from shader() + geometry?
+  - Add in the "Using Textures" section or as a note after first filter() use
+
+- [ ] **2.6** Improve framing before swizzling code examples ← _Chris feedback_
+  - Add transition text like "The following line does the same thing, but in a more concise way..."
+  - Reader currently lacks context until the end of the section
+
+- [ ] **2.7** Make parallelism section more visual ← _Raph feedback_
+  - Reference "The Pixel Swarm" by thndl
+  - Consider a simple diagram showing parallel execution
+  - The Wikipedia link may be too complex for the audience
+
+---
+
+## Phase 3: New Sections — Fragment Shader Topics
+
+New sections that complete the fragment shader story. These fill the gap between the current post-processing content and the vertex shader sections.
+
+- [ ] **3.1** Write "Generative fragment shader drawing" section (SDFs)
+  - Simple `step(distance(...))` circle example — compare to Processing's `ellipse()`
+  - Show aspect ratio correction for proper circles regardless of canvas size
+  - SDF rectangle — compare to Processing's `rect()`
+  - Link to iquilezles.org SDF resources and Shadertoy
+  - _Source: OUTLINE_WIP.md, GOOGLE_DOC.md, analysis_
+
+- [ ] **3.2** Write "Noise in GLSL" section or subsection
+  - There is no `noise()` or `random()` in GLSL — this surprises Processing users
+  - Show a simple hash-based pseudo-random function
+  - Reference Ashima's simplex noise or similar community implementations
+  - Practical uses: grain effect, displacement, generative patterns
+  - Compare to Processing's `noise()` function
+  - _Source: NOTES.md (Raph noted this), OUTLINE_WIP.md_
+
+- [ ] **3.3** Write "Multiple textures / compositing" section
+  - Passing a second `sampler2D` uniform via `set()` — the article mentions this is possible but never demonstrates it
+  - Simple example: blend two images with `mix()` based on mouse position
+  - Optionally: mask/matte compositing
+  - _Source: OUTLINE_WIP.md, analysis_
+
+- [ ] **3.4** Write "Neighbor pixel sampling" section (kernels, blur)
+  - Introduce `texOffset` built-in uniform
+  - Simple blur or edge detection kernel
+  - Explain that pixels normally don't know about neighbors — this is the workaround
+  - Reference Processing's built-in blur filter example
+  - _Source: OUTLINE_WIP.md, GOOGLE_DOC.md_
+
+- [ ] **3.5** Write "PGraphics + shaders" section
+  - Multi-pass rendering with offscreen buffers
+  - `pg.filter()` doesn't need `beginDraw()`/`endDraw()`, but `pg.shader()` does
+  - Feedback loops and compositing pipelines
+  - Distinctly Processing-specific and practical
+  - _Source: OUTLINE_WIP.md_
+
+---
+
+## Phase 4: New Sections — Vertex Shader & Advanced Topics
+
+These extend the existing vertex shader coverage and add the planned advanced material.
+
+- [ ] **4.1** Write "Different types of shaders" section
   - Cover `#COLOR`, `#TEXTURE`, `#TEXLIGHT`, `#LINE`, `#POINT` shader types
   - Reference Processing4 source: `PShader.java` lines 58-83
   - Create example sketches for at least COLOR and TEXLIGHT types
   - Explain when each type is used and what built-in uniforms/attributes they provide
+  - _Source: OUTLINE_WIP.md, Raph feedback_
 
-- [ ] **1.2** Write "Lighting basics" section
+- [ ] **4.2** Write "Lighting basics" section
   - Basic diffuse lighting with normals and light position
   - Reference existing Processing examples: GlossyFishEye, ToonShading
-  - Note that custom shaders disable built-in lighting
+  - Note that custom shaders disable built-in lighting (connects to 2.3 above)
+  - Connect to `#TEXLIGHT` shader type
   - Create example sketch
+  - _Source: OUTLINE_WIP.md, Raph feedback_
 
-- [ ] **1.3** Write "Generative fragment shader drawing" section
-  - SDF shapes (circle, rectangle)
-  - Compare to Processing's `ellipse()` / `rect()`
-  - Link to iquilezles.org SDF resources
-  - Domain warping deeper dive
+- [ ] **4.3** Write "PShape deep-dive" section (if not already covered enough)
+  - Cached geometry + shaders for performance
+  - Custom attributes via `attrib()` (if appropriate for this level)
+  - `beginShape()` vs PShape performance comparison
+  - _Source: OUTLINE_WIP.md, NOTES.md_
 
-- [ ] **1.4** Write placeholder "Advanced concepts" section
-  - Brief descriptions with links for: raymarching, GPU particles, feedback loops, multiple render passes, compute shaders
-  - Link to external resources and Processing community examples
+- [ ] **4.4** Write POINTS shader example
+  - Check 50 Shades demos for reference
+  - GPU point rendering / particles
+  - _Source: OUTLINE_WIP.md_
 
-- [ ] **1.5** Expand interpolation explanation at rasterization pipeline section (🚨 marker)
-  - Use `diagram_interpolation` example as visual aid
-  - Explain how varying variables are interpolated between vertices
-
-- [ ] **1.6** Fill in the generative 3D grid section's TODO block
-  - Explain camera rotation, object space vs world space vs screen space
+- [ ] **4.5** Write Line shader example
+  - Fill + stroke interaction with shaders
+  - _Source: OUTLINE_WIP.md_
 
 ---
 
-## Phase 2: Address Reviewer Feedback
+## Phase 5: Reference Material & Reviewer Feedback
 
-- [ ] **2.1** Add visual examples of shader capabilities to the intro (Raph)
-  - Show compelling images: generative art, post-fx, 3D materials
-  - Motivate the reader to continue
+These are reference-style additions rather than tutorial flow. Can be integrated into existing sections or added as appendix material.
 
-- [ ] **2.2** Make parallelism section more visual (Raph)
-  - Reference "The Pixel Swarm" by thndl
-  - Consider adding a simple diagram
-
-- [ ] **2.3** Document Processing's built-in uniforms (Raph)
-  - `transform`, `modelview`, `projection`, `texMatrix`, etc.
+- [ ] **5.1** Document Processing's built-in uniforms ← _Raph feedback_
+  - Vertex shader: `transformMatrix`, `modelviewMatrix`, `texMatrix`, `normalMatrix`, light uniforms
+  - Vertex attributes: `position`, `color`, `normal`, `texCoord`, `ambient`, `specular`, `emissive`, `shininess`
+  - Fragment shader: `texture`, `texOffset`, `gl_FragCoord`
   - Reference Alex's Google doc notes and Processing4 source
-  - Add a reference table
+  - Add as a reference table — either inline or as an appendix
+  - _Source: GOOGLE_DOC.md (Alex's list), Raph feedback, NOTES.md_
 
-- [ ] **2.4** Explain PShader vs raw GLSL differences (Raph)
-  - How Processing wraps GLSL
-  - Version differences
-  - What's added automatically
+- [ ] **5.2** Explain PShader vs raw GLSL differences ← _Raph feedback_
+  - How Processing wraps GLSL (what's added automatically)
+  - GLSL version differences — Processing uses OpenGL ES 2.0 (already noted in intro)
+  - Why your shader's `main()` looks different from Shadertoy
+  - `loadShader()` vs `new PShader()` — and why the former is recommended
+  - _Source: Raph feedback, NOTES.md (Justin noted GLSL version issues)_
 
-- [ ] **2.5** Clarify filter() order of operations (Chris)
-  - What does filter() actually send to the shader?
-  - If multiple things are drawn before filter(), do they all pass through?
-  - How is filter() different from shader() + geometry?
+- [ ] **5.3** Add a "Common pitfalls" sidebar or section
+  - Aggregate warnings already scattered through the article:
+    - int vs float type mismatch
+    - Forgetting P2D/P3D in `size()`
+    - Not calling `resetShader()` after `shader()`
+    - Misspelled uniform names fail silently
+    - `millis()` returns int — cast to float for uniforms
+  - Quick-reference format for debugging
+  - _Source: analysis, content already exists scattered through article_
 
-- [ ] **2.6** Add sin() calculation note in animation section (Chris)
-  - When to calculate on CPU vs in shader
+- [ ] **5.4** Add "Performance tips" sidebar
+  - Minimize for loops and conditionals in shaders
+  - Limit texture lookups
+  - Certain things still better on CPU (text, complex logic)
+  - Shaders complement the CPU, not replace it
+  - _Source: NOTES.md (Raph noted this)_
+
+- [ ] **5.5** Coordinate system diagrams — aspect ratio independence ← _Raph feedback_
+  - Make clearer how normalized coordinates work across different canvas sizes
+  - Could connect to the SDF/circle aspect-correction example in 3.1
 
 ---
 
-## Phase 3: Code & Example Cleanup
+## Phase 6: Advanced Concepts & Conclusion
 
-- [ ] **3.1** Add `u` prefix to all custom uniform names
-  - Audit README.md and all example .glsl files
-  - e.g., `splitX` → `uSplitX`, `time` → `uTime`
+- [ ] **6.1** Write "Advanced concepts & further exploration" section
+  - Brief descriptions with links for each topic:
+    - Raymarching
+    - GPU particle systems (mention float32 texture approach from NOTES.md)
+    - Feedback loops with PGraphics
+    - Using textures as data (heightmaps, simulation state)
+    - Multiple render passes / FBOs
+    - Compute shaders (if supported)
+    - Matcap shading (reference from NOTES.md)
+    - Simulation shaders (Conway, `ppixels`)
+  - Link to external resources and Processing community examples
+  - _Source: OUTLINE_WIP.md, NOTES.md, GOOGLE_DOC.md_
 
-- [x] **3.2** Ensure all examples in /examples/ match tutorial code exactly
-  - Resolved via import system — code is now single-source from example files
-  - No more duplication to get out of sync
+- [ ] **6.2** Write tutorial conclusion
+  - Brief summary of what was covered
+  - Encouragement to experiment
+  - Links to community resources, Shadertoy, Book of Shaders, iquilezles.org
 
-- [ ] **3.3** Standardize comment capitalization across all shader files
+---
 
-- [ ] **3.4** Add Processing function documentation links on first mention
+## Phase 7: Final Polish
+
+- [x] **7.1** Add `u` prefix to all custom uniform names — _already done by author_
+- [x] **7.2** Examples match tutorial code — _resolved via import system_
+- [ ] **7.3** Standardize comment capitalization across all shader files
+- [ ] **7.4** Add Processing function documentation links on first mention
   - `filter()`, `shader()`, `resetShader()`, `loadShader()`, `PShader.set()`, etc.
-
-- [ ] **3.5** Resave all screenshot images at 640×480
-
-- [ ] **3.6** Replace cool-cat image with chuck doge (or finalize image choice)
-
----
-
-## Phase 4: Build System for Code Import
-
-- [x] **4.1** Build code import script
-  - `scripts/build.js` — parses `<!-- @import path lang:xxx -->` directives in `README_SRC.md`
-  - Replaces directives with fenced code blocks containing file contents
-  - Supports `lang:`, `label:`, and `lines:` options
-  - Run via `npm run build:readme`
-  - Added `"type": "module"` to package.json for ESM imports
-  - Source file: `README_SRC.md` → Output: `README.md`
-
-- [x] **4.2** Convert ALL inline code blocks to import directives — **35 imports, 19 examples**
-  - [x] `01_solid_color` (was `shader_demo_01`) — .pde + shader.glsl
-  - [x] `02_uv_gradient` (was `shader_demo_02`) — shader.glsl only
-  - [x] `03_uv_map` (was `shader_demo_03_uv_map`) — shader.glsl only
-  - [x] `04_uniforms_mouse` (was `shader_demo_04`) — .pde + shader.glsl
-  - [x] `05_texture_grayscale` (was `shader_demo_gpu_pixels`) — .pde + shader.glsl
-  - [x] `06_cpu_pixels` (was `shader_demo_cpu_pixels`) — .pde only
-  - [x] `07_texture_filter` (was `shader_demo_texture_filter`) — .pde + shader.glsl
-  - [x] `08_post_brightness` (was `shader_demo_post_processing`) — .pde + brightness.glsl
-  - [x] `09_post_vignette` — .pde + vignette.glsl
-  - [x] `10_post_tiling` — .pde + tile.glsl
-  - [x] `11_post_displace` — .pde + displace.glsl
-  - [x] `12_texture_wrap` (was `shader_demo_repeat`) — .pde + uv-adjust.glsl
-  - [x] `13_shader_image` (was `shader_demo_image_shader`) — .pde + shader.glsl
-  - [x] `14_custom_uv` (was `shader_demo_image_uv_coords`) — .pde only
-  - [x] `15_custom_uv_shader` (was `shader_demo_custom_shape_uv_shader`) — .pde + shader.glsl
-  - [x] `16_vertex_shader` (was `shader_demo_vertex_shader`) — .pde + vert.glsl + frag.glsl
-  - [x] `17_vertex_colors` (was `shader_demo_vertex_shader_colors`) — .pde + vert.glsl + frag.glsl
-  - [x] `18_vertex_generative` (was `shader_demo_vertex_shader_generative`) — .pde + vert.glsl + frag.glsl
-  - [x] `19_vertex_displacement` (was `shader_demo_vertex_shader_displacement`) — .pde + vert.glsl + frag.glsl
-
-- [x] **4.3** Example renaming complete
-  - Convention: numbered like `01_solid_color/`
-  - Processing sketch convention: `.pde` in same-named directory
-  - Shaders in `data/` subdirectory
-  - File labels in article use **bold** formatting (e.g., **shader.glsl**)
-  - Original examples still exist alongside new numbered versions
+- [ ] **7.5** Resave all screenshot images at 640×480
+- [ ] **7.6** Replace cool-cat image with chuck doge (or finalize image choice)
+- [ ] **7.7** Apply p5js documentation style guide
+- [ ] **7.8** Final proofreading pass
+- [ ] **7.9** Resolve remaining open questions
+  - Are precision specifiers needed in fragment shaders?
+  - Should we link to this repo's examples in the tutorial?
+- [ ] **7.10** Clean up /docs/wip/ once content is merged into article
 
 ---
 
-## Phase 5: Final Polish
+## Completed Work
 
-- [ ] **5.1** Apply documentation style guide (p5js style guide)
-  - American English, Oxford comma, present tense
-  - Inclusive and accessible language
-  - Review all wording
+### Build System (Phase 4 — DONE)
 
-- [ ] **5.2** Final proofreading pass
-  - Check for consistency in terminology
-  - Verify all images load correctly
-  - Test all linked URLs
+- [x] Built `scripts/build.js` — import directive processor
+- [x] Converted all 19 examples to import directives (35 imports)
+- [x] Renamed all examples to numbered convention (`01_solid_color` through `19_vertex_displacement`)
+- [x] Archived original `shader_demo_*` directories to `_assets/article-examples-converted/`
+- [x] Moved diagrams to `/diagrams/`
 
-- [ ] **5.3** Resolve open questions from TODO.md
-  - Decide on `#define PROCESSING_TEXTURE_SHADER` guidance
-  - Decide on precision specifier guidance
-  - Decide on linking to repo examples vs keeping code inline
+### Editorial Gap Fixes (Phase 3.5 — DONE)
 
-- [ ] **5.4** Clean up /docs/wip/ once content is merged into article
+- [x] UV coordinate explanation — added two-triangles concept
+- [x] Uniform array table note — removed (not needed for intro)
+- [x] `#define PROCESSING_TEXTURE_SHADER` block — deleted
+- [x] CPU/GPU timing comparison — uncommented and integrated
+- [x] Interpolation explanation — added at rasterization section
+- [ ] Generative 3D TODO block + "Next:" placeholder — deferred to Phase 2.3

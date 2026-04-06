@@ -2,7 +2,7 @@
 
 ## Current Examples
 
-Each example is a standalone Processing sketch in `/examples/`. Numbered examples (01-19) are imported into the tutorial via `README_SRC.md`. Original `shader_demo_*` directories still exist alongside.
+Each example is a standalone Processing sketch in `/examples/`. Numbered examples (01-19) are imported into the tutorial via `README_SRC.md`. Original `shader_demo_*` directories have been archived to `_assets/article-examples-converted/`. Diagrams live in `/diagrams/`.
 
 ### Legend
 - **Imported**: Code is pulled into README.md via build system (35 total imports)
