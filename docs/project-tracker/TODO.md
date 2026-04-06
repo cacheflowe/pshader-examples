@@ -103,7 +103,7 @@ These are the unwritten sections from the outline that need to be authored in RE
   - Verify output matches current article
 
 - [ ] **4.3** Consider example renaming for article order
-  - Number examples sequentially by tutorial appearance
+  - Name examples sequentially by topic or tutorial appearance
   - Group diagrams separately
 
 ---

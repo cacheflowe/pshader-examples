@@ -31,26 +31,11 @@ The `loadShader()` function returns a [`PShader`](https://processing.org/referen
 
 sketch.pde
 
-```java
-PShader myShader;
-
-void setup() {
-  size(640, 480, P2D);
-  myShader = loadShader("shader.glsl"); 
-}
-
-void draw() {
-  filter(myShader);
-}
-```
+<!-- @import examples/01_solid_color/01_solid_color.pde lang:java -->
 
 shader.glsl
 
-```glsl
-void main() {
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-}
-```
+<!-- @import examples/01_solid_color/data/shader.glsl lang:glsl -->
 
 Output:
 
