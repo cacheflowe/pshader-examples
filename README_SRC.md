@@ -305,53 +305,11 @@ These are just a small sample of post-processing effects that can be created wit
 
 By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)`, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration in Processing can change the global drawing context and affect GLSL behavior.
 
-```java
-PImage img;
-PShader uvRepeatShader;
+**sketch.pde**
+<!-- @import examples/12_texture_wrap/12_texture_wrap.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-  uvRepeatShader = loadShader("uv-adjust.glsl");
-}
-
-void draw() {
-  // Alternate between REPEAT and CLAMP every 60 frames
-  if(frameCount % 120 < 60) {
-    // When UV coordinates go outside 0.0 - 1.0 range, repeat the texture.
-    // The UV coords now behave like modulo in Java, or fract() in glsl
-    textureWrap(REPEAT);
-  } else {
-    // default is CLAMP
-    textureWrap(CLAMP); 
-  }
-
-  // draw a scene to be post-processed
-  image(img, 0, 0);
-  
-  // adjust UVs to show repeating vs clamping behavior
-  float mouseOffsetX = map(mouseX, 0, width, 1.0, -1.0);
-  float mouseOffsetY = map(mouseY, 0, height, -1.0, 1.0);
-  uvRepeatShader.set("uMouseOffset", mouseOffsetX, mouseOffsetY);
-  filter(uvRepeatShader);
-}
-```
-
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-uniform vec2 uMouseOffset;
-
-void main() {
-  // Get the UV coordinates from the vertex shader
-  // and adjust the UV coordinates based on the mouse position
-  vec2 uv = vertTexCoord.xy + uMouseOffset;
-  // Sample the texture at the adjusted texture coordinates
-  vec4 color = texture2D(texture, uv);
-  // Multiply the RGB color by the brightness uniform, but leave alpha unchanged
-  gl_FragColor = color;
-}
-```
+**uv-adjust.glsl**
+<!-- @import examples/12_texture_wrap/data/uv-adjust.glsl lang:glsl -->
 
 _Result of `textureWrap(CLAMP)`_:
 
@@ -370,46 +328,11 @@ Processing also provides the `shader()` function, which allows for more targeted
 
 The most basic use of `shader()` is to apply a shader to shapes drawn with functions like `image()`, `rect()`, or custom geometry created with `beginShape()`, `vertex()`, and `endShape()`. When a shader is applied in this way, the UV coordinates in the shader are directly mapped to the shape's vertices, which have their own UV coordinates. `image()`  and `rect()`, for example, have default coordinates (like calling `filter()` on the entire canvas), but these coordinates are contained within the shape's bounds, wherever it's drawn on-screen. In the following example, the shader is only applied within the image boundaries, wherever it is drawn on the canvas:
 
-```java
-PImage img;
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/13_shader_image/13_shader_image.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-  myShader = loadShader("shader.glsl");
-}
-
-void draw() {
-  background(255, 0, 0);
-  imageMode(CENTER);
-
-  // Set the shader on the drawing context 
-  shader(myShader);
-
-  // Draw an image - the shader will adjust the way it's drawn
-  // The `texture` uniform in the shader is automatically set to the PImage
-  image(img, mouseX, mouseY, img.width/2, img.height/2);
-
-  // reset the shader
-  resetShader();
-}
-```
-
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-
-void main() {
-  // sample color from the image being drawn
-  vec2 uv = vertTexCoord.xy;
-  vec4 color = texture2D(texture, uv);
-
-  // Set alpha based on red channel, which makes darker pixels more transparent
-  color.a = color.r; 
-  gl_FragColor = color;
-}
-```
+**shader.glsl**
+<!-- @import examples/13_shader_image/data/shader.glsl lang:glsl -->
 
 ![A cat photo with alpha transparency based on pixel brightness](images/shader_demo_image_shader.png)
 
@@ -420,112 +343,18 @@ As noted previously, every shader in Processing is handed `vertTexCoord`, which 
 
 Consider this example of custom UV coordinates with `beginShape()` and `vertex()` without a shader. The result mimics the `tiling.glsl` post-processing shader example, but this time the tiling behavior is specified on the CPU by setting custom UV coordinates for each vertex of the shape rather than inside the shader. This exemplifies the connection between geometry data created in Java and how that data is used, opening the door for further manipulation on the GPU via shaders.
 
-```java
-PImage img;
-
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-}
-
-void draw() {
-  background(0);
-  
-  // Specify custom UV coordinates for each vertex
-  // Use normalized coordinates (0-1), to match GLSL
-  textureMode(NORMAL); 
-  // set UV coords to repeat
-  textureWrap(REPEAT); 
-    
-  // draw tiled image via UV multiplication
-  // https://processing.org/reference/texture_.html
-  float numTiles = map(mouseX, 0, width, 1, 10);
-  beginShape();
-  texture(img);
-  vertex(0, 0, 0, 0);
-  vertex(width, 0, numTiles, 0);
-  vertex(width, height, numTiles, numTiles);
-  vertex(0, height, 0, numTiles);
-  endShape();
-}
-```
+**sketch.pde**
+<!-- @import examples/14_custom_uv/14_custom_uv.pde lang:java -->
 
 ![A cat photo tiled multiple times across the canvas using custom UV coordinates](images/shader_demo_image_uv_coords.png)
 
 The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
 
-```java 
-PImage img;
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/15_custom_uv_shader/15_custom_uv_shader.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-  myShader = loadShader("shader.glsl");
-}
-
-void draw() {
-  background(0);
-
-  // draw a circle with custom UV coordinates
-  textureMode(NORMAL);
-  textureWrap(REPEAT);
-  
-  // update shader uniform
-  float displaceAmp = map(mouseX, 0, width, -0.25, 0.25);
-  myShader.set("uDisplaceAmp", displaceAmp);
-  shader(myShader);
-
-  // move geometry around a little bit, for fun effect
-  float shapeX = map(mouseX, 0, width, -200, 200);
-  float shapeY = map(mouseY, 0, height, -100, 100);
-  translate(shapeX, shapeY);
-
-  // apply shader to the context, and draw custom geometry
-  noStroke();
-  beginShape();
-  texture(img);
-  int circleResolution = 36;
-  float radius = 150;
-  for (int i = 0; i <= circleResolution; i++) {
-    // calculate vertex positions around circle
-    float angle = TWO_PI * i / circleResolution;
-    float x = width/2 + cos(angle) * radius;
-    float y = height/2 + sin(angle) * radius;
-    
-    // map UVs to circle shape
-    // and correct for image aspect ratio, so the image doesn't look squished
-    float aspect = float(img.width) / float(img.height);
-    float u = 0.5 + cos(angle) * 0.5 / aspect;
-    float v = 0.5 + sin(angle) * 0.5;
-    
-    // draw each vertex position and UV coords
-    vertex(x, y, u, v);
-  }
-  endShape(CLOSE);
-  
-  resetShader();
-}
-```
-
-```glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-uniform float uDisplaceAmp;
-
-void main() {
-  // sample color from the image being drawn
-  vec2 uv = vertTexCoord.xy;
-
-  // Apply a sine wave distortion to the UV coordinates
-  float frequency = 6.0;
-  vec2 displace = vec2(cos(uv.y * frequency), sin(uv.x * frequency));
-  uv += displace * uDisplaceAmp;
-
-  // draw to screen by sampling the texture at the displaced UVs
-  gl_FragColor = texture2D(texture, uv);
-}
-```
+**shader.glsl**
+<!-- @import examples/15_custom_uv_shader/data/shader.glsl lang:glsl -->
 
 ![A circular cutout of a cat photo with wavy distortion controlled by mouse movement](images/shader_demo_custom_shape_uv_shader.png)
 
@@ -539,112 +368,14 @@ The default Processing vertex shader when dealing with textures is [here](https:
 
 Note that any custom uniform set on the `PShader` object via `set()` in either the vertex or fragment shader is available to both, provided the uniform is declared in the shader code. This is a convenient way to potentially add interactivity to both shaders at once.
 
-```java
-PImage img;
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/16_vertex_shader/16_vertex_shader.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  img = loadImage("cool-cat.jpg");
-  myShader = loadShader("frag.glsl", "vert.glsl");
-}
+**vert.glsl**
+<!-- @import examples/16_vertex_shader/data/vert.glsl lang:glsl -->
 
-void draw() {
-  background(0);
-
-  // Update shader uniform and apply shader to the context 
-  float displaceAmp = map(mouseX, 0, width, 0, 50);
-  myShader.set("uDisplaceAmp", displaceAmp);
-  myShader.set("uTime", (float) millis());
-  shader(myShader);
-
-  // draw a circle with custom UV coordinates
-  noStroke();
-  textureMode(NORMAL);
-  beginShape();
-  texture(img);
-  int circleResolution = 36;
-  float radius = 150;
-  for (int i = 0; i <= circleResolution; i++) {
-    // calculate vertex positions around circle
-    float angle = TWO_PI * i / circleResolution;
-    float x = width/2 + cos(angle) * radius;
-    float y = height/2 + sin(angle) * radius;
-    
-    // map UVs to circle shape
-    // and correct for image aspect ratio, so the image doesn't look squished
-    float aspect = float(img.width) / float(img.height);
-    float u = 0.5 + cos(angle) * 0.5 / aspect;
-    float v = 0.5 + sin(angle) * 0.5;
-    
-    // draw each vertex position and UV coords
-    vertex(x, y, u, v);
-  }
-  endShape(CLOSE);
-  
-  resetShader();
-}
-```
-
-```glsl
-// vert.glsl
-// processing-provided variables
-uniform mat4 transformMatrix;
-uniform mat4 texMatrix;
-
-attribute vec4 position;
-attribute vec4 color;
-attribute vec2 texCoord;
-
-varying vec4 vertColor;
-varying vec4 vertTexCoord;
-
-// custom variables
-uniform float uDisplaceAmp;
-uniform float uTime;
-
-
-void main() {
-  // apply transformations to vertex position
-  vec4 newPosition = position;
-  
-  // Apply a sine wave distortion to the vertices' original positions (only the .xy components)
-  // Important note: position is in screen space, rather than normalized UV space like in the fragment shader
-  float frequency = 0.015; // use a lower frequency for position space distortion
-  float phaseX = uTime * 0.005;
-  float phaseY = uTime * 0.007;
-  vec2 displace = vec2(
-    cos(position.y * frequency + phaseX), 
-    sin(position.x * frequency + phaseY)
-  );
-  newPosition.xy += displace * uDisplaceAmp;
-
-  // set final vertex position and pass varying data to fragment shader
-  gl_Position = transformMatrix * newPosition;
-
-  // Pass vertex color and texture coordinate along to fragment shader
-  // This is default behavior in Processing, and shows the pipeline between
-  // geometry creation on the CPU, vertex shader application, and final
-  // fragment shader rendering to the screen
-  vertColor = color;
-  vertTexCoord = texMatrix * vec4(texCoord, 1.0, 1.0);
-}
-```
-
-```glsl
-// frag.glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-
-void main() {
-  // sample color from the image being drawn, 
-  // based on geometry's custom UV coords
-  vec2 uv = vertTexCoord.xy;
-
-  // draw color to screen
-  gl_FragColor = texture2D(texture, uv);
-}
-```
+**frag.glsl**
+<!-- @import examples/16_vertex_shader/data/frag.glsl lang:glsl -->
 
 ![A circular cat photo cutout with animated wavy displacement applied to the vertices](images/shader_demo_vertex_shader.png)
 
@@ -685,85 +416,14 @@ In the following example, the vertex shader modifies the original vertex colors 
 
 If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, some texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl). This is a great starting point to create custom shaders. 
 
-```java
-PImage img;
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/17_vertex_colors/17_vertex_colors.pde lang:java -->
 
-void setup() {
-  size(640, 480, P2D);
-  myShader = loadShader("frag.glsl", "vert.glsl");
-}
+**vert.glsl**
+<!-- @import examples/17_vertex_colors/data/vert.glsl lang:glsl -->
 
-void draw() {
-  background(0);
-
-  // Update shader uniform and apply shader to the context 
-  myShader.set("uMouse", (float) mouseX, (float) mouseY);
-  shader(myShader);
-
-  // Draw a rectangle with a different fill color on each vertex
-  // Colors here mimic the "UV map" so the interpolation between
-  // vertices is clearly illustrated
-  noStroke();
-  beginShape();
-  // black at top-left corner
-  fill(0, 0, 0);
-  vertex(width * 0.2, height * 0.2, 0, 0);
-  // green at top-right corner
-  fill(255, 0, 0);
-  vertex(width * 0.8, height * 0.2, 1, 0);
-  // yellow at bottom-right corner
-  fill(255, 255, 0);
-  vertex(width * 0.8, height * 0.8, 1, 1);
-  // green at bottom-left corner
-  fill(0, 255, 0);
-  vertex(width * 0.2, height * 0.8, 0, 1);
-  endShape(CLOSE);
-  
-  resetShader();
-}
-```
-
-```glsl
-// vert.glsl
-// processing-provided variables
-uniform mat4 transformMatrix;
-
-attribute vec4 position;
-attribute vec4 color;
-
-varying vec4 vertColor;
-
-// custom uniforms
-uniform vec2 uMouse;
-
-void main() {
-  gl_Position = transformMatrix * position;
-
-  // Calculate distance between mouse and vertex position
-  float dist = distance(uMouse, position.xy);
-
-  // Use distance to modify vertex color's rgb components - closer vertices are brighter
-  // Create a new `finalColor` variable to hold the adjusted color, since attributes are read-only
-  float maxDist = 200.;
-  float brightness = 1.0 - dist / maxDist;
-  brightness = clamp(brightness, 0.0, 1.0); // clamp is like Processing's constrain()
-  vec4 finalColor = color; // copy original color
-  finalColor.xyz += vec3(brightness);
-
-  // adjust the original vertex color and pass to fragment shader
-  vertColor = finalColor;
-}
-```
-
-```glsl
-// frag.glsl
-varying vec4 vertColor;
-
-void main() {
-  gl_FragColor = vertColor;
-}
-```
+**frag.glsl**
+<!-- @import examples/17_vertex_colors/data/frag.glsl lang:glsl -->
 
 ![Mouse distance vertex colors](images/shader_demo_vertex_shader_colors.png)
 
@@ -777,92 +437,14 @@ In the following example, the vertex shader is used to generate all of the color
 
 Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows 3d transformations like `rotateX()` and `rotateY()` to view the 3D geometry from different angles.
 
-```java
-PShader myShader;
+**sketch.pde**
+<!-- @import examples/18_vertex_generative/18_vertex_generative.pde lang:java -->
 
-void setup() {
-  size(640, 480, P3D);
-  myShader = loadShader("frag.glsl", "vert.glsl");
-}
+**vert.glsl**
+<!-- @import examples/18_vertex_generative/data/vert.glsl lang:glsl -->
 
-void draw() {
-  background(0);
-  
-  // set center of screen as 3d world origin
-  translate(width/2, height/2, -100);
-  rotateX(map(mouseY, 0, height, PI, -PI));
-  rotateY(map(mouseX, 0, width, -PI, PI));
-
-  // Update shader uniform and apply shader to the context 
-  myShader.set("uTime", (float) millis());
-  myShader.set("uDisplaceAmp", 100.0);
-  shader(myShader);
-
-  // Draw a subdivided mesh grid
-  // The shader will displace vertices in Z based on their position
-  fill(255);
-  noStroke();
-  float cellSize = 10;
-  int cols = floor(width / cellSize);
-  int rows = floor(height / cellSize);
-
-  for(int row = 0; row < rows; row++) {
-    for(int col = 0; col < cols; col++) {
-      float x = col * cellSize - width / 2;
-      float y = row * cellSize - height / 2;
-      rect(x, y, cellSize, cellSize);
-    }
-  }
-  
-  resetShader();
-}
-```
-
-```glsl
-// vertex.glsl
-// processing-provided variables
-uniform mat4 transformMatrix;
-
-attribute vec4 vertex;
-attribute vec3 normal;
-
-varying vec4 vertColor;
-
-// custom uniforms
-uniform float uTime;
-uniform float uDisplaceAmp;
-
-void main() {
-  // Calculate distance from center of world 
-  // in original xy coords
-  float dist = distance(vec2(0.), vertex.xy);
-  dist *= 0.05;
-
-  // sin function for circular wave, normalized & offset over time
-  float phaseOffset = uTime * -0.003;
-  float sinAmp = 0.5 + 0.5 * sin(phaseOffset + dist);
-
-  // Use the sin amplitude to also create the vertex color 
-  // and pass to fragment shader to match displacement
-  vec4 finalColor = vec4(vec3(sinAmp), 1.);
-  vertColor = finalColor;
-
-  // Apply displacement in object space along Z axis
-  // using the normal direction, which orients properly
-  vec4 displacedvertex = vertex;
-  displacedvertex.xyz += normal * (sinAmp * uDisplaceAmp); 
-  gl_Position = transformMatrix * displacedvertex;
-}
-```
-
-```glsl
-// frag.glsl
-varying vec4 vertColor;
-
-void main() {
-  gl_FragColor = vertColor;
-}
-```
+**frag.glsl**
+<!-- @import examples/18_vertex_generative/data/frag.glsl lang:glsl -->
 
 ![A 3D grid of rectangles with animated wave-like displacement and brightness controlled by vertex shader](images/shader_demo_vertex_shader_generative.png)
 
@@ -932,88 +514,14 @@ Next example:
 
 The next example reintroduces texture sampling in 3D space, combined with vertex displacement in a custom vertex shader. Both the vertex and fragment shaders sample the texture image, but for different purposes. The vertex shader samples the texture to determine how much to displace each vertex along its normal, while the fragment shader samples the texture to determine the final pixel color. The result is a bumpy sphere effect, where the texture image drives the vertex displacement.
 
-```java
-PImage img;
-PShader myShader;
-PShape globe;
+**sketch.pde**
+<!-- @import examples/19_vertex_displacement/19_vertex_displacement.pde lang:java -->
 
-void setup() {
-  size(640, 480, P3D);
-  img = loadImage("moon-nasa.jpg");
+**vert.glsl**
+<!-- @import examples/19_vertex_displacement/data/vert.glsl lang:glsl -->
 
-  // load shader and set on context
-  // no need to resetShader() later since we're only drawing with the shader
-  myShader = loadShader("frag.glsl", "vert.glsl");
-  shader(myShader);
-  
-  // build a texture-mapped sphere using PShape
-  sphereDetail(80); // increase detail for smoother sphere
-  globe = createShape(SPHERE, 150);
-  globe.setTexture(img);
-  globe.setStroke(color(0, 0)); // invisible stroke
-}
-
-void draw() {
-  background(0);
-
-  // set center of screen as 3d world origin
-  translate(width/2, height/2, -100);
-
-  // rotate based on mouse position
-  rotateX(map(mouseY, 0, height, PI, -PI));
-  rotateY(map(mouseX, 0, width, -PI, PI));
-
-  // Update shader uniform and activate shader
-  myShader.set("uDisplaceAmp", map(sin(millis() * 0.001), -1, 1, 0, 0.75));
-
-  // draw the textured sphere with displacement
-  shape(globe);
-}
-```
-
-```glsl
-// vertex.glsl
-// processing-provided variables
-uniform mat4 transformMatrix;
-uniform mat4 texMatrix;
-uniform sampler2D texture;
-
-attribute vec4 position;
-attribute vec2 texCoord;
-
-varying vec4 vertTexCoord;
-
-// custom uniforms
-uniform float uDisplaceAmp;
-
-void main() {
-  // sample texture color at the vertex's UV coordinate
-  vec4 texColor = texture2D(texture, texCoord.xy);
-
-  // for a sphere, displace vertex position based on texture's red channel
-  vec3 positionDisplaced = position.xyz;
-  positionDisplaced.xyz *= 1. + uDisplaceAmp * texColor.r;
-  gl_Position = transformMatrix * vec4(positionDisplaced, position.w);
-
-  // pass texture coordinates to fragment shader
-  vertTexCoord = texMatrix * vec4(texCoord, 1.0, 1.0);
-}
-```
-
-```glsl
-// frag.glsl
-varying vec4 vertTexCoord;
-uniform sampler2D texture;
-
-void main() {
-  // sample color from the image being drawn, 
-  // based on geometry's custom UV coords
-  vec2 uv = vertTexCoord.xy;
-
-  // draw color to screen
-  gl_FragColor = texture2D(texture, uv);
-}
-```
+**frag.glsl**
+<!-- @import examples/19_vertex_displacement/data/frag.glsl lang:glsl -->
 
 ![A textured sphere with bumpy displacement based on the moon surface texture](images/shader_demo_vertex_shader_displacement.png)
 

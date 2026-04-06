@@ -2,37 +2,50 @@
 
 ## Current Examples
 
-Each example is a standalone Processing sketch in `/examples/`. Some are used directly in the tutorial (README.md), some are diagrams, and some are standalone demos.
+Each example is a standalone Processing sketch in `/examples/`. Numbered examples (01-19) are imported into the tutorial via `README_SRC.md`. Original `shader_demo_*` directories still exist alongside.
 
 ### Legend
-- **In Article**: Code appears inline in README.md
+- **Imported**: Code is pulled into README.md via build system (35 total imports)
+- **Original**: Pre-existing example, not yet cleaned up or removed
 - **Diagram**: Visual aid, not a shader example
-- **Standalone**: Not yet referenced in the article
+- **Standalone**: Not referenced in the article
 
-| # | Directory | Type | Shader | In Article? | Notes |
-|---|-----------|------|--------|-------------|-------|
-| 1 | `diagram_interpolation/` | Diagram | None | No | Color interpolation visualization |
-| 2 | `diagram_normals/` | Diagram | None | Yes (images only) | Normal direction visualization |
-| 3 | `diagram_uv_coords/` | Diagram | None | Yes (images only) | UV coordinate grid |
-| 4 | `fragment_01_solid_color/` | Demo | Fragment | No | Green solid color (from 50 Shades) |
-| — | ~~`shader_demo_01/`~~ | — | — | — | **Renamed → `01_solid_color/`** ✅ imported |
-| — | ~~`shader_demo_02/`~~ | — | — | — | **Renamed → `02_uv_gradient/`** ✅ imported |
-| — | ~~`shader_demo_03_uv_map/`~~ | — | — | — | **Renamed → `03_uv_map/`** ✅ imported |
-| 8 | `shader_demo_04/` | Demo | Fragment | Yes | Mouse split-screen — **next to convert** |
-| 9 | `shader_demo_cpu_pixels/` | Demo | None (CPU) | Yes | CPU pixel manipulation |
-| 10 | `shader_demo_cpu_pixels_bug/` | Demo | None (CPU) | No | Bug demonstration |
-| 11 | `shader_demo_custom_shape_uv/` | Demo | Fragment | No | Custom shape UVs (no texture) |
-| 12 | `shader_demo_custom_shape_uv_shader/` | Demo | Fragment | Yes | Circle with displaced UVs |
-| 13 | `shader_demo_gpu_pixels/` | Demo | Fragment | Yes | GPU grayscale filter |
-| 14 | `shader_demo_image_shader/` | Demo | Fragment | Yes | shader() on drawn image |
-| 15 | `shader_demo_image_uv_coords/` | Demo | Fragment | Yes | Custom UV tiling |
-| 16 | `shader_demo_post_processing/` | Demo | Fragment (4x) | Yes | Brightness, vignette, tiling, displace |
-| 17 | `shader_demo_repeat/` | Demo | Fragment | Yes | REPEAT vs CLAMP |
-| 18 | `shader_demo_texture_filter/` | Demo | Fragment | Yes | GPU texture filter + timing |
-| 19 | `shader_demo_vertex_shader/` | Demo | Vert+Frag | Yes | Circle vertex displacement |
-| 20 | `shader_demo_vertex_shader_colors/` | Demo | Vert+Frag | Yes | Per-vertex colors + mouse |
-| 21 | `shader_demo_vertex_shader_displacement/` | Demo | Vert+Frag | Yes | PShape sphere displacement |
-| 22 | `shader_demo_vertex_shader_generative/` | Demo | Vert+Frag | Yes | 3D grid generative |
+### Numbered Examples (imported into article)
+
+| # | Directory | Section | Files Imported |
+|---|-----------|---------|----------------|
+| 01 | `01_solid_color/` | Writing a First Shader | .pde + shader.glsl |
+| 02 | `02_uv_gradient/` | Coordinate System (gradient) | shader.glsl |
+| 03 | `03_uv_map/` | Coordinate System (UV map) | shader.glsl |
+| 04 | `04_uniforms_mouse/` | Uniforms | .pde + shader.glsl |
+| 05 | `05_texture_grayscale/` | Using Textures | .pde + shader.glsl |
+| 06 | `06_cpu_pixels/` | CPU vs GPU (CPU) | .pde |
+| 07 | `07_texture_filter/` | CPU vs GPU (GPU) | .pde + shader.glsl |
+| 08 | `08_post_brightness/` | Post-Processing | .pde + brightness.glsl |
+| 09 | `09_post_vignette/` | Post-Processing | vignette.glsl |
+| 10 | `10_post_tiling/` | Post-Processing | tile.glsl |
+| 11 | `11_post_displace/` | Post-Processing | displace.glsl |
+| 12 | `12_texture_wrap/` | textureWrap() | .pde + uv-adjust.glsl |
+| 13 | `13_shader_image/` | Using shader() | .pde + shader.glsl |
+| 14 | `14_custom_uv/` | More on UV coordinates | .pde |
+| 15 | `15_custom_uv_shader/` | Custom shape UV + shader | .pde + shader.glsl |
+| 16 | `16_vertex_shader/` | Adding a vertex shader | .pde + vert.glsl + frag.glsl |
+| 17 | `17_vertex_colors/` | Vertex colors | .pde + vert.glsl + frag.glsl |
+| 18 | `18_vertex_generative/` | 3D with Z coordinates | .pde + vert.glsl + frag.glsl |
+| 19 | `19_vertex_displacement/` | PShape sphere | .pde + vert.glsl + frag.glsl |
+
+### Original Examples (still present, not imported)
+
+| Directory | Type | Notes |
+|-----------|------|-------|
+| `diagram_interpolation/` | Diagram | Could illustrate rasterization section |
+| `diagram_normals/` | Diagram | Images used in article |
+| `diagram_uv_coords/` | Diagram | Images used in article |
+| `fragment_01_solid_color/` | Standalone | From 50 Shades, uses green |
+| `shader_demo_cpu_pixels_bug/` | Standalone | Bug demo |
+| `shader_demo_custom_shape_uv/` | Standalone | Custom shape UVs (no texture) |
+| `shader_demo_post_processing/` | Original | Combined 4-filter demo, kept as "stacking" bonus |
+| `shader_demo_01/` through `shader_demo_vertex_shader_displacement/` | Original | Superseded by numbered versions |
 
 ### Examples NOT yet in the article
 - `fragment_01_solid_color/` - From 50 Shades, uses green instead of red

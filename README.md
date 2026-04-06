@@ -522,6 +522,7 @@ These are just a small sample of post-processing effects that can be created wit
 
 By default, when UV coordinates extend beyond the normalized 0-1 range, the `texture2D()` function uses the color of the nearest edge pixel. However, sometimes it's desirable to have the texture repeat instead of the default "clamping" behavior. To achieve this, call `textureWrap(REPEAT)`, which switches from clamping to repeating the texture. This is an example of how CPU-side configuration in Processing can change the global drawing context and affect GLSL behavior.
 
+**sketch.pde**
 ```java
 PImage img;
 PShader uvRepeatShader;
@@ -554,6 +555,7 @@ void draw() {
 }
 ```
 
+**uv-adjust.glsl**
 ```glsl
 varying vec4 vertTexCoord;
 uniform sampler2D texture;
@@ -587,6 +589,7 @@ Processing also provides the `shader()` function, which allows for more targeted
 
 The most basic use of `shader()` is to apply a shader to shapes drawn with functions like `image()`, `rect()`, or custom geometry created with `beginShape()`, `vertex()`, and `endShape()`. When a shader is applied in this way, the UV coordinates in the shader are directly mapped to the shape's vertices, which have their own UV coordinates. `image()`  and `rect()`, for example, have default coordinates (like calling `filter()` on the entire canvas), but these coordinates are contained within the shape's bounds, wherever it's drawn on-screen. In the following example, the shader is only applied within the image boundaries, wherever it is drawn on the canvas:
 
+**sketch.pde**
 ```java
 PImage img;
 PShader myShader;
@@ -613,6 +616,7 @@ void draw() {
 }
 ```
 
+**shader.glsl**
 ```glsl
 varying vec4 vertTexCoord;
 uniform sampler2D texture;
@@ -637,6 +641,7 @@ As noted previously, every shader in Processing is handed `vertTexCoord`, which 
 
 Consider this example of custom UV coordinates with `beginShape()` and `vertex()` without a shader. The result mimics the `tiling.glsl` post-processing shader example, but this time the tiling behavior is specified on the CPU by setting custom UV coordinates for each vertex of the shape rather than inside the shader. This exemplifies the connection between geometry data created in Java and how that data is used, opening the door for further manipulation on the GPU via shaders.
 
+**sketch.pde**
 ```java
 PImage img;
 
@@ -671,7 +676,8 @@ void draw() {
 
 The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
 
-```java 
+**sketch.pde**
+```java
 PImage img;
 PShader myShader;
 
@@ -725,6 +731,7 @@ void draw() {
 }
 ```
 
+**shader.glsl**
 ```glsl
 varying vec4 vertTexCoord;
 uniform sampler2D texture;
@@ -756,6 +763,7 @@ The default Processing vertex shader when dealing with textures is [here](https:
 
 Note that any custom uniform set on the `PShader` object via `set()` in either the vertex or fragment shader is available to both, provided the uniform is declared in the shader code. This is a convenient way to potentially add interactivity to both shaders at once.
 
+**sketch.pde**
 ```java
 PImage img;
 PShader myShader;
@@ -803,6 +811,7 @@ void draw() {
 }
 ```
 
+**vert.glsl**
 ```glsl
 // vert.glsl
 // processing-provided variables
@@ -848,6 +857,7 @@ void main() {
 }
 ```
 
+**frag.glsl**
 ```glsl
 // frag.glsl
 varying vec4 vertTexCoord;
@@ -902,6 +912,7 @@ In the following example, the vertex shader modifies the original vertex colors 
 
 If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, some texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl). This is a great starting point to create custom shaders. 
 
+**sketch.pde**
 ```java
 PImage img;
 PShader myShader;
@@ -941,6 +952,7 @@ void draw() {
 }
 ```
 
+**vert.glsl**
 ```glsl
 // vert.glsl
 // processing-provided variables
@@ -973,6 +985,7 @@ void main() {
 }
 ```
 
+**frag.glsl**
 ```glsl
 // frag.glsl
 varying vec4 vertColor;
@@ -994,6 +1007,7 @@ In the following example, the vertex shader is used to generate all of the color
 
 Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows 3d transformations like `rotateX()` and `rotateY()` to view the 3D geometry from different angles.
 
+**sketch.pde**
 ```java
 PShader myShader;
 
@@ -1035,6 +1049,7 @@ void draw() {
 }
 ```
 
+**vert.glsl**
 ```glsl
 // vertex.glsl
 // processing-provided variables
@@ -1072,6 +1087,7 @@ void main() {
 }
 ```
 
+**frag.glsl**
 ```glsl
 // frag.glsl
 varying vec4 vertColor;
@@ -1149,6 +1165,7 @@ Next example:
 
 The next example reintroduces texture sampling in 3D space, combined with vertex displacement in a custom vertex shader. Both the vertex and fragment shaders sample the texture image, but for different purposes. The vertex shader samples the texture to determine how much to displace each vertex along its normal, while the fragment shader samples the texture to determine the final pixel color. The result is a bumpy sphere effect, where the texture image drives the vertex displacement.
 
+**sketch.pde**
 ```java
 PImage img;
 PShader myShader;
@@ -1188,6 +1205,7 @@ void draw() {
 }
 ```
 
+**vert.glsl**
 ```glsl
 // vertex.glsl
 // processing-provided variables
@@ -1217,6 +1235,7 @@ void main() {
 }
 ```
 
+**frag.glsl**
 ```glsl
 // frag.glsl
 varying vec4 vertTexCoord;

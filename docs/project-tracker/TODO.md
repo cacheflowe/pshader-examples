@@ -75,9 +75,9 @@ These are the unwritten sections from the outline that need to be authored in RE
   - Audit README.md and all example .glsl files
   - e.g., `splitX` → `uSplitX`, `time` → `uTime`
 
-- [ ] **3.2** Ensure all examples in /examples/ match tutorial code exactly
-  - Diff each inline code block against its source example
-  - Fix discrepancies
+- [x] **3.2** Ensure all examples in /examples/ match tutorial code exactly
+  - Resolved via import system — code is now single-source from example files
+  - No more duplication to get out of sync
 
 - [ ] **3.3** Standardize comment capitalization across all shader files
 
@@ -100,22 +100,33 @@ These are the unwritten sections from the outline that need to be authored in RE
   - Added `"type": "module"` to package.json for ESM imports
   - Source file: `README_SRC.md` → Output: `README.md`
 
-- [ ] **4.2** Convert existing inline code blocks to import directives
-  - Replace each duplicated code block with an import directive
-  - Verify output matches current article
-  - **Progress:**
-    - [x] `01_solid_color` (was `shader_demo_01`) — .pde + shader.glsl
-    - [x] `02_uv_gradient` (was `shader_demo_02`) — shader.glsl only
-    - [x] `03_uv_map` (was `shader_demo_03_uv_map`) — shader.glsl only
-    - [ ] `04_uniforms_mouse` (was `shader_demo_04`) — .pde + shader.glsl
-    - [ ] remaining examples...
+- [x] **4.2** Convert ALL inline code blocks to import directives — **35 imports, 19 examples**
+  - [x] `01_solid_color` (was `shader_demo_01`) — .pde + shader.glsl
+  - [x] `02_uv_gradient` (was `shader_demo_02`) — shader.glsl only
+  - [x] `03_uv_map` (was `shader_demo_03_uv_map`) — shader.glsl only
+  - [x] `04_uniforms_mouse` (was `shader_demo_04`) — .pde + shader.glsl
+  - [x] `05_texture_grayscale` (was `shader_demo_gpu_pixels`) — .pde + shader.glsl
+  - [x] `06_cpu_pixels` (was `shader_demo_cpu_pixels`) — .pde only
+  - [x] `07_texture_filter` (was `shader_demo_texture_filter`) — .pde + shader.glsl
+  - [x] `08_post_brightness` (was `shader_demo_post_processing`) — .pde + brightness.glsl
+  - [x] `09_post_vignette` — .pde + vignette.glsl
+  - [x] `10_post_tiling` — .pde + tile.glsl
+  - [x] `11_post_displace` — .pde + displace.glsl
+  - [x] `12_texture_wrap` (was `shader_demo_repeat`) — .pde + uv-adjust.glsl
+  - [x] `13_shader_image` (was `shader_demo_image_shader`) — .pde + shader.glsl
+  - [x] `14_custom_uv` (was `shader_demo_image_uv_coords`) — .pde only
+  - [x] `15_custom_uv_shader` (was `shader_demo_custom_shape_uv_shader`) — .pde + shader.glsl
+  - [x] `16_vertex_shader` (was `shader_demo_vertex_shader`) — .pde + vert.glsl + frag.glsl
+  - [x] `17_vertex_colors` (was `shader_demo_vertex_shader_colors`) — .pde + vert.glsl + frag.glsl
+  - [x] `18_vertex_generative` (was `shader_demo_vertex_shader_generative`) — .pde + vert.glsl + frag.glsl
+  - [x] `19_vertex_displacement` (was `shader_demo_vertex_shader_displacement`) — .pde + vert.glsl + frag.glsl
 
-- [ ] **4.3** Consider example renaming for article order
-  - Convention decided: numbered like `01_solid_color/`
-  - Processing sketch convention: `.pde` must be in a same-named directory
-  - Shaders go in `data/` subdirectory
+- [x] **4.3** Example renaming complete
+  - Convention: numbered like `01_solid_color/`
+  - Processing sketch convention: `.pde` in same-named directory
+  - Shaders in `data/` subdirectory
   - File labels in article use **bold** formatting (e.g., **shader.glsl**)
-  - Group diagrams separately
+  - Original examples still exist alongside new numbered versions
 
 ---
 
