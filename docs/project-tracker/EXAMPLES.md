@@ -2,10 +2,10 @@
 
 ## Current Examples
 
-Each example is a standalone Processing sketch in `/examples/`. Numbered examples (01-19) are imported into the tutorial via `README_SRC.md`. Original `shader_demo_*` directories have been archived to `_assets/article-examples-converted/`. Diagrams live in `/diagrams/`.
+Each example is a standalone Processing sketch in `/examples/`. Numbered examples (01-20) are imported into the tutorial via `README_SRC.md`. Original `shader_demo_*` directories have been archived to `_assets/article-examples-converted/`. Diagrams live in `/diagrams/`.
 
 ### Legend
-- **Imported**: Code is pulled into README.md via build system (35 total imports)
+- **Imported**: Code is pulled into README.md via build system (37 total imports)
 - **Original**: Pre-existing example, not yet cleaned up or removed
 - **Diagram**: Visual aid, not a shader example
 - **Standalone**: Not referenced in the article
@@ -21,18 +21,19 @@ Each example is a standalone Processing sketch in `/examples/`. Numbered example
 | 05 | `05_texture_grayscale/` | Using Textures | .pde + shader.glsl |
 | 06 | `06_cpu_pixels/` | CPU vs GPU (CPU) | .pde |
 | 07 | `07_texture_filter/` | CPU vs GPU (GPU) | .pde + shader.glsl |
-| 08 | `08_post_brightness/` | Post-Processing | .pde + brightness.glsl |
-| 09 | `09_post_vignette/` | Post-Processing | vignette.glsl |
-| 10 | `10_post_tiling/` | Post-Processing | tile.glsl |
-| 11 | `11_post_displace/` | Post-Processing | displace.glsl |
-| 12 | `12_texture_wrap/` | textureWrap() | .pde + uv-adjust.glsl |
-| 13 | `13_shader_image/` | Using shader() | .pde + shader.glsl |
-| 14 | `14_custom_uv/` | More on UV coordinates | .pde |
-| 15 | `15_custom_uv_shader/` | Custom shape UV + shader | .pde + shader.glsl |
-| 16 | `16_vertex_shader/` | Adding a vertex shader | .pde + vert.glsl + frag.glsl |
-| 17 | `17_vertex_colors/` | Vertex colors | .pde + vert.glsl + frag.glsl |
-| 18 | `18_vertex_generative/` | 3D with Z coordinates | .pde + vert.glsl + frag.glsl |
-| 19 | `19_vertex_displacement/` | PShape sphere | .pde + vert.glsl + frag.glsl |
+| 08 | `08_sdf_circle/` | SDF Circle (interactive) | .pde + shader.glsl |
+| 09 | `09_post_brightness/` | Post-Processing | .pde + brightness.glsl |
+| 10 | `10_post_vignette/` | Post-Processing | vignette.glsl |
+| 11 | `11_post_tiling/` | Post-Processing | tile.glsl |
+| 12 | `12_post_displace/` | Post-Processing | displace.glsl |
+| 13 | `13_texture_wrap/` | textureWrap() | .pde + uv-adjust.glsl |
+| 14 | `14_shader_image/` | Using shader() | .pde + shader.glsl |
+| 15 | `15_custom_uv/` | More on UV coordinates | .pde |
+| 16 | `16_custom_uv_shader/` | Custom shape UV + shader | .pde + shader.glsl |
+| 17 | `17_vertex_shader/` | Adding a vertex shader | .pde + vert.glsl + frag.glsl |
+| 18 | `18_vertex_colors/` | Vertex colors | .pde + vert.glsl + frag.glsl |
+| 19 | `19_vertex_generative/` | 3D with Z coordinates | .pde + vert.glsl + frag.glsl |
+| 20 | `20_vertex_displacement/` | PShape sphere | .pde + vert.glsl + frag.glsl |
 
 ### Original Examples (archived to `_assets/article-examples-converted/`)
 

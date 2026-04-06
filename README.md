@@ -16,6 +16,10 @@ This tutorial provides an entry-level introduction to using shaders in Processin
 
 In the Processing IDE, go to **File > Examples... > Topics > Shaders** to find a set of built-in shader examples that come with Processing. These examples cover a variety of shader techniques and are a great way to explore how shaders work in Processing. The full source code for these examples can also be found in the [processing-examples GitHub repository](https://github.com/processing/processing-examples/tree/main/Topics/Shaders), which makes the external shader files easy to browse.
 
+---
+
+# Part 1: Fragment Shader Fundamentals
+
 ## Writing a First Shader
 
 > As of this writing, the Processing IDE does not support opening GLSL files directly. The current recommendation is to use the popular [VS Code](https://code.visualstudio.com/)) IDE with the [Processing extension](https://vscode.processing.org/) installed. This requires Processing to be installed as well, as the extension uses the Processing application to run code. Finally, add the [Shader Languages Support](https://marketplace.visualstudio.com/items?itemName=slevesque.shader) extension for GLSL syntax highlighting.
@@ -401,6 +405,102 @@ float map(float value, float inputMin, float inputMax, float outputMin, float ou
 }
 ```
 
+## Drawing Shapes with Math: Signed Distance Functions
+
+In Processing, drawing a circle is as simple as calling `ellipse()`. In a shader, there are no built-in drawing functions — every shape must be drawn mathematically, pixel by pixel. This is the concept behind **Signed Distance Functions** (SDFs): instead of describing a shape by its outline, the shader computes the *distance* from each pixel to the nearest edge of a shape. If the distance is small enough, the pixel is colored as part of the shape.
+
+A circle is the simplest SDF to understand. For each pixel, calculate the distance from that pixel to a center point. If the distance is less than the desired radius, the pixel is inside the circle. The built-in GLSL function `distance()` (equivalent to Processing's `dist()`) handles this calculation. Combined with `smoothstep()` to soften the edge and `mix()` to blend colors, this technique produces clean anti-aliased shapes entirely on the GPU.
+
+The following example draws an SDF circle that follows the mouse. The Processing sketch sends the normalized mouse position, a smoothed speed value, and the aspect ratio as uniforms. The shader uses the speed to squish the circle into an oval along the direction of movement — a playful effect that shows how math-driven shapes can respond to interactivity in ways that traditional drawing functions cannot.
+
+**sketch.pde**
+
+```java
+PShader myShader;
+float smoothSpeedX = 0;
+float smoothSpeedY = 0;
+
+void setup() {
+  size(640, 480, P2D);
+  myShader = loadShader("shader.glsl");
+}
+
+void draw() {
+  // normalize mouse position (flip y for GLSL coordinates)
+  float mx = (float) mouseX / width;
+  float my = 1.0 - (float) mouseY / height;
+  myShader.set("uMouse", mx, my);
+
+  // smooth the mouse speed for fluid animation
+  smoothSpeedX = lerp(smoothSpeedX, (float)(mouseX - pmouseX) / width, 0.2);
+  smoothSpeedY = lerp(smoothSpeedY, (float)(pmouseY - mouseY) / height, 0.2);
+  myShader.set("uSpeed", smoothSpeedX, smoothSpeedY);
+
+  // pass aspect ratio for proper circle shape
+  myShader.set("uAspect", (float) width / height);
+
+  filter(myShader);
+}
+```
+
+**shader.glsl**
+
+```glsl
+varying vec4 vertTexCoord;
+uniform vec2 uMouse;
+uniform vec2 uSpeed;
+uniform float uAspect;
+
+void main() {
+  vec2 uv = vertTexCoord.xy;
+
+  // correct x coordinate for aspect ratio so circles aren't stretched
+  uv.x *= uAspect;
+  vec2 mouse = uMouse;
+  mouse.x *= uAspect;
+
+  // vector from mouse position to current pixel
+  vec2 diff = uv - mouse;
+
+  // use mouse speed to squish the circle into an oval
+  float speed = length(uSpeed) * 15.0;
+  vec2 moveDir = length(uSpeed) > 0.001 ? normalize(uSpeed) : vec2(0.0);
+  float parallel = dot(diff, moveDir);
+  vec2 perpComp = diff - parallel * moveDir;
+
+  // stretch along movement direction
+  float stretch = 1.0 + speed;
+  vec2 squished = perpComp + moveDir * (parallel / stretch);
+  float dist = length(squished);
+
+  // circle radius grows slightly with speed
+  float radius = 0.08 + speed * 0.02;
+
+  // smoothstep creates a soft edge instead of a hard pixel boundary
+  float circle = 1.0 - smoothstep(radius - 0.01, radius + 0.02, dist);
+
+  // blend between background and circle color using mix()
+  vec3 color = mix(vec3(0.1), vec3(1.0, 0.4, 0.1), circle);
+
+  gl_FragColor = vec4(color, 1.0);
+}
+```
+
+![An orange circle on a dark background that follows the mouse cursor and squishes as it moves](images/example-08.gif)
+
+A few aspects of this code are worth highlighting:
+
+* The `uAspect` uniform corrects for non-square canvases. Without adjusting the x coordinate by the aspect ratio, the circle would appear stretched horizontally. This is a common pattern in SDF shaders.
+* The `smoothstep()` function creates a soft anti-aliased edge. Unlike a hard `if/else` boundary, `smoothstep()` returns a smooth transition between 0.0 and 1.0 over a small range. The two edge parameters control how wide the soft transition is.
+* The `mix()` function blends between two colors based on the circle's alpha value. This is equivalent to Processing's `lerp()` but works with any GLSL type, including `vec3` and `vec4`.
+* The squish effect decomposes the distance vector into components parallel and perpendicular to the movement direction, then scales the parallel component. This is basic vector math — `dot()` calculates projection, and `normalize()` finds the unit direction vector.
+
+SDFs can be extended well beyond circles. Rectangles, rounded rectangles, lines, stars, and even complex boolean combinations of shapes can all be defined as distance functions. The math grows more involved, but the core pattern remains the same: compute a distance, then decide the color. For a comprehensive reference to SDF shape functions, [Inigo Quilez's 2D SDF page](https://iquilezles.org/articles/distfunctions2d/) is an excellent resource.
+
+---
+
+# Part 2: Post-Processing & Texture Techniques
+
 ## Post-Processing Shaders
 
 Post-processing effects are among the most compelling reasons to use shaders, and the above examples have introduced the concept. By treating the entire rendered sketch as an input texture, shaders can apply global effects like color correction and edge detection or more artistic effects like distortion or glitches. While Processing includes default filters via the `filter()` function (such as `BLUR`, `INVERT`, and `THRESHOLD`), custom shaders offer limitless creative control.
@@ -772,6 +872,10 @@ void main() {
 ```
 
 ![A circular cutout of a cat photo with wavy distortion controlled by mouse movement](images/shader_demo_custom_shape_uv_shader.png)
+
+---
+
+# Part 3: Vertex Shaders & 3D
 
 ## Adding a custom vertex shader
 
@@ -1248,6 +1352,10 @@ This example demonstrates several important concepts about working with spherica
 * When `setTexture()` is called on a PShape object, the texture is automatically bound to the `texture` uniform in the shader. This is similar to how the `texture` uniform is automatically populated with the current canvas image when applying a shader with `filter()`.
 * **Equirectangular spherical images** are a special type of texture that appears stretched horizontally at the poles when viewed as a flat image. However, when mapped to a sphere using spherical UV coordinates, the stretching is reversed as the top and bottom edges of the image are "pinched" into single points at the sphere's poles. The [moon texture](https://svs.gsfc.nasa.gov/4720) used in this example is an equirectangular projection.
 * In the vertex shader, displacement is calculated by multiplying the vertex position by an amplitude factor derived from the texture's red channel. Since the PShape sphere geometry is centered at the origin, scaling the position vector effectively moves each vertex outward along its normal direction without needing to use normals directly. 
+
+---
+
+# Part 4: Going Further
 
 🚨 **Next:**
 

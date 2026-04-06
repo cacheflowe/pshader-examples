@@ -91,7 +91,7 @@ Targeted additions to existing content. Small-to-medium edits, not full new sect
 
 New sections that complete the fragment shader story. These fill the gap between the current post-processing content and the vertex shader sections.
 
-- [ ] **3.1** Write "Generative fragment shader drawing" section (SDFs)
+- [x] **3.1** Write "Drawing Shapes with Math: Signed Distance Functions" section — interactive SDF circle example (08_sdf_circle) with mouse following & speed squish
   - Simple `step(distance(...))` circle example — compare to Processing's `ellipse()`
   - Show aspect ratio correction for proper circles regardless of canvas size
   - SDF rectangle — compare to Processing's `rect()`

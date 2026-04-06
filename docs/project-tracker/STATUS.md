@@ -8,7 +8,7 @@ The tutorial is **roughly 70% written**. The article in `README.md` covers fragm
 
 ### Build System & Code Import: COMPLETE
 
-All inline code blocks have been converted to import directives. The article source is now `README_SRC.md`, which is processed by `scripts/build.js` to generate `README.md`. **35 imports** across **19 standalone examples** are fully working. Run `npm run build:readme` to rebuild.
+All inline code blocks have been converted to import directives. The article source is now `README_SRC.md`, which is processed by `scripts/build.js` to generate `README.md`. **37 imports** across **20 standalone examples** are fully working. Run `npm run build:readme` to rebuild.
 
 ---
 
