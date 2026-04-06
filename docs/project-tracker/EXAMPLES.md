@@ -15,10 +15,10 @@ Each example is a standalone Processing sketch in `/examples/`. Some are used di
 | 2 | `diagram_normals/` | Diagram | None | Yes (images only) | Normal direction visualization |
 | 3 | `diagram_uv_coords/` | Diagram | None | Yes (images only) | UV coordinate grid |
 | 4 | `fragment_01_solid_color/` | Demo | Fragment | No | Green solid color (from 50 Shades) |
-| 5 | `shader_demo_01/` | Demo | Fragment | Yes | Red solid color |
-| 6 | `shader_demo_02/` | Demo | Fragment | Yes | UV x-gradient |
-| 7 | `shader_demo_03_uv_map/` | Demo | Fragment | Yes | UV map colors |
-| 8 | `shader_demo_04/` | Demo | Fragment | Yes | Mouse split-screen |
+| — | ~~`shader_demo_01/`~~ | — | — | — | **Renamed → `01_solid_color/`** ✅ imported |
+| — | ~~`shader_demo_02/`~~ | — | — | — | **Renamed → `02_uv_gradient/`** ✅ imported |
+| — | ~~`shader_demo_03_uv_map/`~~ | — | — | — | **Renamed → `03_uv_map/`** ✅ imported |
+| 8 | `shader_demo_04/` | Demo | Fragment | Yes | Mouse split-screen — **next to convert** |
 | 9 | `shader_demo_cpu_pixels/` | Demo | None (CPU) | Yes | CPU pixel manipulation |
 | 10 | `shader_demo_cpu_pixels_bug/` | Demo | None (CPU) | No | Bug demonstration |
 | 11 | `shader_demo_custom_shape_uv/` | Demo | Fragment | No | Custom shape UVs (no texture) |

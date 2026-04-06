@@ -92,18 +92,29 @@ These are the unwritten sections from the outline that need to be authored in RE
 
 ## Phase 4: Build System for Code Import
 
-- [ ] **4.1** Build code import script
-  - Parse `<!-- @import path lang:xxx -->` directives in README.md
-  - Replace with fenced code blocks containing file contents
-  - Support line ranges and region markers
-  - See EXAMPLES.md for full design
+- [x] **4.1** Build code import script
+  - `scripts/build.js` — parses `<!-- @import path lang:xxx -->` directives in `README_SRC.md`
+  - Replaces directives with fenced code blocks containing file contents
+  - Supports `lang:`, `label:`, and `lines:` options
+  - Run via `npm run build:readme`
+  - Added `"type": "module"` to package.json for ESM imports
+  - Source file: `README_SRC.md` → Output: `README.md`
 
 - [ ] **4.2** Convert existing inline code blocks to import directives
   - Replace each duplicated code block with an import directive
   - Verify output matches current article
+  - **Progress:**
+    - [x] `01_solid_color` (was `shader_demo_01`) — .pde + shader.glsl
+    - [x] `02_uv_gradient` (was `shader_demo_02`) — shader.glsl only
+    - [x] `03_uv_map` (was `shader_demo_03_uv_map`) — shader.glsl only
+    - [ ] `04_uniforms_mouse` (was `shader_demo_04`) — .pde + shader.glsl
+    - [ ] remaining examples...
 
 - [ ] **4.3** Consider example renaming for article order
-  - Name examples sequentially by topic or tutorial appearance
+  - Convention decided: numbered like `01_solid_color/`
+  - Processing sketch convention: `.pde` must be in a same-named directory
+  - Shaders go in `data/` subdirectory
+  - File labels in article use **bold** formatting (e.g., **shader.glsl**)
   - Group diagrams separately
 
 ---

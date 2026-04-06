@@ -144,6 +144,8 @@ Most GLSL data types can be set as uniforms from Processing code, with the most 
 
 The following example uses the mouse position to change the color of the left and right sides of the screen. The `splitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
 
+**sketch.pde**
+
 ```java
 PShader myShader;
 
@@ -156,11 +158,15 @@ void draw() {
   // Normalize mouseX to 0-1 to match the shader's coordinate system,
   // and pass that value to the shader via the "splitX" uniform
   myShader.set("splitX", mouseX / float(width));
+  // or do it with time
+  //myShader.set("splitX", (millis() / 1000.0) % 1.0);
   filter(myShader);
 }
 ```
 
 In the shader code, the `splitX` value is accessed as a uniform:
+
+**shader.glsl**
 
 ```glsl
 varying vec4 vertTexCoord;

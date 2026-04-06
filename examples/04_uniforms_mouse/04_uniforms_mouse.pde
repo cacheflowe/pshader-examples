@@ -1,7 +1,7 @@
 PShader myShader;
 
 void setup() {
-  size(640, 360, P2D);
+  size(640, 480, P2D);
   myShader = loadShader("shader.glsl");
 }
 
@@ -11,6 +11,5 @@ void draw() {
   myShader.set("splitX", mouseX / float(width));
   // or do it with time
   //myShader.set("splitX", (millis() / 1000.0) % 1.0);
-
   filter(myShader);
 }

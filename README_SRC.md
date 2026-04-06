@@ -115,40 +115,15 @@ Most GLSL data types can be set as uniforms from Processing code, with the most 
 
 The following example uses the mouse position to change the color of the left and right sides of the screen. The `splitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
 
-```java
-PShader myShader;
+**sketch.pde**
 
-void setup() {
-  size(640, 480, P2D);
-  myShader = loadShader("shader.glsl");
-}
-
-void draw() {
-  // Normalize mouseX to 0-1 to match the shader's coordinate system,
-  // and pass that value to the shader via the "splitX" uniform
-  myShader.set("splitX", mouseX / float(width));
-  filter(myShader);
-}
-```
+<!-- @import examples/04_uniforms_mouse/04_uniforms_mouse.pde lang:java -->
 
 In the shader code, the `splitX` value is accessed as a uniform:
 
-```glsl
-varying vec4 vertTexCoord;
+**shader.glsl**
 
-// user-defined custom uniform variable
-uniform float splitX;
-
-void main() {
-  vec2 uv = vertTexCoord.xy;
-  // if the current pixel is to the left of the splitX position, make it black, otherwise make it white
-  if (uv.x < splitX) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-  } else {
-    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-  }
-}
-```
+<!-- @import examples/04_uniforms_mouse/data/shader.glsl lang:glsl -->
 
 ![An animated black and white split screen following the mouse cursor horizontally](images/example-04.gif)
 
