@@ -125,7 +125,7 @@ Or use markers in the source code:
 ```java
 // @region draw-loop
 void draw() {
-  myShader.set("splitX", mouseX / float(width));
+  myShader.set("uSplitX", mouseX / float(width));
   filter(myShader);
 }
 // @endregion draw-loop

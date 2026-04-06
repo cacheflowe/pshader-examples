@@ -113,13 +113,13 @@ Most GLSL data types can be set as uniforms from Processing code, with the most 
 | `myShader.set("myBool", true)` | `uniform bool myBool` |
 | `myShader.set("mySampler", myImage)` | `uniform sampler2D mySampler` |
 
-The following example uses the mouse position to change the color of the left and right sides of the screen. The `splitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
+The following example uses the mouse position to change the color of the left and right sides of the screen. The `uSplitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
 
 **sketch.pde**
 
 <!-- @import examples/04_uniforms_mouse/04_uniforms_mouse.pde lang:java -->
 
-In the shader code, the `splitX` value is accessed as a uniform:
+In the shader code, the `uSplitX` value is accessed as a uniform:
 
 **shader.glsl**
 

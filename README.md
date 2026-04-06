@@ -142,7 +142,7 @@ Most GLSL data types can be set as uniforms from Processing code, with the most 
 | `myShader.set("myBool", true)` | `uniform bool myBool` |
 | `myShader.set("mySampler", myImage)` | `uniform sampler2D mySampler` |
 
-The following example uses the mouse position to change the color of the left and right sides of the screen. The `splitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
+The following example uses the mouse position to change the color of the left and right sides of the screen. The `uSplitX` value is sent to the shader as a uniform, and the shader uses it to determine which color to draw on each side of the screen.
 
 **sketch.pde**
 
@@ -156,15 +156,15 @@ void setup() {
 
 void draw() {
   // Normalize mouseX to 0-1 to match the shader's coordinate system,
-  // and pass that value to the shader via the "splitX" uniform
-  myShader.set("splitX", mouseX / float(width));
+  // and pass that value to the shader via the "uSplitX" uniform
+  myShader.set("uSplitX", mouseX / float(width));
   // or do it with time
-  //myShader.set("splitX", (millis() / 1000.0) % 1.0);
+  //myShader.set("uSplitX", (millis() / 1000.0) % 1.0);
   filter(myShader);
 }
 ```
 
-In the shader code, the `splitX` value is accessed as a uniform:
+In the shader code, the `uSplitX` value is accessed as a uniform:
 
 **shader.glsl**
 
@@ -172,12 +172,12 @@ In the shader code, the `splitX` value is accessed as a uniform:
 varying vec4 vertTexCoord;
 
 // user-defined custom uniform variable
-uniform float splitX;
+uniform float uSplitX;
 
 void main() {
   vec2 uv = vertTexCoord.xy;
-  // if the current pixel is to the left of the splitX position, make it black, otherwise make it white
-  if (uv.x < splitX) {
+  // if the current pixel is to the left of the uSplitX position, make it black, otherwise make it white
+  if (uv.x < uSplitX) {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   } else {
     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
