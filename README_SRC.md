@@ -82,7 +82,7 @@ Note the following details in the updated shader code:
 * `vertTexCoord` (shorthand for "vertex texture coordinate") is *the current pixel’s location* in the normalized coordinate system. This value ranges from 0-1 for both x and y values. This variable is provided by Processing and is always available in any shader.
 * `vertTexCoord` is a `vec4`, but this code only uses the x and y coordinate values, which can be accessed by requesting the first two values in the `vec4`: `vertTexCoord.xy` - this returns a `vec2`. The x and y values are copied to a new `vec2` variable called `uv`.
 * In addition to `vec2` and `vec4` data types, there is also a `vec3` data type. Single float values are stored in a `float` data type, similar to Processing Java code.
-* In shader programming, a pixel’s location (relative to the triangle that it's drawn onto) is called its [UV coordinate](https://en.wikipedia.org/wiki/UV_mapping), which has roots in 3D modeling. Even in seemingly 2-dimensional shader programs, the graphics tool shades a polygon mesh behind the scenes, even if it is just two triangles that make a flat rectangle. 🚨 Can we better explain this?
+* In shader programming, a pixel's location (relative to the triangle that it's drawn onto) is called its [UV coordinate](https://en.wikipedia.org/wiki/UV_mapping), which has roots in 3D modeling. Even in seemingly 2-dimensional shader programs, the GPU always needs geometry to shade. When `filter()` is called, Processing draws a full-canvas rectangle behind the scenes - two triangles that cover the entire canvas. The shader then runs on every pixel within those triangles. This underlying mesh is invisible to the developer, but it's how the GPU operates and why UV coordinates exist even in flat 2D shaders.
 * UV coordinates exist to map textures onto polygon vertices, which explains the name `vertTexCoord`, as in "vertex texture coordinate". The `u` and `v` are simply different names for the `x` and `y` coordinates of a texture. In Processing, this is similar to how the `texture()` function works with the `vertex()` function.
 
 In the next example, the y coordinate is used to set the green color component, resulting in a classic "UV map" that visualizes the pixel’s coordinate system in terms of color components. Red displays the x coordinate, and green displays the y coordinate. In more advanced shader programming, color data is often a way to store more generalized numeric data. This example provides a first look at visualizing the texture's data, turning position into color. 
@@ -100,8 +100,6 @@ By visualizing the coordinate system with color, the bottom-left origin is easy 
 In the previous examples, the shader program was static; every time `filter()` is called, the output color is the same. However, shaders can be dynamic and interactive. In GLSL, almost any variable can be specified as a **uniform**, which adds the ability to **set** the value from Processing code. Uniforms are the only way to communicate to a shader program, as it has no other information about the world outside of its own code.
 
 Most GLSL data types can be set as uniforms from Processing code, with the most common being `float`, `int`, `vec2/vec3/vec4`, and `sampler2D` (an image or texture representation). These values can be set in Processing code with the `set()` [method](https://processing.org/reference/PShader_set_.html) of the PShader object. Each uniform data type has its own `set()` method to convert Java values into GLSL values. The Processing framework provides this bridge to allow communication from the CPU to the GPU. Examples of using the `set()` method include:
-
-🚨 Add array examples to the table
 
 | Processing Code to Set Value | GLSL Uniform Declaration |
 |--------------------------|------------------------------|
@@ -169,10 +167,6 @@ In the shader program, the existing pixels drawn to the canvas by `image()` can 
 
 The updated shader code introduces new concepts:
 
-<!-- 
-***\[🚨🚨\]***
-* The first line sets a constant variable with `#define`. This helps Processing understand the intended use of the shader. Processing sends different data to the shader depending on the shader type. Defining `PROCESSING_TEXTURE_SHADER` provides access to the existing **texture** of the sketch. 
--->
 * A new variable called `texture` uses the `sampler2D` data type. This is the equivalent to a `PImage` in Processing; it is a representation of an image stored in memory. This variable is also defined as a `uniform`. The `texture` variable is automatically passed to the GLSL program by defining it in the shader and calling `filter()` in Processing code. More images can be sent to the shader by defining additional `sampler2D` uniforms and using the [`set()`](https://processing.org/reference/PShader_set_.html) method in Processing code.
 * A new built-in GLSL function called `texture2D` takes two arguments: a `sampler2D` and a `vec2` location. This is similar to Processing’s [`get()`](https://processing.org/reference/get_.html) function, which retrieves a pixel’s color value at a specific coordinate in an image. This code requests the pixel color at the current location and stores its RGBA data in a `vec4` variable called `color`. In shaders, this is often called “texture sampling” or a “texture lookup”.
 * Finally, when setting the output color of the pixel to `gl_FragColor`, the code uses the sampled color to set the output RGB values, but only uses the red channel. This creates a grayscale version of the image drawn before the shader was applied. This technique allows for swapping color channels, inverting them, or performing other kinds of color manipulation or remapping. 
@@ -246,11 +240,7 @@ Both approaches look exactly the same, but the performance difference is substan
 
 ![A cat photo with only the green channel displayed, showing red pixels mapped to green](images/shader_demo_texture_filter.png)
 
-This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex real-time visual effects like blurs, distortions, and generative patterns that could be prohibitively slow on the CPU, especially at larger resolutions.
-
-<!--
-***\[🚨🚨\]*** In testing on a MacBook Pro M1, the shader version can take \<1ms, while the CPU version can take 30ms if the canvas size is 1920x1080. The difference is less dramatic at smaller sizes.
--->
+This comparison highlights a great advantage of shaders. By processing every pixel simultaneously, the GPU avoids the bottleneck of sequentially iterating through millions of array elements on the CPU. This efficiency allows for complex real-time visual effects like blurs, distortions, and generative patterns that could be prohibitively slow on the CPU, especially at larger resolutions. For reference, on a MacBook Pro M1 at 1920×1080, the shader version runs in under 1ms per frame while the CPU version takes roughly 30ms - a 30× speedup. The difference is less dramatic at smaller canvas sizes, but it scales dramatically as resolution increases.
 
 ## Post-Processing Shaders
 
@@ -403,9 +393,7 @@ When the vertex and fragment shader are applied to the global graphics context w
 
 ![Diagram showing the rasterization pipeline from CPU vertex data through vertex shader, rasterization, and fragment shader to final pixels](./images/rasterisation.png)
 
-🚨 Explain interpolation here - combine with a new rasterization diagram?
-
-- ~~The GPU automatically interpolates these values between vertices for each pixel that is drawn, which allows for smooth transitions across the surface of the shape.~~
+This *interpolation* is at the heart of how shaders produce smooth visuals. For example, if one vertex has a red color and an adjacent vertex has a green color, the pixels between them will smoothly transition from red to green. This is why the UV map example earlier shows a smooth gradient - the four corner vertices have UV values of (0,0), (1,0), (1,1), and (0,1), and every pixel in between receives a smoothly blended UV value. The same principle applies to texture coordinates, colors, and any other `varying` variable passed from the vertex shader to the fragment shader.
 
 
 ## Using vertex colors instead of texture sampling
