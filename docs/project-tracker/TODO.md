@@ -221,15 +221,18 @@ These are reference-style additions rather than tutorial flow. Can be integrated
   - The `processing-default-shaders/` directory is especially valuable — the actual shader source is ground truth for built-in uniforms, attributes, and types
   - Not being committed to git; treat as read-only reference material
 
-- [ ] **8.2** Create AI Skills `.md` files to help developers write Processing shaders with AI assistance
-  - These are `.claude/commands/` files (Claude Code custom slash commands)
-  - Goal: when a developer invokes a skill like `/pshader-vertex`, they get full context on Processing's vertex shader conventions, built-in uniforms, default shader templates, and common patterns
-  - Potential skills to create:
-    - `/pshader-fragment` — fragment shader context (uniforms, coordinates, texture sampling, output)
-    - `/pshader-vertex` — vertex shader context (attributes, varyings, transform matrices, output)
-    - `/pshader-types` — shader type selection guide (#COLOR, #TEXTURE, #TEXLIGHT, etc.)
-    - `/pshader-debug` — debugging guide for broken shaders
-  - This is a separate deliverable from the tutorial itself; makes this repo useful as an AI coding assistant resource
+- [x] **8.2** Create AI context/skill files for developers writing Processing shaders with AI assistance
+  - **Ambient context** (auto-loaded by file type):
+    - `.github/instructions/pshader-glsl.instructions.md` — applies to `*.glsl, *.frag, *.vert`; GLSL conventions, built-ins, templates, gotchas
+    - `.github/instructions/pshader-processing.instructions.md` — applies to `*.pde`; PShader API, uniforms, filter/shader/resetShader patterns
+  - **Project context** (always loaded):
+    - `CLAUDE.md` — root-level auto-loaded context for Claude Code; project overview, key files, build command, writing guide
+    - `.github/copilot-instructions.md` — equivalent for Copilot (renamed from INSTRUCTIONS.md)
+  - **Explicit slash commands** (Claude Code, on-demand):
+    - `.claude/commands/pshader-fragment.md` — `/pshader-fragment`
+    - `.claude/commands/pshader-vertex.md` — `/pshader-vertex`
+    - `.claude/commands/pshader-types.md` — `/pshader-types`
+    - `.claude/commands/pshader-debug.md` — `/pshader-debug`
 
 ---
 
