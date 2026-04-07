@@ -124,6 +124,7 @@ These extend the existing vertex shader coverage and add the planned advanced ma
   - Reference Processing4 source: `PShader.java` lines 58-83
   - Create example sketches for at least COLOR and TEXLIGHT types
   - Explain when each type is used and what built-in uniforms/attributes they provide
+  - **Reference**: `docs/other-articles/Processing-Android-Chapter-15-GLSL-shaders.md` — Andres' chapter covers shader types extensively
   - _Source: OUTLINE_WIP.md, Raph feedback_
 
 - [ ] **4.2** Write "Lighting basics" section
@@ -155,13 +156,11 @@ These extend the existing vertex shader coverage and add the planned advanced ma
 
 These are reference-style additions rather than tutorial flow. Can be integrated into existing sections or added as appendix material.
 
-- [ ] **5.1** Document Processing's built-in uniforms ← _Raph feedback_
-  - Vertex shader: `transformMatrix`, `modelviewMatrix`, `texMatrix`, `normalMatrix`, light uniforms
-  - Vertex attributes: `position`, `color`, `normal`, `texCoord`, `ambient`, `specular`, `emissive`, `shininess`
-  - Fragment shader: `texture`, `texOffset`, `gl_FragCoord`
-  - Reference Alex's Google doc notes and Processing4 source
-  - Add as a reference table — either inline or as an appendix
-  - _Source: GOOGLE_DOC.md (Alex's list), Raph feedback, NOTES.md_
+- [x] **5.1** Document Processing's built-in uniforms ← _Raph feedback_
+  - ✅ Written as "Processing's Built-in Uniforms and Attributes" in Part 4 of README_SRC.md
+  - Tables organized by shader type: Color, Texture, Light+Texture, Line, Point
+  - Sourced directly from `_assets/processing-default-shaders/*.glsl` (ground truth)
+  - Also answered the precision specifier open question: yes, use `#ifdef GL_ES` block
 
 - [ ] **5.2** Explain PShader vs raw GLSL differences ← _Raph feedback_
   - How Processing wraps GLSL (what's added automatically)
@@ -215,6 +214,25 @@ These are reference-style additions rather than tutorial flow. Can be integrated
 
 ---
 
+## Phase 8: New Goals (2026-04-07)
+
+- [ ] **8.1** Use cached local shader libraries in `_assets/` as reference and factual reinforcement when writing new tutorial sections
+  - Libraries available: `1405_FiftyShadesOfShaders_update/`, `haxademic-shaders-@cacheflowe/`, `processing-default-shaders/`, `processing-examples-Shaders/`, `processing-postfx-master-@cansik/`, `Processing-Shader-Examples-master-@genekogan/`, `pshader-experiments-master-@codeanticode/`
+  - The `processing-default-shaders/` directory is especially valuable — the actual shader source is ground truth for built-in uniforms, attributes, and types
+  - Not being committed to git; treat as read-only reference material
+
+- [ ] **8.2** Create AI Skills `.md` files to help developers write Processing shaders with AI assistance
+  - These are `.claude/commands/` files (Claude Code custom slash commands)
+  - Goal: when a developer invokes a skill like `/pshader-vertex`, they get full context on Processing's vertex shader conventions, built-in uniforms, default shader templates, and common patterns
+  - Potential skills to create:
+    - `/pshader-fragment` — fragment shader context (uniforms, coordinates, texture sampling, output)
+    - `/pshader-vertex` — vertex shader context (attributes, varyings, transform matrices, output)
+    - `/pshader-types` — shader type selection guide (#COLOR, #TEXTURE, #TEXLIGHT, etc.)
+    - `/pshader-debug` — debugging guide for broken shaders
+  - This is a separate deliverable from the tutorial itself; makes this repo useful as an AI coding assistant resource
+
+---
+
 ## Phase 7: Final Polish
 
 - [x] **7.1** Add `u` prefix to all custom uniform names — _already done by author_
@@ -227,9 +245,12 @@ These are reference-style additions rather than tutorial flow. Can be integrated
 - [ ] **7.7** Apply p5js documentation style guide
 - [ ] **7.8** Final proofreading pass
 - [ ] **7.9** Resolve remaining open questions
-  - Are precision specifiers needed in fragment shaders?
-  - Should we link to this repo's examples in the tutorial?
+  - ~~Are precision specifiers needed in fragment shaders?~~ **RESOLVED** — Yes. Processing's default fragment shaders use `#ifdef GL_ES / precision mediump float; precision mediump int; #endif`. Wrap in `#ifdef GL_ES` so they compile on both desktop and ES targets. Worth noting in the tutorial.
+  - Should we link to this repo's examples in the tutorial? (If yes, rename example sketch folders for clarity)
+  - Should more examples be created in the official `processing-examples` repo in a PShader tutorial section?
+  - Punctuation/apostrophe conventions for the tutorial?
 - [ ] **7.10** Clean up /docs/wip/ once content is merged into article
+- [ ] **7.11** Link to reference projects in tutorial (optional): Filters4Processing, Shadertoy2Processing, FIP — consider where these fit (conclusion / further resources)
 
 ---
 

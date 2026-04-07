@@ -292,7 +292,7 @@ In comparison, the shader-powered version of this program runs significantly fas
 **shader.glsl**
 <!-- @import examples/07_texture_filter/data/shader.glsl lang:glsl -->
 
-Both approaches look exactly the same, but the performance difference is substantial.
+The output of both approaches looks exactly the same, but the performance difference is substantial.
 
 ![A cat photo with only the green channel displayed, showing red pixels mapped to green](images/shader_demo_texture_filter.png)
 
@@ -618,18 +618,108 @@ This example demonstrates several important concepts about working with spherica
 
 # Part 4: Going Further
 
-🚨 **Next:**
+## Processing's Built-in Uniforms and Attributes
 
-## Different types of shaders & advanced configuration
+Every custom shader in Processing has access to a set of variables that Processing populates automatically. These don't need to be set with [`set()`](https://processing.org/reference/PShader_set_.html) — they arrive already filled in, based on the current drawing context. Knowing what's available prevents redundant work and unlocks capabilities that would otherwise require significant effort to recreate manually.
 
-- Processing shader types
-- Lighting
-- POINTS
-- Lines
-- PShape
+These variables fall into three categories:
+- **Uniforms** — values set once per draw call, the same for every vertex or pixel
+- **Attributes** — values set per vertex, varying from one to the next as geometry is drawn
+- **Varyings** — values computed in the vertex shader and passed to the fragment shader, smoothly interpolated across the pixels between vertices
+
+The specific variables available depend on the *shader type* — the category of drawing operation the shader handles. Processing uses different default shaders internally for colored geometry, textured geometry, lit geometry, lines, and points. A custom shader replaces the appropriate default for that drawing context. The actual source code for these defaults is in the [Processing source repository](https://github.com/processing/processing4/tree/main/core/src/processing/opengl/shaders) and is the authoritative reference for everything listed below.
+
+### Fragment Shader Variables
+
+These are available in any fragment shader when paired with the corresponding vertex shader type:
+
+| Variable | Type | Available When | Description |
+|----------|------|----------------|-------------|
+| `vertColor` | `varying vec4` | Always | The interpolated vertex color, passed from the vertex shader. A value of `vec4(1.0)` (white) is the default if no color is set. |
+| `vertTexCoord` | `varying vec4` | Texture types | The interpolated texture coordinate. Access `.st` or `.xy` for the 2D UV position (0.0–1.0). |
+| `texture` | `uniform sampler2D` | Texture types | The currently bound texture. Automatically populated when a texture is active — the same `texture` uniform accessed by `filter()` throughout this tutorial. |
+| `texOffset` | `uniform vec2` | Texture types | The size of one pixel in normalized texture coordinates. For a 640×480 texture, `texOffset` is `vec2(1.0/640.0, 1.0/480.0)`. Useful for sampling neighboring pixels, as covered later. |
+| `gl_FragColor` | built-in output | Always | The final output color of the fragment. This must be set in every fragment shader. |
+
+> The `#ifdef GL_ES` precision block appears in all of Processing's default fragment shaders: `#ifdef GL_ES` / `precision mediump float;` / `precision mediump int;` / `#endif`. This sets floating-point precision on OpenGL ES hardware (mobile, some GPUs). Desktop OpenGL ignores it. It's safe and recommended to include in all custom fragment shaders.
+
+### Vertex Shader Uniforms and Attributes
+
+The vertex shader has more variables, organized by shader type. Each type reflects a different kind of drawing operation in Processing.
+
+**Color type** — used when drawing colored geometry with no texture ([`ColorVert.glsl`](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl)):
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `transformMatrix` | `uniform mat4` | Combined modelview + projection matrix. Multiply `position` by this to produce `gl_Position`. This matrix encodes all of Processing's current transforms (`translate()`, `rotate()`, `scale()`) and the camera. |
+| `position` | `attribute vec4` | The vertex position in screen space (pixel coordinates). Set by `vertex(x, y)` or `vertex(x, y, z)` in Processing code. |
+| `color` | `attribute vec4` | The vertex color in normalized 0–1 range. Set by calling `fill()` before `vertex()`. |
+| `vertColor` | `varying vec4` | Output: assign `color` to this to pass the vertex color to the fragment shader. |
+| `gl_Position` | built-in output | The final clip-space position of the vertex. Must be set in every vertex shader. |
+
+**Texture type** — used when a texture is applied ([`TexVert.glsl`](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/TexVert.glsl)), adds:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `texMatrix` | `uniform mat4` | Texture transform matrix. Multiply `texCoord` by this (as `texMatrix * vec4(texCoord, 1.0, 1.0)`) to produce the correct `vertTexCoord`. |
+| `texCoord` | `attribute vec2` | The UV coordinate assigned to this vertex. Set by `vertex(x, y, u, v)` in Processing code, or assigned automatically for primitive shapes. |
+| `vertTexCoord` | `varying vec4` | Output: the texture coordinate passed to the fragment shader. |
+
+**Light + texture type** — used when textures and Processing's lighting functions are both active ([`TexLightVert.glsl`](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/TexLightVert.glsl)), adds all of the above plus:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `modelviewMatrix` | `uniform mat4` | The modelview matrix without projection. Used to transform vertex positions and normals into eye space for lighting calculations. |
+| `normalMatrix` | `uniform mat3` | Transforms surface normals into eye space. Computed as the inverse transpose of the modelview matrix's upper 3×3. |
+| `normal` | `attribute vec3` | The surface normal vector at this vertex. Set automatically by Processing for primitive shapes; set manually with [`normal()`](https://processing.org/reference/normal_.html) for custom geometry. |
+| `ambient` | `attribute vec4` | Per-vertex ambient material color, set by `ambient()` in Processing. |
+| `specular` | `attribute vec4` | Per-vertex specular material color, set by `specular()`. |
+| `emissive` | `attribute vec4` | Per-vertex emissive material color, set by `emissive()`. |
+| `shininess` | `attribute float` | Per-vertex shininess value for specular highlights, set by `shininess()`. |
+| `lightCount` | `uniform int` | Number of active lights in the scene. Processing supports up to 8. |
+| `lightPosition[8]` | `uniform vec4` | Position of each light in eye space. `.w` is `0.0` for directional lights, `1.0` for point/spot lights. |
+| `lightNormal[8]` | `uniform vec3` | Direction each light is pointing (for directional and spot lights). |
+| `lightAmbient[8]` | `uniform vec3` | Ambient color contribution of each light. |
+| `lightDiffuse[8]` | `uniform vec3` | Diffuse color contribution of each light. |
+| `lightSpecular[8]` | `uniform vec3` | Specular color contribution of each light. |
+| `lightFalloff[8]` | `uniform vec3` | Falloff coefficients `(constant, linear, quadratic)` for distance-based light attenuation. |
+| `lightSpot[8]` | `uniform vec2` | Spotlight parameters: `.x` is the minimum cosine of the cutoff angle, `.y` is the spotlight exponent. |
+
+**Line type** — used when `stroke()` draws lines ([`LineVert.glsl`](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/LineVert.glsl)):
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `modelviewMatrix` | `uniform mat4` | |
+| `projectionMatrix` | `uniform mat4` | The projection matrix separate from modelview, needed for line geometry expansion. |
+| `viewport` | `uniform vec4` | The viewport `(x, y, width, height)` in pixels. Used to convert clip-space positions to screen space for correct line width. |
+| `perspective` | `uniform int` | `1` if perspective projection is active, `0` for orthographic. |
+| `scale` | `uniform vec3` | A small offset factor to prevent z-fighting between stroked lines and filled shapes. |
+| `direction` | `attribute vec4` | The direction vector of the line segment in eye space. `.w` contains the stroke weight. |
+
+**Point type** — used when `point()` draws individual points ([`PointVert.glsl`](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/PointVert.glsl)):
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `projectionMatrix` | `uniform mat4` | |
+| `modelviewMatrix` | `uniform mat4` | |
+| `viewport` | `uniform vec4` | |
+| `perspective` | `uniform int` | |
+| `offset` | `attribute vec2` | The 2D offset of the current point vertex. Points are expanded into quads by the GPU; this offset defines the corner positions of that quad. |
+
+Most custom shaders start from the **texture type** (when displaying images or applying post-processing) or the **color type** (when drawing colored geometry without a texture). The light and line/point types are more specialized, and their uniforms are most relevant when writing shaders that replicate or extend Processing's built-in lighting or stroke behavior.
+
+---
+
+<!-- TODO: Phase 4.1 — Different types of shaders & advanced configuration goes here -->
+<!-- - Processing shader types: how to activate each type -->
+<!-- - Lighting basics -->
+<!-- - POINTS shader -->
+<!-- - Lines -->
+<!-- - PShape -->
 
 ## Advanced concepts and further exploration
 
+<!-- TODO: Phase 6.1 — write this section -->
 - Raymarching
 - GPU particle systems
 - Feedback loops with PGraphics
@@ -641,4 +731,4 @@ This example demonstrates several important concepts about working with spherica
 - Shader performance optimization tips
 - Debugging shaders in Processing
 - Resources for learning GLSL and graphics programming
-- 
+-

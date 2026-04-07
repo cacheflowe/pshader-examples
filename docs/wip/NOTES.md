@@ -28,6 +28,13 @@ Cool cat image source:
 - Enough understanding to know use cases
 - List of built-in uniforms. Where's the definitive list? Look @ Processing4 source
 
+## Bring these in for reference:
+
+- https://github.com/SableRaf/Filters4Processing
+- https://github.com/SableRaf/Shadertoy2Processing
+- https://github.com/prontopablo/FIP
+  - https://prontopablo.github.io/FIP/
+
 ## Topics to cover in tutorial
 
 - Overarching goal for creative coding, not just GLSL proficiency: ***what do shaders unlock***?
@@ -45,4 +52,19 @@ Cool cat image source:
   
 Outside the scope of tutorial
 - PShapeUtil in a library - https://processing.github.io/processing-library-template/
+Help with pixelDensity issues
+- https://github.com/processing/processing4/blob/main/BUILD.md
 
+##  Notes from Raph convo
+
+- Pshader abstracts boilerplate of OpenGL for setting up shaders
+  - What are simplifications provided by processing vs opengl?
+  - built-in conveniences
+- Expand on the idea of a fragment shader in a visual way
+  - show a grid of pixels
+  - thendl - explains this well with human pixels
+  - put the person in the pixel fragment themselves - little autonomous programs
+  - little computer people
+- More nasa images to replace cool cat? Maybe change NASA image
+  - Public domain image archive? https://pdimagearchive.org/
+  - Use chuck photo

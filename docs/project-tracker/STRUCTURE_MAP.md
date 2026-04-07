@@ -21,18 +21,19 @@ _Original `shader_demo_*` directories archived to `_assets/article-examples-conv
 | Using Textures (grayscale) | `05_texture_grayscale/` | .pde + shader.glsl | `shader_demo_gpu_pixels/` |
 | CPU vs GPU comparison (CPU) | `06_cpu_pixels/` | .pde | `shader_demo_cpu_pixels/` |
 | CPU vs GPU comparison (GPU) | `07_texture_filter/` | .pde + shader.glsl | `shader_demo_texture_filter/` |
-| Post-Processing: Brightness | `08_post_brightness/` | .pde + brightness.glsl | `shader_demo_post_processing/` |
-| Post-Processing: Vignette | `09_post_vignette/` | vignette.glsl | `shader_demo_post_processing/` |
-| Post-Processing: Tiling | `10_post_tiling/` | tile.glsl | `shader_demo_post_processing/` |
-| Post-Processing: Displacement | `11_post_displace/` | displace.glsl | `shader_demo_post_processing/` |
-| textureWrap() | `12_texture_wrap/` | .pde + uv-adjust.glsl | `shader_demo_repeat/` |
-| Using shader() | `13_shader_image/` | .pde + shader.glsl | `shader_demo_image_shader/` |
-| More on UV coordinates | `14_custom_uv/` | .pde | `shader_demo_image_uv_coords/` |
-| Custom shape UV + shader | `15_custom_uv_shader/` | .pde + shader.glsl | `shader_demo_custom_shape_uv_shader/` |
-| Adding a vertex shader | `16_vertex_shader/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader/` |
-| Vertex colors | `17_vertex_colors/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_colors/` |
-| 3D with Z coordinates | `18_vertex_generative/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_generative/` |
-| PShape sphere displacement | `19_vertex_displacement/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_displacement/` |
+| Drawing Shapes with Math: SDFs | `08_sdf_circle/` | .pde + shader.glsl | (new — added after tracker was written) |
+| Post-Processing: Brightness | `09_post_brightness/` | .pde + brightness.glsl | `shader_demo_post_processing/` |
+| Post-Processing: Vignette | `10_post_vignette/` | vignette.glsl | `shader_demo_post_processing/` |
+| Post-Processing: Tiling | `11_post_tiling/` | tile.glsl | `shader_demo_post_processing/` |
+| Post-Processing: Displacement | `12_post_displace/` | displace.glsl | `shader_demo_post_processing/` |
+| textureWrap() | `13_texture_wrap/` | .pde + uv-adjust.glsl | `shader_demo_repeat/` |
+| Using shader() | `14_shader_image/` | .pde + shader.glsl | `shader_demo_image_shader/` |
+| More on UV coordinates | `15_custom_uv/` | .pde | `shader_demo_image_uv_coords/` |
+| Custom shape UV + shader | `16_custom_uv_shader/` | .pde + shader.glsl | `shader_demo_custom_shape_uv_shader/` |
+| Adding a vertex shader | `17_vertex_shader/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader/` |
+| Vertex colors | `18_vertex_colors/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_colors/` |
+| 3D with Z coordinates | `19_vertex_generative/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_generative/` |
+| PShape sphere displacement | `20_vertex_displacement/` | .pde + vert.glsl + frag.glsl | `shader_demo_vertex_shader_displacement/` |
 
 ## Diagram → Section Mapping
 

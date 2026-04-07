@@ -1,10 +1,18 @@
 # Project Status & Progress
 
-_Last updated: 2026-04-06_
+_Last updated: 2026-04-07_
 
 ## Overall State
 
 The tutorial is **roughly 70% written**. The article in `README.md` covers fragment shaders comprehensively and has a solid start on vertex shaders. The remaining work is primarily in advanced vertex shader topics, shader types, lighting, and a final "further exploration" section. There are also editorial passes needed (style guide, feedback integration, code example cleanup).
+
+### New Resources Available (2026-04-07)
+
+- **Processing for Android Ch.15 (Andres Colubri)** is now available as local markdown at `docs/other-articles/Processing-Android-Chapter-15-GLSL-shaders.md`. This is the full chapter text and is valuable reference for Phase 4.1 (shader types), lighting basics (Phase 4.2), and the graphics pipeline framing. Previously only linked as a Google Drive PDF.
+- **`docs/wip/NOTES.md` and `docs/wip/TODO.md`** have untracked items now absorbed into this tracker (see TODO.md for details).
+- **STRUCTURE_MAP.md** corrected — example `08_sdf_circle` was inserted after the last tracker update, shifting all subsequent example numbers up by one (post-processing through PShape are now 09–20, not 08–19).
+
+---
 
 ### Build System & Code Import: COMPLETE
 
@@ -38,6 +46,12 @@ All inline code blocks have been converted to import directives. The article sou
 | Adding Z coordinates (3D) | Done | Generative grid displacement |
 | GLSL math functions | Done | Processing ↔ GLSL comparison table |
 | Spherical texturing with PShape | Done | Moon displacement sphere |
+
+### Completed Sections (added 2026-04-07)
+
+| Section | Status | Notes |
+|---------|--------|-------|
+| Processing's Built-in Uniforms and Attributes | Done | Part 4 — tables for all 5 shader types; sourced from default shader files |
 
 ### Remaining Sections (outlined but not written)
 
