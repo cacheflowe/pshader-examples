@@ -52,6 +52,9 @@ All inline code blocks have been converted to import directives. The article sou
 | Section | Status | Notes |
 |---------|--------|-------|
 | Processing's Built-in Uniforms and Attributes | Done | Part 4 — tables for all 5 shader types; sourced from default shader files |
+| Noise and Randomness in GLSL | Done | Phase 3.2 — hash-based random, film grain example (21_noise_grain), simplex noise reference |
+| Neighbor Pixel Sampling | Done | Phase 3.4 — `texOffset`, convolution kernel, Gaussian blur + edge detection (22_kernel_blur) |
+| Processing's Shader Types | Done | Phase 4.1 + 4.4 — `#define` markers, targeted `shader()`, POINTS type with animated grid example (23_point_shader) |
 
 ### Remaining Sections (outlined but not written)
 
@@ -74,15 +77,11 @@ All inline code blocks have been converted to import directives. The article sou
 | Parallelism visual | Low | 2.7 | Raph feedback |
 | **New sections — fragment shader** | | | |
 | Generative drawing / SDFs | High | 3.1 | Completes fragment shader story |
-| Noise in GLSL | Medium | 3.2 | No `noise()` or `random()` — surprises Processing users |
 | Multiple textures / compositing | Medium | 3.3 | Practical, mentioned but not demonstrated |
-| Neighbor pixel sampling / kernels | Medium | 3.4 | Blur, edge detection via `texOffset` |
 | PGraphics + shaders | Medium | 3.5 | Multi-pass rendering, distinctly Processing |
 | **New sections — vertex shader & advanced** | | | |
-| Shader types (#COLOR, #TEXLIGHT, etc.) | High | 4.1 | Raph feedback, core Processing concept |
 | Lighting basics | High | 4.2 | Normals, diffuse lighting |
 | PShape deep-dive | Medium | 4.3 | Cached geometry + performance |
-| POINTS shader | Medium | 4.4 | GPU points / particles |
 | Line shader | Low | 4.5 | Fill + stroke interaction |
 | **Reference material** | | | |
 | Built-in uniforms reference table | High | 5.1 | Raph feedback, Alex's list |

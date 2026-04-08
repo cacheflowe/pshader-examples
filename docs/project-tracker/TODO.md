@@ -85,7 +85,7 @@ New sections that complete the fragment shader story. These fill the gap between
   - Link to iquilezles.org SDF resources and Shadertoy
   - _Source: OUTLINE_WIP.md, GOOGLE_DOC.md, analysis_
 
-- [ ] **3.2** Write "Noise in GLSL" section or subsection
+- [x] **3.2** Write "Noise in GLSL" section or subsection
   - There is no `noise()` or `random()` in GLSL — this surprises Processing users
   - Show a simple hash-based pseudo-random function
   - Reference Ashima's simplex noise or similar community implementations
@@ -99,7 +99,7 @@ New sections that complete the fragment shader story. These fill the gap between
   - Optionally: mask/matte compositing
   - _Source: OUTLINE_WIP.md, analysis_
 
-- [ ] **3.4** Write "Neighbor pixel sampling" section (kernels, blur)
+- [x] **3.4** Write "Neighbor pixel sampling" section (kernels, blur)
   - Introduce `texOffset` built-in uniform
   - Simple blur or edge detection kernel
   - Explain that pixels normally don't know about neighbors — this is the workaround
@@ -119,7 +119,7 @@ New sections that complete the fragment shader story. These fill the gap between
 
 These extend the existing vertex shader coverage and add the planned advanced material.
 
-- [ ] **4.1** Write "Different types of shaders" section
+- [x] **4.1** Write "Different types of shaders" section
   - Cover `#COLOR`, `#TEXTURE`, `#TEXLIGHT`, `#LINE`, `#POINT` shader types
   - Reference Processing4 source: `PShader.java` lines 58-83
   - Create example sketches for at least COLOR and TEXLIGHT types
