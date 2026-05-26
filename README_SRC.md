@@ -2,9 +2,11 @@
 
 ## Table of Contents
 
-- [Introduction: What are Shaders?](#introduction-what-are-shaders)
-- [What Can Shaders Do?](#what-can-shaders-do)
-- [Processing Shader Examples](#processing-shader-examples)
+- [PShader Tutorial](#pshader-tutorial)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction: What are Shaders?](#introduction-what-are-shaders)
+  - [What Can Shaders Do?](#what-can-shaders-do)
+  - [Processing Shader Examples](#processing-shader-examples)
 - [Part 1: Fragment Shader Fundamentals](#part-1-fragment-shader-fundamentals)
   - [Writing a First Shader](#writing-a-first-shader)
   - [When Things Go Wrong: Debugging Shaders](#when-things-go-wrong-debugging-shaders)
@@ -17,18 +19,26 @@
   - [GLSL Math Functions](#glsl-math-functions)
   - [Drawing Shapes with Math: Signed Distance Functions](#drawing-shapes-with-math-signed-distance-functions)
   - [Noise and Randomness in GLSL](#noise-and-randomness-in-glsl)
-- [Part 2: Post-Processing & Texture Techniques](#part-2-post-processing--texture-techniques)
+- [Part 2: Post-Processing \& Texture Techniques](#part-2-post-processing--texture-techniques)
   - [Post-Processing Shaders](#post-processing-shaders)
+    - [Example 1: Brightness](#example-1-brightness)
+    - [Example 2: Vignette](#example-2-vignette)
+    - [Example 3: Tiling](#example-3-tiling)
+    - [Example 4: Displacement](#example-4-displacement)
+    - [Example 5: Neighbor Pixel Sampling](#example-5-neighbor-pixel-sampling)
   - [Using `shader()` for more control](#using-shader-for-more-control)
   - [Custom UV Coordinates and Geometry](#custom-uv-coordinates-and-geometry)
-- [Part 3: Vertex Shaders & 3D](#part-3-vertex-shaders--3d)
+- [Part 3: Vertex Shaders \& 3D](#part-3-vertex-shaders--3d)
   - [Adding a custom vertex shader](#adding-a-custom-vertex-shader)
+    - [The full rasterization pipeline explained: from CPU to Vertex Shader to Fragment Shader to screen](#the-full-rasterization-pipeline-explained-from-cpu-to-vertex-shader-to-fragment-shader-to-screen)
   - [Using vertex colors instead of texture sampling](#using-vertex-colors-instead-of-texture-sampling)
   - [Adding a third dimension with Z coordinates](#adding-a-third-dimension-with-z-coordinates)
   - [Spherical texturing and deformation with PShape](#spherical-texturing-and-deformation-with-pshape)
 - [Part 4: Going Further](#part-4-going-further)
   - [Processing's Shader Types](#processings-shader-types)
   - [Processing's Built-in Uniforms and Attributes](#processings-built-in-uniforms-and-attributes)
+    - [Fragment Shader Variables](#fragment-shader-variables)
+    - [Vertex Shader Uniforms and Attributes](#vertex-shader-uniforms-and-attributes)
   - [Advanced concepts and further exploration](#advanced-concepts-and-further-exploration)
 
 ---
@@ -44,6 +54,8 @@ GLSL is a "C-style language" ([1](https://www.khronos.org/opengl/wiki/OpenGL_Sha
 > The current version of Processing (4.x) uses OpenGL ES 2.0, a subset of the full OpenGL specification. Some features of GLSL may not be available, and the syntax may differ from other versions. The [OpenGL ES 2.0 specification](https://registry.khronos.org/OpenGL/specs/es/2.0/es_full_spec_2.0.pdf) is a useful reference for available functions and features.
 
 This tutorial provides an entry-level introduction to using shaders in Processing. Many excellent educational resources on the internet explain deeper concepts, and there is a whole world of shader techniques to explore beyond this introduction. This tutorial explains basic shader concepts through examples and definitions to demonstrate common creative uses of shaders in Processing.
+
+> **Prerequisites:** This tutorial assumes familiarity with Processing fundamentals — variables, functions, loops, and basic drawing (`rect()`, `ellipse()`, `image()`). Experience with `PImage`, `loadImage()`, and the P3D renderer is helpful but not required. If these concepts are unfamiliar, the [Processing tutorials page](https://processing.org/tutorials) is a good place to start.
 
 ## What Can Shaders Do?
 
@@ -137,7 +149,7 @@ Things will go wrong - broken shaders are a normal part of the process. Unlike P
 ## Parallel Computing
 
 The shader program operates on *individual pixels*, which is why it’s often called a **pixel shader**. When using the **fragment shader** nomenclature, a "fragment" also refers to an individual pixel. This concept can be confusing, but it reveals the power and behavior of a GLSL program. For a sketch of 640 x 480 pixels, there are a total of 307,200 pixels drawn to the screen. When a shader program is executed, it operates on *every single pixel at the same time*. This is inherent to how the GPU functions, and is an example of [parallel computing](https://en.wikipedia.org/wiki/Parallel_computing), where 307,200 instances of the shader program run in parallel to draw all of the pixels in the canvas.
-
+Consider an analogy: imagine 307,200 tiny workers, each one standing at a single pixel on the canvas. A shader program is like handing every worker the same set of instructions simultaneously. Each worker follows those instructions independently, using only its own pixel's coordinates — it cannot look at its neighbor's work or wait for another worker to finish. This constraint is what makes shaders fast (all workers execute at once) but also what makes them unfamiliar (no shared state, no sequential logic). The creative challenge of shader programming is finding ways to produce complex images using only per-pixel math and the limited inputs available to each "worker." For a deeper exploration of this metaphor, see ["The Pixel Swarm"](https://thndl.com/the-pixel-swarm) by thndl.
 > Machine Learning systems often take advantage of parallel computing, which is why GPUs are now used for much more than just graphics. 
 
 This parallel execution style differs from how shapes and colors are typically drawn in Processing, where a color is set with `fill()` for example, and a function like `rect()` will update many pixels on the screen. While a GLSL program runs independently on each pixel, it has very limited information to use when deciding what to do with that pixel. Learning shader programming requires adapting to this style of computational thinking, adopting new techniques to draw shapes, picking up new terminology, and learning how and when to make use of shaders' powerful features.
@@ -268,21 +280,21 @@ Another powerful feature of GLSL is **[swizzling](https://www.khronos.org/opengl
 
 Since a `vec3` or `vec4` may represent either an RGB color or an XYZ coordinate in a shader program, GLSL allows `.rgba` and `.xyzw` to be used interchangeably. This flexibility makes it easy to manipulate vector data.
 
-There are multiple equivalent ways to set the output color to a grayscale RGB color using the red channel for all three components.
+There are multiple equivalent ways to set the output color to a grayscale RGB color using the red channel for all three components. The following three code blocks all produce the same result — each one is a more concise version of the previous.
 
-Each color component is set individually by accessing the `r` property three times:
+The most explicit approach sets each color component individually by accessing the `r` property three times:
 
 ```glsl
 gl_FragColor = vec4(color.r, color.r, color.r, 1.0);
 ```
 
-A new `vec3` is created using the red channel, and then passed into the `vec4` output color. If a single float value is passed into a `vec3`, it is duplicated for all three components. If a `vec3` is passed into a `vec4`, only one additional `float` value is passed in to finish populating the 4 values. This is a common technique to convert between different vector data types, and demonstrates their flexibility via [function overloading](https://en.wikipedia.org/wiki/Function_overloading).
+The same thing can be written more concisely. A single `float` value passed into a `vec3` constructor is duplicated for all three components. If a `vec3` is then passed into a `vec4`, only one additional `float` value is needed to complete the 4 values. This is a common technique to convert between different vector data types, and demonstrates their flexibility via [function overloading](https://en.wikipedia.org/wiki/Function_overloading).
 
 ```glsl
 gl_FragColor = vec4(vec3(color.r), 1.0);
 ```
 
-Another method uses [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). The following syntax requests the red channel three times in a row, which returns a `vec3` on the fly. This is then used to create the `vec4` output color. All three examples produce the same result, and are useful shortcuts at different times.
+The most compact version uses [swizzling](https://www.khronos.org/opengl/wiki/Data_Type_(GLSL)#Swizzling). The syntax `color.rrr` requests the red channel three times in a row, which returns a `vec3` on the fly. This is then used to create the `vec4` output color.
 
 ```glsl
 gl_FragColor = vec4(color.rrr, 1.0);
@@ -310,7 +322,7 @@ gl_FragColor = vec4(color.rgb, 1.0);
 
 ## Comparing CPU vs GPU Pixel Manipulation Performance
 
-There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920×1080 contains more than 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains four values for the RGBA color components, there are around 8 million pieces of data to handle for all 2 million pixels. If the program is expected to run at a high framerate, this approach may not work well. In a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent - certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the same task on the CPU.
+There are many [examples](https://processing.org/tutorials/pixels/#our-second-image-filter-making-our-own-tint) of performing this kind of color manipulation in Processing using [`loadPixels()`](https://processing.org/reference/loadPixels_.html) and [`updatePixels()`](https://processing.org/reference/updatePixels_.html). However, the difference in performance can be enormous. The shader version is significantly faster, especially for sketches with larger resolutions. A sketch running at 1920×1080 contains more than 2 million pixels, and running a `for()` loop on the CPU to manipulate colors can be very slow. Since each pixel contains four values for the RGBA color components, there are around 8 million pieces of data to handle for all 2 million pixels. If the program is expected to run at a high framerate, this approach may not work well. By using a shader, however, this graphical operation may have no noticeable impact on performance. This is where the power of shaders becomes apparent - certain tasks, when offloaded to the GPU, can be tens or even thousands of times faster than performing the equivalent task on the CPU.
 
 To examine a comparable program that generates the same image via the CPU or GPU, the following example loops over each pixel and sets the green color value to the red component, and sets the red and blue channels to zero:
 
@@ -560,7 +572,7 @@ Custom UV coordinates also allow for non-rectangular geometry. The following exa
 
 ## Adding a custom vertex shader
 
-So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader when creating a `PShader` object via `loadShader()`. Much like a fragment shader runs once for every pixel on the screen, a vertex shader runs once for every vertex defined in the geometry being drawn. For example, running a vertex shader on a rectangle shape will execute four times (once for each corner vertex), while a circle shape with 36 segments will run the vertex shader 36 times (once for each vertex around the circle). The shader program executes at the moment the geometry is drawn to the screen.
+So far, all examples have used the default vertex shader provided by Processing. However, *custom* vertex shaders can be created to manipulate vertex positions and pass additional data to the fragment shader, which can be used to create more complex effects. A custom vertex shader must be paired with a fragment shader when creating a `PShader` object via `loadShader()`. Much like a fragment shader runs once for every pixel on the screen, a vertex shader runs once for every vertex defined in the geometry being drawn. For example, running a vertex shader on a rectangle shape will execute four times (once for each corner vertex), while a circle shape with 36 segments will run the vertex shader 36 times (once for each vertex around the circle). The shader program executes at the moment the geometry is drawn to the screen. Custom vertex shaders pair especially well with Processing's [`PShape`](https://processing.org/reference/PShape.html) object, which caches geometry on the GPU for efficient rendering — this combination is explored in the final example of this section.
 
 Using the last example as a starting point, a custom vertex shader is added to manipulate the vertex positions of the circular shape. The following example introduces a displacement effect to the circle's vertices based on their position, rather than via texture sampling as seen in the prior fragment shader example. The effect is similar in that the original image becomes warped, but here it's because the *vertices* are moving, not the *sampling location* in the fragment shader. To add a custom vertex shader, create a new file named `vert.glsl` and load it alongside the fragment shader in the Processing sketch, and pass both into the `loadShader()` function, fragment shader first.
 

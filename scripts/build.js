@@ -17,7 +17,7 @@
  *   <!-- @import examples/shader_demo_04/shader_demo_04.pde lang:java lines:12-18 -->
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, watch } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -96,3 +96,16 @@ function build() {
 }
 
 build();
+
+// Watch mode: rebuild on changes to README_SRC.md
+if (process.argv.includes("--watch")) {
+  console.log("\nWatching README_SRC.md for changes...\n");
+  let debounce = null;
+  watch(SRC_FILE, () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      console.log("---");
+      build();
+    }, 200);
+  });
+}

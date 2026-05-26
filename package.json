@@ -11,12 +11,14 @@
     "dev": "vite",
     "build": "vite build",
     "build:readme": "node scripts/build.js",
+    "watch:readme": "node scripts/build.js --watch",
     "renumber": "node scripts/renumber.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update-libs": "npx npm-check-updates -u && npm install"
   },
   "author": "Cacheflowe",
   "license": "ISC",
   "devDependencies": {
-    "vite": "^7.3.1"
+    "vite": "^8.0.14"
   }
 }

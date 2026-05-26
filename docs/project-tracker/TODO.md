@@ -32,7 +32,7 @@ Reorganize existing content for better pedagogical flow. No new writing — just
   - Combined UV sections into streamlined flow
   - filter() vs shader() distinction clarified
 
-- [ ] **1.6** Foreshadow PShape before the final example
+- [x] **1.6** Foreshadow PShape before the final example
   - Add a one-paragraph mention when vertex shaders are introduced: "Processing's PShape caches geometry on the GPU, which pairs naturally with custom shaders — we'll see this later"
   - Prevents PShape, `sphereDetail()`, `setTexture()`, and equirectangular projection from all arriving at once
 
@@ -63,29 +63,22 @@ Targeted additions to existing content. Small-to-medium edits, not full new sect
 - [x] **2.5** Clarify filter() order of operations ← _Chris feedback_
   - Expanded blockquote after first texture example: filter() snapshots the entire canvas as-is, multiple draw calls composite into one texture, calling filter() multiple times chains sequentially
 
-- [ ] **2.6** Improve framing before swizzling code examples ← _Chris feedback_
+- [x] **2.6** Improve framing before swizzling code examples ← _Chris feedback_
   - Add transition text like "The following line does the same thing, but in a more concise way..."
   - Reader currently lacks context until the end of the section
 
-- [ ] **2.7** Make parallelism section more visual ← _Raph feedback_
+- [x] **2.7** Make parallelism section more visual ← _Raph feedback_
   - Reference "The Pixel Swarm" by thndl
   - Consider a simple diagram showing parallel execution
   - The Wikipedia link may be too complex for the audience
 
-- [ ] **2.8** Clarify assumed audience in the introduction ← _Raph feedback_
+- [x] **2.8** Clarify assumed audience in the introduction ← _Raph feedback_
   - The tutorial assumes intermediate-to-advanced Processing knowledge; this should be stated upfront
   - Add a brief note near the top: what the reader should already know (variables, functions, loops, basic Processing drawing), and what to learn first if they don't
   - Could link to the Processing tutorials page or a specific beginner tutorial as a prerequisite pointer
 
-- [ ] **2.9** Add `map()` equivalent to the GLSL math section ← _OUTLINE_WIP.md, NOTES.md_
-  - Processing's `map()` function doesn't exist in GLSL — this surprises beginners (same pattern as `noise()` and `random()`)
-  - Show a custom `remap()` implementation — OUTLINE_WIP already has the code:
-    ```glsl
-    float remap(float value, float low1, float high1, float low2, float high2) {
-      return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
-    }
-    ```
-  - Small addition to the existing GLSL Math Functions section or table
+- [x] **2.9** Add `map()` equivalent to the GLSL math section ← _OUTLINE_WIP.md, NOTES.md_
+  - Already in article (line ~356): "The popular `map()` function in Processing does not have a direct equivalent in GLSL but can be implemented from scratch" with code example
 
 ---
 
