@@ -1,5 +1,38 @@
 # PShader Tutorial
 
+## Table of Contents
+
+- [Introduction: What are Shaders?](#introduction-what-are-shaders)
+- [What Can Shaders Do?](#what-can-shaders-do)
+- [Processing Shader Examples](#processing-shader-examples)
+- [Part 1: Fragment Shader Fundamentals](#part-1-fragment-shader-fundamentals)
+  - [Writing a First Shader](#writing-a-first-shader)
+  - [When Things Go Wrong: Debugging Shaders](#when-things-go-wrong-debugging-shaders)
+  - [Parallel Computing](#parallel-computing)
+  - [A New Coordinate System](#a-new-coordinate-system)
+  - [Uniforms for Animation and Interactivity](#uniforms-for-animation-and-interactivity)
+  - [Using Textures](#using-textures)
+  - [Swizzling and Vector Component Shortcuts](#swizzling-and-vector-component-shortcuts)
+  - [Comparing CPU vs GPU Pixel Manipulation Performance](#comparing-cpu-vs-gpu-pixel-manipulation-performance)
+  - [GLSL Math Functions](#glsl-math-functions)
+  - [Drawing Shapes with Math: Signed Distance Functions](#drawing-shapes-with-math-signed-distance-functions)
+  - [Noise and Randomness in GLSL](#noise-and-randomness-in-glsl)
+- [Part 2: Post-Processing & Texture Techniques](#part-2-post-processing--texture-techniques)
+  - [Post-Processing Shaders](#post-processing-shaders)
+  - [Using `shader()` for more control](#using-shader-for-more-control)
+  - [Custom UV Coordinates and Geometry](#custom-uv-coordinates-and-geometry)
+- [Part 3: Vertex Shaders & 3D](#part-3-vertex-shaders--3d)
+  - [Adding a custom vertex shader](#adding-a-custom-vertex-shader)
+  - [Using vertex colors instead of texture sampling](#using-vertex-colors-instead-of-texture-sampling)
+  - [Adding a third dimension with Z coordinates](#adding-a-third-dimension-with-z-coordinates)
+  - [Spherical texturing and deformation with PShape](#spherical-texturing-and-deformation-with-pshape)
+- [Part 4: Going Further](#part-4-going-further)
+  - [Processing's Shader Types](#processings-shader-types)
+  - [Processing's Built-in Uniforms and Attributes](#processings-built-in-uniforms-and-attributes)
+  - [Advanced concepts and further exploration](#advanced-concepts-and-further-exploration)
+
+---
+
 ## Introduction: What are Shaders?
 
 Shaders are powerful and portable graphics programs, written in [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) (OpenGL Shading Language). This language, and its integration into Processing and other graphical frameworks, provides endless opportunities for powerful and optimized graphics techniques that can expand creative possibilities and make common practical tasks easier and faster. These range from post-processing effects, advanced compositing, generative drawing, custom control over the geometry, materials, and lighting of 3D shapes, and beyond. Shader technology originates in video game graphics — every lighting model, particle effect, and post-processing technique in modern games relies on the same GPU pipeline — and creative coders have adopted these tools to make art.
@@ -893,9 +926,10 @@ void main() {
 
   // weighted average: center gets most weight (4x), edges get 2x, corners get 1x
   // this is a 3x3 Gaussian blur kernel — weights sum to 16
-  gl_FragColor = (      c0 + 2.0*c1 +       c2 +
-                  2.0*c3 + 4.0*c4 + 2.0*c5 +
-                        c6 + 2.0*c7 +       c8) / 16.0;
+  vec4 kernelSum = c0 +       2.0 * c1 + c2 +
+                   2.0 * c3 + 4.0 * c4 + 2.0 * c5 +
+                   c6 +       2.0 * c7 + c8;
+  gl_FragColor = kernelSum / 16.0;
 
   // edge detection variation: subtract neighbors from the center
   // amplifies differences between pixels instead of averaging them
@@ -1598,7 +1632,7 @@ shader(myShader, TRIANGLES); // applies only to filled polygon geometry
 resetShader(POINTS);         // restores the default shader for points only
 ```
 
-The **point shader type** is a good illustration of how types unlock otherwise-inaccessible capabilities. Each `point()` call is expanded by Processing into a quad of four vertices on the GPU. The POINT type exposes an `offset` attribute — the corner position of each vertex within that quad — which the vertex shader uses to control size and shape on screen. The `projectionMatrix` and `modelviewMatrix` uniforms are also provided separately, rather than the combined `transformMatrix` used in other types, which is necessary for correct point sizing in 3D space.
+The **point shader type** is a good illustration of how types unlock otherwise-inaccessible capabilities. Each `point()` call is expanded by Processing into a quad of four vertices on the GPU. The POINT type exposes an `offset` attribute — the corner position of each vertex within that quad — which the vertex shader uses to control size and shape on screen. The `projection` and `modelview` uniforms are also provided separately, rather than the combined `transformMatrix` used in other types, which is necessary for correct point sizing in 3D space.
 
 **sketch.pde**
 
@@ -1606,7 +1640,7 @@ The **point shader type** is a good illustration of how types unlock otherwise-i
 PShader myShader;
 
 void setup() {
-  size(640, 480, P2D);
+  size(640, 480, P3D);
   myShader = loadShader("frag.glsl", "vert.glsl");
 }
 
@@ -1619,7 +1653,6 @@ void draw() {
   // mouseX controls point radius in pixels
   float radius = map(mouseX, 0, width, 2.0, 30.0);
   myShader.set("uPointRadius", radius);
-  myShader.set("uTime", millis() / 1000.0);
 
   // draw a grid of points — the vertex shader sizes them on the GPU
   stroke(255);
@@ -1637,35 +1670,28 @@ void draw() {
 **vert.glsl**
 
 ```glsl
-// point shaders use separate projection and modelview matrices
-// instead of the combined transformMatrix used in other shader types
-uniform mat4 projectionMatrix;
-uniform mat4 modelviewMatrix;
-uniform vec4 viewport;     // canvas dimensions — needed to convert radius to clip space
+#define PROCESSING_POINT_SHADER
+
+uniform mat4 projection;
+uniform mat4 modelview;
 
 uniform float uPointRadius;
-uniform float uTime;
 
-attribute vec4 position;
+attribute vec4 vertex;
 attribute vec4 color;
-attribute vec2 offset;     // corner offset for this vertex within the point quad
-                           // Processing expands each point() call into 4 vertices
+attribute vec2 offset;
 
 varying vec4 vertColor;
 
 void main() {
-  vec4 eyePos  = modelviewMatrix * position;
-  vec4 clipPos = projectionMatrix * eyePos;
+  vec4 pos = modelview * vertex;
+  vec4 clip = projection * pos;
 
-  // convert radius from screen pixels to clip space
-  // clip.w / (0.5 * viewport.zw) is the scale factor from pixels to clip coordinates
-  vec2 screenScale = clipPos.w / (0.5 * viewport.zw);
-  gl_Position.xy = clipPos.xy + offset.xy * uPointRadius * screenScale;
-  gl_Position.zw = clipPos.zw;
+  // apply uPointRadius to the per-vertex offset, then project into clip space
+  vec2 of = offset * uPointRadius;
+  gl_Position = clip + projection * vec4(of, 0.0, 0.0);
 
-  // animate color based on position and time
-  float brightness = 0.5 + 0.5 * sin(position.x * 0.02 + uTime);
-  vertColor = vec4(color.rgb * brightness, color.a);
+  vertColor = color;
 }
 ```
 
@@ -1676,18 +1702,14 @@ varying vec4 vertColor;
 
 void main() {
   gl_FragColor = vertColor;
-
-  // try making points circular instead of square by discarding corners
-  // offset is in the range -1 to 1 within each point quad
-  // gl_FragColor = length(/* offset varying */) > 1.0 ? vec4(0.0) : vertColor;
 }
 ```
 
 <!-- 🚨 TODO: screenshot of point shader grid -->
 
 * `shader(myShader, POINTS)` targets only `point()` calls — other geometry drawn in the same frame is unaffected. This is a precision that `shader(myShader)` alone cannot provide.
-* The expression `clipPos.w / (0.5 * viewport.zw)` converts the point radius from screen pixels to clip-space coordinates. Without this conversion, the apparent size of points would vary with distance in perspective projections, and differ across canvas sizes.
-* The vertex shader controls all of the visual variation in this example — the per-point brightness animation happens there, not in the fragment shader. The fragment shader is intentionally minimal: it passes the interpolated color through unchanged. In more advanced point shaders, the fragment shader can use the `offset` varying to shape each point — discarding pixels outside a circle, for example, to produce round rather than square points.
+* The vertex shader transforms each vertex through `modelview` and `projection` to produce a clip-space position, then adds the scaled `offset` to displace the corner of each point quad. The `uPointRadius` uniform — driven by `mouseX` — controls the radius in pixels.
+* The fragment shader is intentionally minimal: it passes the interpolated vertex color through unchanged. In more advanced point shaders, the fragment shader can use the `offset` varying to shape each point — discarding pixels outside a circle radius, for example, to produce round rather than square points.
 
 The `ToonShading` and `GlossyFishEye` examples in Processing's built-in shader examples demonstrate the **TexLight type**, which extends the texture type with the full lighting uniform set — `lightPosition[8]`, `lightDiffuse[8]`, `normalMatrix`, and material attributes. The complete variable listing for each type is in the reference table that follows.
 

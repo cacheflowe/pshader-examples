@@ -68,3 +68,32 @@ Help with pixelDensity issues
 - More nasa images to replace cool cat? Maybe change NASA image
   - Public domain image archive? https://pdimagearchive.org/
   - Use chuck photo
+
+
+
+# Justin’s extra/advanced notes/topics
+
+* Topics that I wish I had guidance on early on:  
+  * Loading only a fragment shader and using filter()  
+  * The difference between filter() on an existing PGraphics or app surface vs shader() and then drawing some geometry or a PImage  
+    * When using shader(), making sure to call resetShader()  
+  * Explanation of some of the common provided uniforms \- what do they mean?  
+    * Relate these to shadertoy or other common GLSL environments?   
+    * I have notes on this [here](https://github.com/cacheflowe/haxademic/blob/master/data/haxademic/shaders/README.md)  
+  * Using uniforms, and the difference between float/int  
+  * Pointing out the [default shaders](https://github.com/benfry/processing4/tree/main/core/src/processing/opengl/shaders) location, as Alex pointed out  
+    * Noting when to use each type, and the \#SHADER\_TYPE preprocessor that belongs to each  
+  * Setting [attributes](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_GPUParticlesMoveShapes_DepthCamera.java#L123) as geometry metadata using attrib()  
+    * PShape is a relevant topic to shaders, but starting with basic geometry interactions with shaders would be good to cover  
+  * Which version number of GLSL is default, and what happens when you try to compile your own shaders (the version number gets weird). It’s maybe important to know how this relates to GLSL documentation and why your shader’s main() looks different from ShaderToy  
+* Examples:  
+  * I have a ton of ready-to-use (and no-so-ready) shader examples [here](https://github.com/cacheflowe/haxademic/tree/master/data/haxademic/shaders)  
+  * Matcap is a simple but powerful shader concept  
+    * @wblut has a demo [here](https://wblut.com/code/matcap.zip) and I reimplemented [here](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_MatCap.java#L25)  
+  * [https://github.com/codeanticode/pshader-experiments](https://github.com/codeanticode/pshader-experiments)   
+  * [https://github.com/cansik/processing-postfx](https://github.com/cansik/processing-postfx)   
+  * [https://github.com/genekogan/Processing-Shader-Examples](https://github.com/genekogan/Processing-Shader-Examples)   
+* Off the deep end:  
+  * I have a hot-reloading PShader compiler [here](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/core/draw/context/PShaderHotSwap.java) that uses an hacky PShader [subclass](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/core/draw/context/PShaderCompiler.java) to do its job  
+  * You can compile glsl from [inline code](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_ReloadInlineGlsl_Rippleskin.java), especially now that the Processing IDE supports multiline strings  
+  * Using float32 textures for particle simulations. I have a solution in this [GitHub issue](https://github.com/benfry/processing4/issues/724), but also have a [working](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/core/draw/context/pg32/PGraphics32.java) [implementation](https://github.com/cacheflowe/haxademic/blob/master/src/com/haxademic/demo/draw/shapes/shader/Demo_VertexShader_GPUParticles.java) that I could convert into a pure Processing demo

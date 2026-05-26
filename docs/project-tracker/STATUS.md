@@ -61,7 +61,7 @@ All inline code blocks have been converted to import directives. The article sou
 | Section | Priority | Phase | Notes |
 |---------|----------|-------|-------|
 | **Structural / flow fixes** | | | |
-| Table of contents | High | 1.1 | Helps navigation as article grows |
+| ~~Table of contents~~ | ~~High~~ | ~~1.1~~ | ~~Helps navigation as article grows~~ ✅ |
 | Part dividers (4 parts) | High | 1.2 | Reader progress visibility |
 | Move GLSL math section earlier | High | 1.3 | Reader uses `sin()`, `fract()`, etc. long before seeing the table |
 | Fold textureWrap into tiling example | Medium | 1.4 | Currently breaks flow |

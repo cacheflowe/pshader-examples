@@ -23,9 +23,10 @@ void main() {
 
   // weighted average: center gets most weight (4x), edges get 2x, corners get 1x
   // this is a 3x3 Gaussian blur kernel — weights sum to 16
-  gl_FragColor = (      c0 + 2.0*c1 +       c2 +
-                  2.0*c3 + 4.0*c4 + 2.0*c5 +
-                        c6 + 2.0*c7 +       c8) / 16.0;
+  vec4 kernelSum = c0 +       2.0 * c1 + c2 +
+                   2.0 * c3 + 4.0 * c4 + 2.0 * c5 +
+                   c6 +       2.0 * c7 + c8;
+  gl_FragColor = kernelSum / 16.0;
 
   // edge detection variation: subtract neighbors from the center
   // amplifies differences between pixels instead of averaging them

@@ -11,7 +11,7 @@ Check off as completed.
 
 Reorganize existing content for better pedagogical flow. No new writing — just moving, combining, and adding brief connective tissue.
 
-- [ ] **1.1** Add a Table of Contents at the top of the article
+- [x] **1.1** Add a Table of Contents at the top of the article
   - Helps readers navigate the long article and understand scope
   - Update after each new section is added
 
@@ -71,6 +71,21 @@ Targeted additions to existing content. Small-to-medium edits, not full new sect
   - Reference "The Pixel Swarm" by thndl
   - Consider a simple diagram showing parallel execution
   - The Wikipedia link may be too complex for the audience
+
+- [ ] **2.8** Clarify assumed audience in the introduction ← _Raph feedback_
+  - The tutorial assumes intermediate-to-advanced Processing knowledge; this should be stated upfront
+  - Add a brief note near the top: what the reader should already know (variables, functions, loops, basic Processing drawing), and what to learn first if they don't
+  - Could link to the Processing tutorials page or a specific beginner tutorial as a prerequisite pointer
+
+- [ ] **2.9** Add `map()` equivalent to the GLSL math section ← _OUTLINE_WIP.md, NOTES.md_
+  - Processing's `map()` function doesn't exist in GLSL — this surprises beginners (same pattern as `noise()` and `random()`)
+  - Show a custom `remap()` implementation — OUTLINE_WIP already has the code:
+    ```glsl
+    float remap(float value, float low1, float high1, float low2, float high2) {
+      return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+    }
+    ```
+  - Small addition to the existing GLSL Math Functions section or table
 
 ---
 
@@ -137,7 +152,7 @@ These extend the existing vertex shader coverage and add the planned advanced ma
 
 - [ ] **4.3** Write "PShape deep-dive" section (if not already covered enough)
   - Cached geometry + shaders for performance
-  - Custom attributes via `attrib()` (if appropriate for this level)
+  - Custom attributes via `attrib()` (if appropriate for this level) — OUTLINE_WIP open question: "are these only on PShape, and not in the official docs despite being a public method?" Worth a brief mention even if not a full example
   - `beginShape()` vs PShape performance comparison
   - _Source: OUTLINE_WIP.md, NOTES.md_
 
@@ -161,6 +176,7 @@ These are reference-style additions rather than tutorial flow. Can be integrated
   - Tables organized by shader type: Color, Texture, Light+Texture, Line, Point
   - Sourced directly from `_assets/processing-default-shaders/*.glsl` (ground truth)
   - Also answered the precision specifier open question: yes, use `#ifdef GL_ES` block
+  - [ ] 🚨 Add `gl_FragCoord` to the fragment shader variables table — screen-space pixel coordinates (`vec4`); listed in GOOGLE_DOC.md built-ins but missing from the written table. Useful for effects that need actual pixel position rather than normalized UV coords.
 
 - [ ] **5.2** Explain PShader vs raw GLSL differences ← _Raph feedback_
   - How Processing wraps GLSL (what's added automatically)
@@ -176,6 +192,8 @@ These are reference-style additions rather than tutorial flow. Can be integrated
     - Not calling `resetShader()` after `shader()`
     - Misspelled uniform names fail silently
     - `millis()` returns int — cast to float for uniforms
+    - `.glsl` and `.frag` files cannot be opened directly in the Processing IDE — must use an external editor ← _GOOGLE_DOC.md_
+    - `map()`, `random()`, and `noise()` don't exist in GLSL — need custom implementations
   - Quick-reference format for debugging
   - _Source: analysis, content already exists scattered through article_
 
@@ -244,6 +262,10 @@ These are reference-style additions rather than tutorial flow. Can be integrated
 - [ ] **7.4** Add Processing function documentation links on first mention
   - `filter()`, `shader()`, `resetShader()`, `loadShader()`, `PShader.set()`, etc.
 - [ ] **7.5** Resave all screenshot images at 640×480
+- [ ] **7.12** Capture screenshots for new examples 21, 22, 23
+  - `example_21_noise_grain` — 🚨 placeholder in README_SRC.md
+  - `example_22_kernel_blur` — 🚨 placeholder in README_SRC.md
+  - `example_23_point_shader` — 🚨 placeholder in README_SRC.md
 - [ ] **7.6** Replace cool-cat image with chuck doge (or finalize image choice)
 - [ ] **7.7** Apply p5js documentation style guide
 - [ ] **7.8** Final proofreading pass

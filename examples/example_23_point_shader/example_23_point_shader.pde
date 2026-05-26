@@ -1,7 +1,7 @@
 PShader myShader;
 
 void setup() {
-  size(640, 480, P2D);
+  size(640, 480, P3D);
   myShader = loadShader("frag.glsl", "vert.glsl");
 }
 
@@ -14,7 +14,6 @@ void draw() {
   // mouseX controls point radius in pixels
   float radius = map(mouseX, 0, width, 2.0, 30.0);
   myShader.set("uPointRadius", radius);
-  myShader.set("uTime", millis() / 1000.0);
 
   // draw a grid of points — the vertex shader sizes them on the GPU
   stroke(255);
