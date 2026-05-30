@@ -407,11 +407,9 @@ SDFs can be extended well beyond circles, and even into 3d using raymarching tec
 
 ## Noise and Randomness in GLSL
 
-Processing's [`noise()`](https://processing.org/reference/noise_.html) function has no equivalent in GLSL. Neither does `random()`. This is one of the first surprises for Processing users moving into shader programming, and understanding why helps clarify how to work around it.
+Processing's [`noise()`](https://processing.org/reference/noise_.html) function has no equivalent in GLSL. Neither does `random()`. This can be a surprise for Processing users moving into shader programming. A common solution is to rely on **hash functions** - deterministic mathematical operations that take a coordinate as input and return a value that *appears* random. The same input always produces the same output, but small changes in input produce large, unpredictable changes in output.
 
-Shaders don't carry state between pixels or between frames. There's no shared seed, no internal counter, and no way to call a function that returns a different value each invocation. Instead, shader programmers rely on **hash functions** - deterministic mathematical operations that take a coordinate as input and return a value that *appears* random. The same input always produces the same output, but small changes in input produce large, unpredictable changes in output.
-
-A common pattern uses `sin()` and `dot()` to achieve this:
+A common pattern uses `sin()`, `dot()`, and `fract()` to build a hash function that takes a coordinate and returns a pseudo-random value between 0.0 and 1.0:
 
 ```glsl
 float random(vec2 st) {
@@ -419,25 +417,21 @@ float random(vec2 st) {
 }
 ```
 
-`dot()` multiplies corresponding components and sums them, producing a single float from two coordinates. Multiplying that by a large constant stretches the sine wave into a high-frequency oscillation where adjacent inputs land in completely different phases. `fract()` discards everything but the fractional part, keeping the result in 0.0–1.0. The specific constants (`17.0`, `180.0`, `2500.0`) are chosen to avoid visible patterns — changing them produces visually different but equally convincing results.
-
-The following example applies this as a film grain post-processing filter. Adding `uTime` to the calculation ensures the noise changes each frame:
+The following example applies this randomness per-pixel as a film grain post-processing filter. Adding `uTime` to the calculation ensures the noise changes each frame:
 
 **sketch.pde**
 
-<!-- @import examples/example_23_noise_grain/example_23_noise_grain.pde lang:java -->
+<!-- @import examples/example_09_noise_grain/example_09_noise_grain.pde lang:java -->
 
 **shader.glsl**
 
-<!-- @import examples/example_23_noise_grain/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_09_noise_grain/data/shader.glsl lang:glsl -->
 
 <!-- 🚨 TODO: screenshot/gif of grain effect -->
 
 * The `random()` function takes the pixel's UV coordinate as input. Because `uTime` is added before `fract()`, the output shifts every frame — producing animated grain rather than a frozen pattern.
-* `mix()` blends between the sampled image color and the grain value. At `uCrossfade = 0.0`, the image is unchanged. At `1.0`, the output is pure noise. Values in between overlay the grain partially.
-* The commented-out alternative adds grain subtly rather than replacing the image. Centering the noise around zero with `(grain - 0.5)` means bright and dark specks cancel out on average, preserving the overall image brightness.
 
-For smooth, organic-looking noise comparable to Processing's `noise()`, community-written **simplex noise** implementations in GLSL are widely available. Patricio Gonzalez Vivo maintains a commonly-used [GLSL noise functions gist](https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83) that covers Perlin, simplex, and other noise types. The hash technique above is sufficient for many practical uses — film grain, dithering, jitter — and has the advantage of being transparent enough to understand and modify directly.
+For smooth, organic-looking noise comparable to Processing's `noise()`, community-written **simplex noise** implementations in GLSL are widely available. Patricio Gonzalez Vivo maintains a commonly-used [GLSL noise functions gist](https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83) that covers Perlin, simplex, and other noise types. These noise functions are fundamental in procedural generation, where they can create natural-looking textures, patterns, and dynamic randomness at runtime. This is revisited in a later section.
 
 ---
 
@@ -454,10 +448,10 @@ Here are some examples of post-processing effects that can be achieved with shad
 This simple example uses a custom `brightness` uniform to adjust the RGB values of the texture. 
 
 **Processing Code:**
-<!-- @import examples/example_09_post_brightness/example_09_post_brightness.pde lang:java -->
+<!-- @import examples/example_10_post_brightness/example_10_post_brightness.pde lang:java -->
 
 **Shader Code (`brightness.glsl`):**
-<!-- @import examples/example_09_post_brightness/data/brightness.glsl lang:glsl -->
+<!-- @import examples/example_10_post_brightness/data/brightness.glsl lang:glsl -->
 
 ![A cat photo with adjustable brightness controlled by mouse position](images/shader_demo_post_processing-brightness.png)
 
@@ -466,7 +460,7 @@ This simple example uses a custom `brightness` uniform to adjust the RGB values 
 A vignette effect darkens the edges of an image. This is achieved by calculating the distance of the current pixel from the center of the screen, and using that distance to darken the pixels towards the edges of the canvas.
 
 **Shader Code (`vignette.glsl`):**
-<!-- @import examples/example_10_post_vignette/data/vignette.glsl lang:glsl -->
+<!-- @import examples/example_11_post_vignette/data/vignette.glsl lang:glsl -->
 
 ![A cat photo with darkened edges creating a vignette effect](images/shader_demo_post_processing-vignette.png)
 
@@ -476,7 +470,7 @@ A vignette effect darkens the edges of an image. This is achieved by calculating
 Shaders can also manipulate *where* a texture is sampled from. By modifying the original UV coordinates before sampling the texture, the image can be repeated or distorted. This is sometimes called domain warping. The GLSL function `fract()` returns only the fractional part of a number (e.g., `fract(1.5)` returns `0.5`), which is comparable to the modulus operator `%` that's commonly used in Java and other languages on the CPU.
 
 **Shader Code (`tile.glsl`):**
-<!-- @import examples/example_11_post_tiling/data/tile.glsl lang:glsl -->
+<!-- @import examples/example_12_post_tiling/data/tile.glsl lang:glsl -->
 
 ![A cat photo tiled in a grid pattern showing texture repetition](images/shader_demo_post_processing-tiling.png)
 
@@ -502,7 +496,7 @@ _Result of `textureWrap(REPEAT)`_:
 Like the tiling example, UV coordinates can be modified *before* sampling the texture. In this case, a sine wave distortion is applied to the UV coordinates to create a wavy effect. A `phase` uniform is used to animate the pixel displacement over time.
 
 **Shader code (`displace.glsl`):**
-<!-- @import examples/example_12_post_displace/data/displace.glsl lang:glsl -->
+<!-- @import examples/example_14_post_displace/data/displace.glsl lang:glsl -->
 
 ![A cat photo with wavy distortion applied via sine wave displacement](images/shader_demo_post_processing-displace.png)
 
@@ -518,11 +512,11 @@ Sampling multiple pixels and combining their values is called a **convolution ke
 
 **sketch.pde**
 
-<!-- @import examples/example_24_kernel_blur/example_24_kernel_blur.pde lang:java -->
+<!-- @import examples/example_15_kernel_blur/example_15_kernel_blur.pde lang:java -->
 
 **shader.glsl**
 
-<!-- @import examples/example_24_kernel_blur/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_15_kernel_blur/data/shader.glsl lang:glsl -->
 
 <!-- 🚨 TODO: screenshot of blur/edge detection effect -->
 
@@ -542,10 +536,10 @@ Processing also provides the `shader()` function, which allows for more targeted
 The most basic use of `shader()` is to apply a shader to shapes drawn with functions like `image()`, `rect()`, or custom geometry created with `beginShape()`, `vertex()`, and `endShape()`. When a shader is applied in this way, the UV coordinates in the shader are directly mapped to the shape's vertices, which have their own UV coordinates. `image()`  and `rect()`, for example, have default coordinates (like calling `filter()` on the entire canvas), but these coordinates are contained within the shape's bounds, wherever it's drawn on-screen. In the following example, the shader is only applied within the image boundaries, wherever it is drawn on the canvas:
 
 **sketch.pde**
-<!-- @import examples/example_14_shader_image/example_14_shader_image.pde lang:java -->
+<!-- @import examples/example_16_shader_image/example_16_shader_image.pde lang:java -->
 
 **shader.glsl**
-<!-- @import examples/example_14_shader_image/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_16_shader_image/data/shader.glsl lang:glsl -->
 
 ![A cat photo with alpha transparency based on pixel brightness](images/shader_demo_image_shader.png)
 
@@ -557,17 +551,17 @@ As noted previously, every shader in Processing is handed `vertTexCoord`, which 
 Consider this example of custom UV coordinates with `beginShape()` and `vertex()` without a shader. The result mimics the `tiling.glsl` post-processing shader example, but this time the tiling behavior is specified on the CPU by setting custom UV coordinates for each vertex of the shape rather than inside the shader. This exemplifies the connection between geometry data created in Java and how that data is used, opening the door for further manipulation on the GPU via shaders.
 
 **sketch.pde**
-<!-- @import examples/example_15_custom_uv/example_15_custom_uv.pde lang:java -->
+<!-- @import examples/example_17_custom_uv/example_17_custom_uv.pde lang:java -->
 
 ![A cat photo tiled multiple times across the canvas using custom UV coordinates](images/shader_demo_image_uv_coords.png)
 
 Custom UV coordinates also allow for non-rectangular geometry. The following example breaks out of the rectangle shape by using custom UV coordinates with a circular shape. Using `vertex()`, a circular shape is created with UV coordinates corresponding to the circular geometry. This circle displays a cutout of the original image due to the custom UV coordinates that sample a circle from the image. The UV coordinates are then displaced in the shader to change where the image is sampled from by displacing the original UV coordinates. The geometry is a circle, but the image texture is distorted within that circle shape.
 
 **sketch.pde**
-<!-- @import examples/example_16_custom_uv_shader/example_16_custom_uv_shader.pde lang:java -->
+<!-- @import examples/example_18_custom_uv_shader/example_18_custom_uv_shader.pde lang:java -->
 
 **shader.glsl**
-<!-- @import examples/example_16_custom_uv_shader/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_18_custom_uv_shader/data/shader.glsl lang:glsl -->
 
 ![A circular cutout of a cat photo with wavy distortion controlled by mouse movement](images/shader_demo_custom_shape_uv_shader.png)
 
@@ -579,12 +573,12 @@ Every fragment shader so far has used a single `texture` uniform — the one Pro
 This opens up compositing techniques: blending two images, using one image as a mask or displacement map for another, or mixing a generated pattern with a photograph. The following example blends two images together based on the mouse's horizontal position.
 
 **sketch.pde**
-<!-- @import examples/example_17_multi_texture/example_17_multi_texture.pde lang:java -->
+<!-- @import examples/example_19_multi_texture/example_19_multi_texture.pde lang:java -->
 
 **shader.glsl**
-<!-- @import examples/example_17_multi_texture/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_19_multi_texture/data/shader.glsl lang:glsl -->
 
-![Two images blending together based on mouse position — cat on the left, moon on the right](images/example_17_multi_texture.png)
+![Two images blending together based on mouse position — cat on the left, moon on the right](images/example_19_multi_texture.png)
 
 Note the following about working with multiple textures:
 
@@ -604,35 +598,34 @@ Note the following about working with multiple textures:
 > uniform sampler2D uTexture2;
 >
 > void main() {
->   vec4 color1 = texture2D(uTexture1, vertTexCoord.st);
->   vec4 color2 = texture2D(uTexture2, vertTexCoord.st);
+>   vec4 color1 = texture2D(uTexture1, vertTexCoord.xy);
+>   vec4 color2 = texture2D(uTexture2, vertTexCoord.xy);
 >   gl_FragColor = mix(color1, color2, uMix);
 > }
 > ```
 >
 > This approach makes the data flow fully visible in the code. Either pattern works - choose whichever is clearest for the situation.
 
-* The GLSL `mix()` function performs a linear interpolation between two values. `mix(a, b, t)` returns `a` when `t` is 0.0 and `b` when `t` is 1.0. This is equivalent to Processing's `lerp()` function. Here it blends between the two textures.
-* Both textures are sampled at the same UV coordinate (`vertTexCoord.st`), but they don't have to be. A common creative technique is to offset or distort the UV before sampling the second texture, sometimes via the other image's pixel values, creating effects like displacement mapping or parallax scrolling.
+* Both textures are sampled at the same UV coordinate (`vertTexCoord.xy`), but they don't have to be. A common creative technique is to offset or distort the UV before sampling the second texture, sometimes via the other image's pixel values, creating effects like displacement mapping or parallax scrolling.
 
-Expanding on this last point, the second texture doesn't have to be visible - it can serve as *data* that drives an effect. The next example uses a [`PGraphics`](https://processing.org/reference/PGraphics.html) buffer as a **displacement map**. Instead of loading a static image, a separate noise shader renders animated 3D value noise to an offscreen canvas each frame. The displacement shader then uses the brightness values from this dynamic texture to push pixels around in the source image. This two-shader approach — one generating data, another consuming it — is a common and powerful pattern.
+Expanding on this last point, the second texture doesn't have to be visible - it can serve as *data* that drives an effect. The next example uses a [`PGraphics`](https://processing.org/reference/PGraphics.html) buffer as a **displacement map**. This builds on the earlier UV displacement example, which offset pixels using the image's own color data. Here, a separate noise shader renders animated 3D value noise to an offscreen canvas each frame, and the displacement shader uses those brightness values to push pixels around in the source image. Using an independent texture for displacement gives full control over the effect — its scale, speed, and pattern are decoupled from the source image entirely. This two-shader approach — one generating data, another consuming it — is a common and powerful pattern.
 
 **sketch.pde**
-<!-- @import examples/example_18_multi_texture_displace/example_18_multi_texture_displace.pde lang:java -->
+<!-- @import examples/example_20_multi_texture_displace/example_20_multi_texture_displace.pde lang:java -->
 
 **noise.glsl**
-<!-- @import examples/example_18_multi_texture_displace/data/noise.glsl lang:glsl -->
+<!-- @import examples/example_20_multi_texture_displace/data/noise.glsl lang:glsl -->
 
 **shader.glsl**
-<!-- @import examples/example_18_multi_texture_displace/data/shader.glsl lang:glsl -->
+<!-- @import examples/example_20_multi_texture_displace/data/shader.glsl lang:glsl -->
 
-![A cat photo warped by animated noise displacement, controlled by mouse position](images/example_18_multi_texture_displace.png)
+![A cat photo warped by animated noise displacement, controlled by mouse position](images/example_20_multi_texture_displace.png)
 
 * A `PGraphics` buffer created with [`createGraphics()`](https://processing.org/reference/createGraphics_.html) acts as an offscreen canvas. Applying a shader to it via `filter()` renders the noise entirely on the GPU, then the resulting texture is passed to the displacement shader. This chain — shader rendering to `PGraphics`, `PGraphics` feeding another shader — keeps all the heavy computation on the GPU.
 * The noise shader samples 3D value noise at three different Z offsets to produce independent R, G, and B channels. The `uTime` uniform drives the Z coordinate, creating smooth seamless animation without any visible scrolling direction — a key advantage of 3D noise over 2D noise with a time offset.
 * The `texOffset` built-in uniform provides a convenient aspect ratio correction: `uv.x *= texOffset.y / texOffset.x` compensates for non-square canvases without needing to pass width and height as custom uniforms. Since `texOffset` is `vec2(1.0/width, 1.0/height)`, its component ratio encodes the aspect ratio directly.
 * The source image is drawn to the main canvas with `image()`, then `filter()` applies the displacement shader. The built-in `texture` uniform automatically contains the rendered canvas (the cat photo). Only the displacement map needs to be passed manually via `set()`.
-* The displacement shader uses `vertTexCoord.st` directly for the built-in `texture` (which is already Y-corrected by `texMatrix`), but flips Y for the displacement map with `1.0 - st.t`. Textures passed via `set()` are stored right-side-up and don't receive the `texMatrix` correction — this is a common gotcha when mixing the built-in `texture` with manually-set `sampler2D` uniforms.
+* The displacement shader uses `vertTexCoord.xy` directly for the built-in `texture` (which is already Y-corrected by `texMatrix`), but flips Y for the displacement map with `1.0 - vertTexCoord.y`. Textures passed via `set()` are stored right-side-up and don't receive the `texMatrix` correction — this is a common gotcha when mixing the built-in `texture` with manually-set `sampler2D` uniforms.
 
 This example shows that using one texture's image data to control how another texture is rendered is the foundation of many interesting visual effects. These texture-based shader techniques provide capabilities far beyond traditional drawing tools.
 
@@ -651,13 +644,13 @@ The default Processing vertex shader when dealing with textures is [here](https:
 Note that any custom uniform set on the `PShader` object via `set()` is available to both the vertex and fragment shaders, provided the uniform is declared in the shader code. This is a convenient way to add interactivity and shared dyanmic values to both shaders at once.
 
 **sketch.pde**
-<!-- @import examples/example_19_vertex_shader/example_19_vertex_shader.pde lang:java -->
+<!-- @import examples/example_21_vertex_shader/example_21_vertex_shader.pde lang:java -->
 
 **vert.glsl**
-<!-- @import examples/example_19_vertex_shader/data/vert.glsl lang:glsl -->
+<!-- @import examples/example_21_vertex_shader/data/vert.glsl lang:glsl -->
 
 **frag.glsl**
-<!-- @import examples/example_19_vertex_shader/data/frag.glsl lang:glsl -->
+<!-- @import examples/example_21_vertex_shader/data/frag.glsl lang:glsl -->
 
 ![A circular cat photo cutout with animated wavy displacement applied to the vertices](images/shader_demo_vertex_shader.png)
 
@@ -697,13 +690,13 @@ In the following example, the vertex shader modifies the original vertex colors 
 If textures aren't being used, the shaders become slightly simplified. The texture shader code is additive to color shaders, so if textures aren't needed, some texture-related code can be removed. The default color vertex shader in Processing is [here](https://github.com/processing/processing4/blob/main/core/src/processing/opengl/shaders/ColorVert.glsl). This is a great starting point to create custom shaders. 
 
 **sketch.pde**
-<!-- @import examples/example_20_vertex_colors/example_20_vertex_colors.pde lang:java -->
+<!-- @import examples/example_22_vertex_colors/example_22_vertex_colors.pde lang:java -->
 
 **vert.glsl**
-<!-- @import examples/example_20_vertex_colors/data/vert.glsl lang:glsl -->
+<!-- @import examples/example_22_vertex_colors/data/vert.glsl lang:glsl -->
 
 **frag.glsl**
-<!-- @import examples/example_20_vertex_colors/data/frag.glsl lang:glsl -->
+<!-- @import examples/example_22_vertex_colors/data/frag.glsl lang:glsl -->
 
 ![Mouse distance vertex colors](images/shader_demo_vertex_shader_colors.png)
 
@@ -718,13 +711,13 @@ In the following example, the vertex shader is used to generate all of the color
 Note that when using 3D coordinates, the Processing sketch must use the P3D renderer by specifying `size(width, height, P3D);` in `setup()`. This also allows 3d transformations like `rotateX()` and `rotateY()` to view the 3D geometry from different angles.
 
 **sketch.pde**
-<!-- @import examples/example_21_vertex_generative/example_21_vertex_generative.pde lang:java -->
+<!-- @import examples/example_23_vertex_generative/example_23_vertex_generative.pde lang:java -->
 
 **vert.glsl**
-<!-- @import examples/example_21_vertex_generative/data/vert.glsl lang:glsl -->
+<!-- @import examples/example_23_vertex_generative/data/vert.glsl lang:glsl -->
 
 **frag.glsl**
-<!-- @import examples/example_21_vertex_generative/data/frag.glsl lang:glsl -->
+<!-- @import examples/example_23_vertex_generative/data/frag.glsl lang:glsl -->
 
 ![A 3D grid of rectangles with animated wave-like displacement and brightness controlled by vertex shader](images/shader_demo_vertex_shader_generative.png)
 
@@ -769,13 +762,13 @@ Next example:
 The next example reintroduces texture sampling in 3D space, combined with vertex displacement in a custom vertex shader. Both the vertex and fragment shaders sample the texture image, but for different purposes. The vertex shader samples the texture to determine how much to displace each vertex along its normal, while the fragment shader samples the texture to determine the final pixel color. The result is a bumpy sphere effect, where the texture image drives the vertex displacement.
 
 **sketch.pde**
-<!-- @import examples/example_22_vertex_displacement/example_22_vertex_displacement.pde lang:java -->
+<!-- @import examples/example_24_vertex_displacement/example_24_vertex_displacement.pde lang:java -->
 
 **vert.glsl**
-<!-- @import examples/example_22_vertex_displacement/data/vert.glsl lang:glsl -->
+<!-- @import examples/example_24_vertex_displacement/data/vert.glsl lang:glsl -->
 
 **frag.glsl**
-<!-- @import examples/example_22_vertex_displacement/data/frag.glsl lang:glsl -->
+<!-- @import examples/example_24_vertex_displacement/data/frag.glsl lang:glsl -->
 
 ![A textured sphere with bumpy displacement based on the moon surface texture](images/shader_demo_vertex_shader_displacement.png)
 
@@ -833,8 +826,10 @@ The **point shader type** is a good illustration of how types unlock otherwise-i
 
 <!-- 🚨 TODO: screenshot of point shader grid -->
 
+Notice that the vertex shader works entirely in **pixel coordinates**, not normalized 0.0–1.0 values. The `vertex.xy` position arrives in screen pixels (matching Processing's coordinate system), `uMouse` is passed as pixel values, and the distance calculation produces a pixel measurement. This is a departure from fragment shaders, where UV coordinates are typically normalized — vertex shaders operate in the same coordinate space as your Processing sketch.
+
 * `shader(myShader, POINTS)` targets only `point()` calls — other geometry drawn in the same frame is unaffected. This is a precision that `shader(myShader)` alone cannot provide.
-* The vertex shader transforms each vertex through `modelview` and `projection` to produce a clip-space position, then adds the scaled `offset` to displace the corner of each point quad. The `uPointRadius` uniform — driven by `mouseX` — controls the radius in pixels.
+* The vertex shader computes the distance from each point's position to the mouse, then uses `smoothstep()` to scale the radius — points close to the cursor grow large, while distant points shrink to a minimum size. This per-vertex calculation runs entirely on the GPU.
 * The fragment shader is intentionally minimal: it passes the interpolated vertex color through unchanged. In more advanced point shaders, the fragment shader can use the `offset` varying to shape each point — discarding pixels outside a circle radius, for example, to produce round rather than square points.
 
 The `ToonShading` and `GlossyFishEye` examples in Processing's built-in shader examples demonstrate the **TexLight type**, which extends the texture type with the full lighting uniform set — `lightPosition[8]`, `lightDiffuse[8]`, `normalMatrix`, and material attributes. The complete variable listing for each type is in the reference table that follows.

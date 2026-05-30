@@ -1187,7 +1187,7 @@ void main() {
 }
 ```
 
-![Two images blending together based on mouse position — cat on the left, moon on the right](images/example_17_multi_texture.png)
+![Two images blending together based on mouse position — cat on the left, moon on the right](images/example_19_multi_texture.png)
 
 Note the following about working with multiple textures:
 
@@ -1372,7 +1372,7 @@ void main() {
 }
 ```
 
-![A cat photo warped by animated noise displacement, controlled by mouse position](images/example_18_multi_texture_displace.png)
+![A cat photo warped by animated noise displacement, controlled by mouse position](images/example_20_multi_texture_displace.png)
 
 * A `PGraphics` buffer created with [`createGraphics()`](https://processing.org/reference/createGraphics_.html) acts as an offscreen canvas. Applying a shader to it via `filter()` renders the noise entirely on the GPU, then the resulting texture is passed to the displacement shader. This chain — shader rendering to `PGraphics`, `PGraphics` feeding another shader — keeps all the heavy computation on the GPU.
 * The noise shader samples 3D value noise at three different Z offsets to produce independent R, G, and B channels. The `uTime` uniform drives the Z coordinate, creating smooth seamless animation without any visible scrolling direction — a key advantage of 3D noise over 2D noise with a time offset.
