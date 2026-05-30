@@ -21,7 +21,4 @@ void main() {
 
   // blend the original image with the grain based on the crossfade amount
   gl_FragColor = mix(color, vec4(vec3(grain), 1.0), uCrossfade);
-
-  // try adding grain subtly on top of the image instead of replacing it
-  // gl_FragColor = vec4(color.rgb + (grain - 0.5) * uCrossfade, 1.0);
 }

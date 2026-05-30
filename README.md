@@ -28,6 +28,7 @@
     - [Example 5: Neighbor Pixel Sampling](#example-5-neighbor-pixel-sampling)
   - [Using `shader()` for more control](#using-shader-for-more-control)
   - [Custom UV Coordinates and Geometry](#custom-uv-coordinates-and-geometry)
+  - [Multiple Textures](#multiple-textures)
 - [Part 3: Vertex Shaders \& 3D](#part-3-vertex-shaders--3d)
   - [Adding a custom vertex shader](#adding-a-custom-vertex-shader)
     - [The full rasterization pipeline explained: from CPU to Vertex Shader to Fragment Shader to screen](#the-full-rasterization-pipeline-explained-from-cpu-to-vertex-shader-to-fragment-shader-to-screen)
@@ -502,18 +503,16 @@ float map(float value, float inputMin, float inputMax, float outputMin, float ou
 
 ## Drawing Shapes with Math: Signed Distance Functions
 
-In Processing, drawing a circle is as simple as calling `ellipse()`. In a shader, there are no built-in drawing functions — every shape must be drawn mathematically, pixel by pixel. This is the concept behind **Signed Distance Functions** (SDFs): instead of describing a shape by its outline, the shader computes the *distance* from each pixel to the nearest edge of a shape. If the distance is small enough, the pixel is colored as part of the shape.
+In Processing, drawing a circle is as simple as calling `ellipse()`. In a shader, there are no built-in drawing functions — every shape must be drawn mathematically, pixel by pixel. This is the concept behind **Signed Distance Functions** (SDFs): instead of describing a shape by its outline, the shader computes the *distance from each pixel* to the *nearest edge of a shape*. If the distance is within the bounds of the shape, the pixel is colored as part of the shape.
 
 A circle is the simplest SDF to understand. For each pixel, calculate the distance from that pixel to a center point. If the distance is less than the desired radius, the pixel is inside the circle. The built-in GLSL function `distance()` (equivalent to Processing's `dist()`) handles this calculation. Combined with `smoothstep()` to soften the edge and `mix()` to blend colors, this technique produces clean anti-aliased shapes entirely on the GPU.
 
-The following example draws an SDF circle that follows the mouse. The Processing sketch sends the normalized mouse position, a smoothed speed value, and the aspect ratio as uniforms. The shader uses the speed to squish the circle into an oval along the direction of movement — a playful effect that shows how math-driven shapes can respond to interactivity in ways that traditional drawing functions cannot.
+The following example draws an SDF circle that follows the mouse. Moving the mouse left and right changes the circle's radius, while moving up and down controls the edge softness. The sketch passes the canvas resolution as a `uResolution` uniform so the shader can compute the aspect ratio — a standard pattern in shader programming.
 
 **sketch.pde**
 
 ```java
 PShader myShader;
-float smoothSpeedX = 0;
-float smoothSpeedY = 0;
 
 void setup() {
   size(640, 480, P2D);
@@ -521,19 +520,10 @@ void setup() {
 }
 
 void draw() {
-  // normalize mouse position (flip y for GLSL coordinates)
-  float mx = (float) mouseX / width;
-  float my = 1.0 - (float) mouseY / height;
-  myShader.set("uMouse", mx, my);
-
-  // smooth the mouse speed for fluid animation
-  smoothSpeedX = lerp(smoothSpeedX, (float)(mouseX - pmouseX) / width, 0.2);
-  smoothSpeedY = lerp(smoothSpeedY, (float)(pmouseY - mouseY) / height, 0.2);
-  myShader.set("uSpeed", smoothSpeedX, smoothSpeedY);
-
-  // pass aspect ratio for proper circle shape
-  myShader.set("uAspect", (float) width / height);
-
+  // pass resolution and normalized mouse position into the shader
+  // flip the y coordinate because in Processing, (0, 0) is the top left, but in GLSL it's the bottom left
+  myShader.set("uResolution", (float) width, (float) height);
+  myShader.set("uMouse", (float) mouseX / width, 1.0 - (float) mouseY / height);
   filter(myShader);
 }
 ```
@@ -541,62 +531,66 @@ void draw() {
 **shader.glsl**
 
 ```glsl
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+#define PROCESSING_TEXTURE_SHADER
+
 varying vec4 vertTexCoord;
+uniform vec2 uResolution;
 uniform vec2 uMouse;
-uniform vec2 uSpeed;
-uniform float uAspect;
 
 void main() {
+  // calculate aspect ratio from canvas size
+  float aspect = uResolution.x / uResolution.y;
+
+  // correct for aspect ratio so the circle isn't stretched
   vec2 uv = vertTexCoord.xy;
+  uv.x *= aspect;
+  vec2 mouseUV = uMouse;
+  mouseUV.x *= aspect;
 
-  // correct x coordinate for aspect ratio so circles aren't stretched
-  uv.x *= uAspect;
-  vec2 mouse = uMouse;
-  mouse.x *= uAspect;
+  // distance from mouse position to current pixel
+  float dist = distance(uv, mouseUV);
 
-  // vector from mouse position to current pixel
-  vec2 diff = uv - mouse;
-
-  // use mouse speed to squish the circle into an oval
-  float speed = length(uSpeed) * 15.0;
-  vec2 moveDir = length(uSpeed) > 0.001 ? normalize(uSpeed) : vec2(0.0);
-  float parallel = dot(diff, moveDir);
-  vec2 perpComp = diff - parallel * moveDir;
-
-  // stretch along movement direction
-  float stretch = 1.0 + speed;
-  vec2 squished = perpComp + moveDir * (parallel / stretch);
-  float dist = length(squished);
-
-  // circle radius grows slightly with speed
-  float radius = 0.08 + speed * 0.02;
+  // mouseX controls circle radius, mouseY controls edge softness
+  float radius = uMouse.x * 0.3;
+  float softness = uMouse.y * 0.15;
 
   // smoothstep creates a soft edge instead of a hard pixel boundary
-  float circle = 1.0 - smoothstep(radius - 0.01, radius + 0.02, dist);
+  float circle = 1.0 - smoothstep(radius - softness, radius + softness, dist);
 
   // blend between background and circle color using mix()
-  vec3 color = mix(vec3(0.1), vec3(1.0, 0.4, 0.1), circle);
+  vec3 bgColor = vec3(0.1);
+  vec3 circleColor = vec3(1.0);
+  vec3 color = mix(bgColor, circleColor, circle);
 
   gl_FragColor = vec4(color, 1.0);
 }
 ```
 
-![An orange circle on a dark background that follows the mouse cursor and squishes as it moves](images/example-08.gif)
+![An orange circle on a dark background that follows the mouse cursor, with adjustable size and softness](images/example-08.gif)
+
+You can find more SDF shape functions in [Inigo Quilez's 2D SDF page](https://iquilezles.org/articles/distfunctions2d/), which includes rectangles, polygons, and more. The math can be complex, but the pattern of computing a distance and deciding the color inside and outside of that boundary is consistent across all shapes. 
 
 A few aspects of this code are worth highlighting:
 
-* The `uAspect` uniform corrects for non-square canvases. Without adjusting the x coordinate by the aspect ratio, the circle would appear stretched horizontally. This is a common pattern in SDF shaders.
-* The `smoothstep()` function creates a soft anti-aliased edge. Unlike a hard `if/else` boundary, `smoothstep()` returns a smooth transition between 0.0 and 1.0 over a small range. The two edge parameters control how wide the soft transition is.
-* The `mix()` function blends between two colors based on the circle's alpha value. This is equivalent to Processing's `lerp()` but works with any GLSL type, including `vec3` and `vec4`.
-* The squish effect decomposes the distance vector into components parallel and perpendicular to the movement direction, then scales the parallel component. This is basic vector math — `dot()` calculates projection, and `normalize()` finds the unit direction vector.
+* The `uResolution` uniform passes the canvas width and height into the shader. The aspect ratio is then computed as `uResolution.x / uResolution.y` and used to correct the x coordinate so the circle appears round rather than stretched on non-square canvases. Using a `resolution` uniform for this purpose is a very common convention across shader environments.
 
-SDFs can be extended well beyond circles. Rectangles, rounded rectangles, lines, stars, and even complex boolean combinations of shapes can all be defined as distance functions. The math grows more involved, but the core pattern remains the same: compute a distance, then decide the color. For a comprehensive reference to SDF shape functions, [Inigo Quilez's 2D SDF page](https://iquilezles.org/articles/distfunctions2d/) is an excellent resource.
+> **Tip:** In Processing's texture-type shaders, the built-in `texOffset` uniform equates to `vec2(1.0/width, 1.0/height)`. This allows for the same aspect ratio calculation without having to pass in a custom uniform. The expression `texOffset.y / texOffset.x` is equal to `width / height`. Later examples in this tutorial use this shortcut.
+
+* The `smoothstep()` function creates a soft anti-aliased edge. Unlike a hard `if/else` (inside/outside) boundary, `smoothstep()` returns a smooth transition between 0.0 and 1.0 over a small range. The two edge parameters control how wide the soft transition is. In this example, `mouseY` drives the softness.
+* The `mix()` function blends between two colors based on the circle's alpha value. This is equivalent to Processing's `lerp()` but works with any GLSL type, including `vec3` and `vec4`.
+
+SDFs can be extended well beyond circles, and even into 3d using raymarching techniques. Rectangles, rounded rectangles, lines, stars, and even complex boolean combinations of shapes can all be defined as distance functions. The math can be complex for these shapes, but the core pattern remains the same: compute a distance, then decide the color. For a reference to a number of useful SDF shape functions, [Inigo Quilez's 2D SDF page](https://iquilezles.org/articles/distfunctions2d/) is an excellent resource.
 
 ## Noise and Randomness in GLSL
 
 Processing's [`noise()`](https://processing.org/reference/noise_.html) function has no equivalent in GLSL. Neither does `random()`. This is one of the first surprises for Processing users moving into shader programming, and understanding why helps clarify how to work around it.
 
-Shaders don't carry state between pixels or between frames. There's no shared seed, no internal counter, and no way to call a function that returns a different value each invocation. Instead, shader programmers rely on **hash functions** — deterministic mathematical operations that take a coordinate as input and return a value that *appears* random. The same input always produces the same output, but small changes in input produce large, unpredictable changes in output.
+Shaders don't carry state between pixels or between frames. There's no shared seed, no internal counter, and no way to call a function that returns a different value each invocation. Instead, shader programmers rely on **hash functions** - deterministic mathematical operations that take a coordinate as input and return a value that *appears* random. The same input always produces the same output, but small changes in input produce large, unpredictable changes in output.
 
 A common pattern uses `sin()` and `dot()` to achieve this:
 
@@ -662,9 +656,6 @@ void main() {
 
   // blend the original image with the grain based on the crossfade amount
   gl_FragColor = mix(color, vec4(vec3(grain), 1.0), uCrossfade);
-
-  // try adding grain subtly on top of the image instead of replacing it
-  // gl_FragColor = vec4(color.rgb + (grain - 0.5) * uCrossfade, 1.0);
 }
 ```
 
@@ -1129,6 +1120,267 @@ void main() {
 ```
 
 ![A circular cutout of a cat photo with wavy distortion controlled by mouse movement](images/shader_demo_custom_shape_uv_shader.png)
+
+
+## Multiple Textures
+
+Every fragment shader so far has used a single `texture` uniform — the one Processing populates automatically via `filter()` or when drawing textured geometry. But shaders can sample from multiple images simultaneously. Passing a second image to the shader is done with `set()`, the same method used for floats and vectors. The shader declares a second `uniform sampler2D` with a custom name, and `texture2D()` samples from it just like the first.
+
+This opens up compositing techniques: blending two images, using one image as a mask or displacement map for another, or mixing a generated pattern with a photograph. The following example blends two images together based on the mouse's horizontal position.
+
+**sketch.pde**
+```java
+PImage img1;
+PImage img2;
+PShader myShader;
+
+void setup() {
+  size(640, 480, P2D);
+  img1 = loadImage("cool-cat.jpg");
+  img2 = loadImage("moon-nasa.jpg");
+  myShader = loadShader("shader.glsl");
+}
+
+void draw() {
+  background(0);
+
+  // Set the shader and pass a second texture
+  shader(myShader);
+  myShader.set("uTexture2", img2);
+  myShader.set("uMix", (float) mouseX / width);
+
+  // Draw the first image - it becomes the default `texture` uniform
+  image(img1, 0, 0, width, height);
+
+  resetShader();
+}
+```
+
+**shader.glsl**
+```glsl
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+#define PROCESSING_TEXTURE_SHADER
+
+// The primary texture, automatically bound by Processing
+uniform sampler2D texture;
+
+// A second texture, set manually via myShader.set("uTexture2", img2)
+uniform sampler2D uTexture2;
+
+// Controls the blend between the two textures (0.0 = texture 1, 1.0 = texture 2)
+uniform float uMix;
+
+// UV coordinates from the vertex shader
+varying vec4 vertTexCoord;
+
+void main() {
+  // Sample both textures at the same UV coordinate
+  vec4 color1 = texture2D(texture, vertTexCoord.st);
+  vec4 color2 = texture2D(uTexture2, vertTexCoord.st);
+
+  // Blend between the two textures based on the mix value
+  gl_FragColor = mix(color1, color2, uMix);
+}
+```
+
+![Two images blending together based on mouse position — cat on the left, moon on the right](images/example_17_multi_texture.png)
+
+Note the following about working with multiple textures:
+
+* The first texture (`texture`) is automatically bound when drawing an image with `shader()` active — this is the same built-in uniform used throughout the tutorial. The second texture (`uTexture2`) is passed explicitly via `set()` before drawing.
+
+> **Alternative: passing both textures explicitly.** The example above relies on the built-in `texture` uniform for the first image. For more explicit control (or when using `filter()` where `texture` holds the canvas snapshot) multiple PImage or PGraphics objects can be passed in as custom uniforms:
+>
+> ```java
+> // Processing sketch - both textures set manually
+> myShader.set("uTexture1", img1);
+> myShader.set("uTexture2", img2);
+> ```
+>
+> ```glsl
+> // GLSL - two custom sampler2D uniforms, no reliance on built-in `texture`
+> uniform sampler2D uTexture1;
+> uniform sampler2D uTexture2;
+>
+> void main() {
+>   vec4 color1 = texture2D(uTexture1, vertTexCoord.st);
+>   vec4 color2 = texture2D(uTexture2, vertTexCoord.st);
+>   gl_FragColor = mix(color1, color2, uMix);
+> }
+> ```
+>
+> This approach makes the data flow fully visible in the code. Either pattern works - choose whichever is clearest for the situation.
+
+* The GLSL `mix()` function performs a linear interpolation between two values. `mix(a, b, t)` returns `a` when `t` is 0.0 and `b` when `t` is 1.0. This is equivalent to Processing's `lerp()` function. Here it blends between the two textures.
+* Both textures are sampled at the same UV coordinate (`vertTexCoord.st`), but they don't have to be. A common creative technique is to offset or distort the UV before sampling the second texture, sometimes via the other image's pixel values, creating effects like displacement mapping or parallax scrolling.
+
+Expanding on this last point, the second texture doesn't have to be visible - it can serve as *data* that drives an effect. The next example uses a [`PGraphics`](https://processing.org/reference/PGraphics.html) buffer as a **displacement map**. Instead of loading a static image, a separate noise shader renders animated 3D value noise to an offscreen canvas each frame. The displacement shader then uses the brightness values from this dynamic texture to push pixels around in the source image. This two-shader approach — one generating data, another consuming it — is a common and powerful pattern.
+
+**sketch.pde**
+```java
+PImage img;
+PGraphics displaceMap;
+PShader myShader;
+PShader noiseShader;
+
+void setup() {
+  size(640, 480, P2D);
+  img = loadImage("cool-cat.jpg");
+  displaceMap = createGraphics(width, height, P2D);
+  myShader = loadShader("shader.glsl");
+  noiseShader = loadShader("noise.glsl");
+  textureMode(REPEAT);
+}
+
+void draw() {
+  // Generate animated noise on the displacement map using a shader
+  noiseShader.set("uTime", (float) millis() / 1000.0);
+  noiseShader.set("uScale", map(mouseY, 0, height, 0.5, 8.0));
+  displaceMap.filter(noiseShader);
+
+  if (mousePressed) {
+    // draw the displacement map
+    image(displaceMap, 0, 0);
+  } else {
+    // Draw the source image
+    image(img, 0, 0, width, height);
+
+    // Then apply displacement via filter()
+    myShader.set("uDisplaceMap", displaceMap);
+    myShader.set("uDisplaceAmt", (float) mouseX / width);
+    filter(myShader);
+  }
+}
+```
+
+**noise.glsl**
+```glsl
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+varying vec4 vertTexCoord;
+
+uniform vec2 texOffset;
+
+uniform float uTime;
+uniform float uScale;
+
+// 3d noise function from:
+//	<https://www.shadertoy.com/view/4dS3Wd>
+//	By Morgan McGuire @morgan3d, http://graphicscodex.com
+//  from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+
+float hash(float n) {
+  return fract(sin(n) * 1e4);
+}
+float hash(vec2 p) {
+  return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x))));
+}
+
+float noise(float x) {
+  float i = floor(x);
+  float f = fract(x);
+  float u = f * f * (3.0 - 2.0 * f);
+  return mix(hash(i), hash(i + 1.0), u);
+}
+
+float noise(vec2 x) {
+  vec2 i = floor(x);
+  vec2 f = fract(x);
+
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+float noise(vec3 x) {
+  const vec3 step = vec3(110, 241, 171);
+
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+
+	// For performance, compute the base input to a 1D hash from the integer part of the argument and the 
+	// incremental change to the 1D based on the 3D -> 1D wrapping
+  float n = dot(i, step);
+
+  vec3 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash(n + dot(step, vec3(0, 0, 0))), hash(n + dot(step, vec3(1, 0, 0))), u.x), mix(hash(n + dot(step, vec3(0, 1, 0))), hash(n + dot(step, vec3(1, 1, 0))), u.x), u.y), mix(mix(hash(n + dot(step, vec3(0, 0, 1))), hash(n + dot(step, vec3(1, 0, 1))), u.x), mix(hash(n + dot(step, vec3(0, 1, 1))), hash(n + dot(step, vec3(1, 1, 1))), u.x), u.y), u.z);
+}
+
+void main() {
+  // center the coordinate system
+  vec2 uv = vertTexCoord.xy - 0.5;
+
+  // correct for aspect ratio
+  uv.x *= texOffset.y / texOffset.x;
+
+  // Sample 3D noise at different Z offsets for each color channel
+  float r = noise(vec3(uv * uScale, uTime * 0.2));
+  float g = noise(vec3(uv * uScale, uTime * 0.4 + 100.0));
+  float b = noise(vec3(uv * uScale, uTime * 0.6 + 200.0));
+
+  // draw RGB noise 
+  gl_FragColor = vec4(r, g, b, 1.0);
+}
+```
+
+**shader.glsl**
+```glsl
+#ifdef GL_ES
+precision mediump float;
+precision mediump int;
+#endif
+
+// Built-in texture from filter() — contains the rendered canvas
+uniform sampler2D texture;
+
+// Displacement map passed via set()
+uniform sampler2D uDisplaceMap;
+
+// Controls displacement intensity (0.0 = no displacement, 1.0 = full)
+uniform float uDisplaceAmt;
+
+// UV coordinates from the vertex shader
+varying vec4 vertTexCoord;
+
+void main() {
+  vec2 st = vertTexCoord.st;
+
+  // Flip Y for the displacement map (set() textures are right-side-up,
+  // but vertTexCoord is Y-flipped by texMatrix for the built-in texture)
+  vec2 stFlipped = vec2(st.s, 1.0 - st.t);
+
+  // Sample the displacement map to get offset values
+  vec2 displace = texture2D(uDisplaceMap, st).rg;
+
+  // Shift UV coordinates based on displacement brightness
+  // Subtracting 0.5 centers the displacement around zero (push and pull)
+  vec2 uv = st + (displace - 0.5) * uDisplaceAmt * 0.4;
+
+  // Sample the canvas texture at the displaced coordinates
+  gl_FragColor = texture2D(texture, uv);
+}
+```
+
+![A cat photo warped by animated noise displacement, controlled by mouse position](images/example_18_multi_texture_displace.png)
+
+* A `PGraphics` buffer created with [`createGraphics()`](https://processing.org/reference/createGraphics_.html) acts as an offscreen canvas. Applying a shader to it via `filter()` renders the noise entirely on the GPU, then the resulting texture is passed to the displacement shader. This chain — shader rendering to `PGraphics`, `PGraphics` feeding another shader — keeps all the heavy computation on the GPU.
+* The noise shader samples 3D value noise at three different Z offsets to produce independent R, G, and B channels. The `uTime` uniform drives the Z coordinate, creating smooth seamless animation without any visible scrolling direction — a key advantage of 3D noise over 2D noise with a time offset.
+* The `texOffset` built-in uniform provides a convenient aspect ratio correction: `uv.x *= texOffset.y / texOffset.x` compensates for non-square canvases without needing to pass width and height as custom uniforms. Since `texOffset` is `vec2(1.0/width, 1.0/height)`, its component ratio encodes the aspect ratio directly.
+* The source image is drawn to the main canvas with `image()`, then `filter()` applies the displacement shader. The built-in `texture` uniform automatically contains the rendered canvas (the cat photo). Only the displacement map needs to be passed manually via `set()`.
+* The displacement shader uses `vertTexCoord.st` directly for the built-in `texture` (which is already Y-corrected by `texMatrix`), but flips Y for the displacement map with `1.0 - st.t`. Textures passed via `set()` are stored right-side-up and don't receive the `texMatrix` correction — this is a common gotcha when mixing the built-in `texture` with manually-set `sampler2D` uniforms.
+
+This example shows that using one texture's image data to control how another texture is rendered is the foundation of many interesting visual effects. These texture-based shader techniques provide capabilities far beyond traditional drawing tools.
 
 ---
 

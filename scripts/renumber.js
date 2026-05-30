@@ -36,12 +36,12 @@ const ROOT = resolve(__dirname, "..");
 const EXAMPLES_DIR = resolve(ROOT, "examples");
 const SRC_FILE = resolve(ROOT, "README_SRC.md");
 
-// Parse numbered example directories: "08_sdf_circle" -> { num: 8, name: "sdf_circle", dir: "08_sdf_circle" }
+// Parse numbered example directories: "example_08_sdf_circle" -> { num: 8, name: "sdf_circle", dir: "example_08_sdf_circle" }
 function parseExamples() {
   const entries = readdirSync(EXAMPLES_DIR, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && /^\d{2}_/.test(d.name))
+    .filter((d) => d.isDirectory() && /^example_\d{2}_/.test(d.name))
     .map((d) => {
-      const match = d.name.match(/^(\d{2})_(.+)$/);
+      const match = d.name.match(/^example_(\d{2})_(.+)$/);
       return { num: parseInt(match[1], 10), name: match[2], dir: d.name };
     })
     .sort((a, b) => a.num - b.num);
@@ -83,7 +83,7 @@ function run() {
   // Check for collision on insert: would the highest number collide with an existing dir?
   if (action === "insert") {
     const highestNew = pad(toRename[toRename.length - 1].num + 1);
-    const wouldCollide = `${highestNew}_${toRename[toRename.length - 1].name}`;
+    const wouldCollide = `example_${highestNew}_${toRename[toRename.length - 1].name}`;
     if (existsSync(join(EXAMPLES_DIR, wouldCollide))) {
       console.error(`ERROR: Target directory already exists: ${wouldCollide}`);
       process.exit(1);
@@ -101,7 +101,7 @@ function run() {
   for (const ex of ordered) {
     const newNum = ex.num + delta;
     const oldDir = ex.dir;
-    const newDir = `${pad(newNum)}_${ex.name}`;
+    const newDir = `example_${pad(newNum)}_${ex.name}`;
     const oldPath = join(EXAMPLES_DIR, oldDir);
     const newPath = join(EXAMPLES_DIR, newDir);
 
@@ -130,15 +130,18 @@ function run() {
   renames.sort((a, b) => b.oldDir.length - a.oldDir.length || b.oldDir.localeCompare(a.oldDir));
 
   for (const { oldDir, newDir } of renames) {
-    // Replace directory references in import paths: examples/08_name/ -> examples/09_name/
+    // Replace directory references in import paths: examples/old_dir/ -> examples/new_dir/
     const pattern = new RegExp(`examples/${escapeRegex(oldDir)}/`, "g");
     const replacement = `examples/${newDir}/`;
     const before = src;
     src = src.replace(pattern, replacement);
-    const count =
-      before.length - src.replace(pattern, replacement).length === 0
-        ? src.split(replacement).length - before.split(replacement).length + (before.match(pattern) || []).length
-        : 0;
+
+    // Also replace .pde filename references within import paths
+    // e.g. examples/new_dir/old_dir.pde -> examples/new_dir/new_dir.pde
+    const pdePattern = new RegExp(`${escapeRegex(newDir)}/${escapeRegex(oldDir)}\\.pde`, "g");
+    const pdeReplacement = `${newDir}/${newDir}.pde`;
+    src = src.replace(pdePattern, pdeReplacement);
+
     // Count actual replacements
     const matches = before.match(pattern);
     if (matches) {

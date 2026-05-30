@@ -101,7 +101,7 @@ New sections that complete the fragment shader story. These fill the gap between
   - Compare to Processing's `noise()` function
   - _Source: NOTES.md (Raph noted this), OUTLINE_WIP.md_
 
-- [ ] **3.3** Write "Multiple textures / compositing" section
+- [x] **3.3** Write "Multiple textures / compositing" section
   - Passing a second `sampler2D` uniform via `set()` — the article mentions this is possible but never demonstrates it
   - Simple example: blend two images with `mix()` based on mouse position
   - Optionally: mask/matte compositing
@@ -134,6 +134,10 @@ These extend the existing vertex shader coverage and add the planned advanced ma
   - Explain when each type is used and what built-in uniforms/attributes they provide
   - **Reference**: `docs/other-articles/Processing-Android-Chapter-15-GLSL-shaders.md` — Andres' chapter covers shader types extensively
   - _Source: OUTLINE_WIP.md, Raph feedback_
+
+- [ ] **4.1.1** Add nice tip about asapect ratio
+    - Most shader environments expect the developer to pass in a width and height as a "resolution" uniform. from this we can derive an aspect ratio, which is needed to draw shapes that aren't squeezed in a non-square canvas
+    - In processing, we can use `uv.x *= texOffset.y / texOffset.x;` as a simple trick to do that same, because texOffset has the relative size of the two cartesian axes
 
 - [ ] **4.2** Write "Lighting basics" section
   - Basic diffuse lighting with normals and light position
